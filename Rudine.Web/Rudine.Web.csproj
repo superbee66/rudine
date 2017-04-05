@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6FFFC718-3D54-4E34-8A46-9B7433A3B1D6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Rudine.Web</RootNamespace>
+    <AssemblyName>Rudine.Web</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Nonshipping>true</Nonshipping>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Release\Rudine.Web.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseAutoIdent.cs" />
+    <Compile Include="BaseDoc.cs" />
+    <Compile Include="BaseDocController.cs" />
+    <Compile Include="DocKnownTypesProber.cs" />
+    <Compile Include="DocProcessingInstructions.cs" />
+    <Compile Include="DocURN.cs" />
+    <Compile Include="IDocRevKnownTypes.cs" />
+    <Compile Include="DocTerm.cs" />
+    <Compile Include="DocXmlParser.cs" />
+    <Compile Include="ClientBaseDocController.cs" />
+    <Compile Include="DocCmd.cs" />
+    <Compile Include="DocTypeInfo.cs" />
+    <Compile Include="IBaseDoc.cs" />
+    <Compile Include="IDocIdentifiers.cs" />
+    <Compile Include="IDocModel.cs" />
+    <Compile Include="IDocURN.cs" />
+    <Compile Include="LightDoc.cs" />
+    <Compile Include="Parm.cs" />
+    <Compile Include="SignatureVerifier.cs" />
+    <Compile Include="Util\CacheMan.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\CssClassify.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\Dynamic.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\FileSystem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\MethodInfoExtensions.cs" />
+    <Compile Include="Util\Null.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\PropertyDefaultValue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\RequestPaths.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\Serialize.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\StreamExtensions.cs" />
+    <Compile Include="Util\StringTransform.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\TypeExtensions.cs" />
+    <Compile Include="Util\ZipStorer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IDocLogistics.cs" />
+    <Compile Include="IBaseDocController.cs" />
+    <Compile Include="rProxHttpHandler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

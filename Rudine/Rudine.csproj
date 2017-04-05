@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C9065636-B397-4FB3-B9DE-8FE5A754210A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Rudine</RootNamespace>
+    <AssemblyName>Rudine</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40;TASKS_OFF</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <NoWarn>
+    </NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>NET40;TASKS_ON</DefineConstants>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+    <DocumentationFile>bin\Rudine.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Rudine.Web\BaseAutoIdent.cs">
+      <Link>Web\BaseAutoIdent.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\BaseDoc.cs">
+      <Link>Web\BaseDoc.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\BaseDocController.cs">
+      <Link>Web\BaseDocController.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\DocProcessingInstructions.cs">
+      <Link>Web\DocProcessingInstructions.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\DocTerm.cs">
+      <Link>Web\DocTerm.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\DocTypeInfo.cs">
+      <Link>Web\DocTypeInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\DocURN.cs">
+      <Link>Web\DocURN.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IBaseDoc.cs">
+      <Link>Web\IBaseDoc.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IBaseDocController.cs">
+      <Link>Web\IBaseDocController.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IDocIdentifiers.cs">
+      <Link>Web\IDocIdentifiers.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IDocLogistics.cs">
+      <Link>Web\IDocLogistics.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IDocModel.cs">
+      <Link>Web\IDocModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IDocRevKnownTypes.cs">
+      <Link>Web\IDocRevKnownTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IDocURN.cs">
+      <Link>Web\IDocURN.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\LightDoc.cs">
+      <Link>Web\LightDoc.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Parm.cs">
+      <Link>Web\Parm.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\rProxHttpHandler.cs">
+      <Link>Web\rProxHttpHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\CacheMan.cs">
+      <Link>Web\Util\CacheMan.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\Dynamic.cs">
+      <Link>Web\Util\Dynamic.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
+      <Link>Web\Util\FileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\PropertyDefaultValue.cs">
+      <Link>Web\Util\PropertyDefaultValue.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\RequestPaths.cs">
+      <Link>Web\Util\RequestPaths.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\Serialize.cs">
+      <Link>Web\Util\Serialize.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\StreamExtensions.cs">
+      <Link>Web\Util\StreamExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\StringTransform.cs">
+      <Link>Web\Util\StringTransform.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\TypeExtensions.cs">
+      <Link>Web\Util\TypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="BaseDocExtensions.cs" />
+    <Compile Include="DocExchangeServiceHostFactory.cs" />
+    <Compile Include="DocExchangeWsdlExporter.cs" />
+    <Compile Include="DocKeyEncrypter.cs" />
+    <Compile Include="DocProcessingInstructionsExtensions.cs" />
+    <Compile Include="Interpreters\DocTempleter.cs" />
+    <Compile Include="Interpreters\Embeded\EmbededInterpreter.cs" />
+    <Compile Include="Interpreters\IDocBaseInterpreter.cs" />
+    <Compile Include="Interpreters\IDocByteInterpreter.cs" />
+    <Compile Include="Interpreters\IDocTextInterpreter.cs" />
+    <Compile Include="ImporterLightDoc.cs" />
+    <Compile Include="Exceptions\ImportException.cs" />
+    <Compile Include="Exceptions\InterpreterLocationException.cs" />
+    <Compile Include="Exceptions\NoChangesSinceLastSubmitException.cs" />
+    <Compile Include="Exceptions\NoChangesSinceRenderedException.cs" />
+    <Compile Include="Exceptions\NoOverwriteOfPreviouslyApproveException.cs" />
+    <Compile Include="Exceptions\PocosImportException.cs" />
+    <Compile Include="DocRevDateTimeExtension.cs" />
+    <Compile Include="Interpreters\DocInterpreter.cs" />
+    <Compile Include="Interpreters\DocByteInterpreter.cs" />
+    <Compile Include="Interpreters\DocBaseInterpreter.cs" />
+    <Compile Include="Interpreters\DocTextInterpreter.cs" />
+    <Compile Include="DocExchange.cs" />
+    <Compile Include="LightDocExtensions.cs" />
+    <Compile Include="Runtime.cs" />
+    <Compile Include="RuntimeTypeNamer.cs" />
+    <Compile Include="Storage\Docdb\BaseDocExtensions.cs" />
+    <Compile Include="Storage\Docdb\DocumentExtensions.cs" />
+    <Compile Include="Storage\Docdb\LuceneControllerExtension.cs" />
+    <Compile Include="Storage\Docdb\ShouldSerializeContractResolver.cs" />
+    <Compile Include="Exceptions\SubmissionException.cs" />
+    <Compile Include="Exceptions\SubmitDeniedException.cs" />
+    <Compile Include="Tasker.cs" />
+    <Compile Include="Template\Embeded\DOCREV_SCHEMAS.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DOCREV_SCHEMAS.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Template\Embeded\EmbededTemplateController.cs" />
+    <Compile Include="Template\Filesystem\FilesystemTemplateController.cs" />
+    <Compile Include="Template\Docdb\DocdbTemplateController.cs" />
+    <Compile Include="Template\TemplateController.cs" />
+    <Compile Include="Template\ITemplateController.cs" />
+    <Compile Include="Exceptions\DocDataException.cs" />
+    <Compile Include="IDocRev.cs" />
+    <Compile Include="ImporterController.cs" />
+    <Compile Include="Template\TemplateFileInfo.cs" />
+    <Compile Include="Util\Cabs\ArchiveMemoryStreamContext.cs" />
+    <Compile Include="Util\Cabs\CabInfoExtensions.cs" />
+    <Compile Include="Util\Base36.cs" />
+    <Compile Include="Util\Cabs\CabExtract.cs" />
+    <Compile Include="Util\ExceptionExtrensions.cs" />
+    <Compile Include="Util\Reflection.cs" />
+    <Compile Include="Util\SelfMarshalByRefObject.cs" />
+    <Compile Include="Util\StringExtensions.cs" />
+    <Compile Include="Util\Types\CompositeProperty.cs" />
+    <Compile Include="Util\Types\CompositeSignature.cs" />
+    <Compile Include="Util\Types\CompositeType.cs" />
+    <Compile Include="Util\Types\ImplicitTypeConversionExtension.cs" />
+    <Compile Include="Util\Xsds\Res.cs" />
+    <Compile Include="Util\MimeExtensionHelper.cs" />
+    <Compile Include="Storage\Docdb\LuceneController.cs" />
+    <Compile Include="Nav.cs" />
+    <Compile Include="FormsMigrationsCode\*.cs" />
+    <Compile Include="IDocFormatting.cs" />
+    <Compile Include="Util\Xsds\Xsd.cs" />
+    <Compile Include="Util\Xsds\XsdExporter.cs" />
+    <Compile Include="Util\Xsds\XsdParameters.cs" />
+    <Compile Include="Util\Zips\Compressor.cs" />
+    <Compile Include="Util\Zips\RuntimeBinaryFormatter.cs" />
+    <Compile Include="Util\Cabs\CabinetInfo.cs" />
+    <Compile Include="Util\PropertyOverlay.cs" />
+    <Compile Include="Util\DictionaryExtensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\RijndaelEnhanced.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Util\Url.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <!--<Include="FormsMigrationsCode\*.resx"/>-->
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Lucene.Net, Version=3.0.3.0, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Deployment.Compression, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad, processorArchitecture=MSIL">
+      <HintPath>..\packages\MSFTCompressionCab.1.0.0\lib\Microsoft.Deployment.Compression.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Deployment.Compression.Cab, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad, processorArchitecture=MSIL">
+      <HintPath>..\packages\MSFTCompressionCab.1.0.0\lib\Microsoft.Deployment.Compression.Cab.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Activation" />
+    <Reference Include="System.Web">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.Extensions">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.XML, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Template\Embeded\DOCREV_SCHEMAS.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DOCREV_SCHEMAS.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Template\Embeded\DOCREV.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
