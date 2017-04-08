@@ -4,7 +4,7 @@ using Rudine.Web;
 
 namespace Rudine.Interpreters.Embeded
 {
-    class EmbededInterpreter : DocByteInterpreter
+    public class EmbededInterpreter : DocByteInterpreter
     {
         public override string ContentFileExtension =>
             "docrev";
