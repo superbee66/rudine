@@ -54,19 +54,18 @@ namespace Rudine.Interpreters.Xsn
         ///     Default value upon class construction is xml processing instructions specific to Microsoft Office InfoPath & an
         ///     additional instruction set named mso-infoPathSolution specific to this application
         /// </summary>
-        public WriteXmlProcessingInstructions WriteXmlProcessingInstructions;
+        private readonly WriteXmlProcessingInstructions WriteXmlProcessingInstructions;
 
-        public XsnXmlInterpreter() { WriteXmlProcessingInstructions = WriteInfoPathProcessingInstructions; }
-
-        public override string ContentFileExtension
+        public XsnXmlInterpreter()
         {
-            get { return "xml"; }
+            WriteXmlProcessingInstructions = WriteInfoPathProcessingInstructions;
         }
 
-        public override string ContentType
-        {
-            get { return "application/vnd.ms-infopath"; }
-        }
+        public override string ContentFileExtension =>
+            "xml";
+
+        public override string ContentType =>
+            "application/vnd.ms-infopath";
 
         /// <summary>
         ///     Removes empty elements from xml. Achieving the same rendering (or lack of) DefaultValue(0)
@@ -76,7 +75,7 @@ namespace Rudine.Interpreters.Xsn
         /// </summary>
         /// <param name="DocData"></param>
         /// <returns></returns>
-        public static string CollapseDefaultValueElements(string DocData, string DocTypeName)
+        private static string CollapseDefaultValueElements(string DocData, string DocTypeName)
         {
             // remove empty tags from the template.xml so they are not read as blanks when
             // the XmlSerializer reads them to be merged with an incoming create request
@@ -89,8 +88,9 @@ namespace Rudine.Interpreters.Xsn
             //TODO:Remove only empty tags of integral value types as these are the only ones that mess up the XmlSerializer parser.
             //The fact of the matter is, empty tags are significant to the infopath application and should be kept
             string rootTag = Regex.Match(DocData,
-                @"<my:" + DocTypeName + "[^>]+>",
-                RegexOptions.Singleline | RegexOptions.IgnoreCase).Value;
+                                      @"<my:" + DocTypeName + "[^>]+>",
+                                      RegexOptions.Singleline | RegexOptions.IgnoreCase)
+                                  .Value;
 
             while (Length != DocData.Length)
             {
@@ -106,7 +106,8 @@ namespace Rudine.Interpreters.Xsn
             return DocData;
         }
 
-        public override BaseDoc Create(string DocTypeName) { return Read(TemplateController.Instance.OpenText(DocTypeName, "template.xml")); }
+        public override BaseDoc Create(string DocTypeName) =>
+            Read(TemplateController.Instance.OpenText(DocTypeName, "template.xml"));
 
         /// <summary>
         ///     XmlSerializer writes Booleans as the words "true" & "false". InfoPath can
@@ -115,15 +116,17 @@ namespace Rudine.Interpreters.Xsn
         /// <param name="docXml"></param>
         /// <param name="DocTypeName"></param>
         /// <returns></returns>
-        internal static string FormatBooleansTrueFalseOrZeroOne(string docXml, string DocTypeName)
+        private static string FormatBooleansTrueFalseOrZeroOne(string docXml, string DocTypeName)
         {
             string templateDocXml = TemplateController.Instance.OpenText(DocTypeName, "template.xml");
 
             return Regex.Replace(
                 docXml,
                 @"(<my:)([^>]+)(>)(false|true)(</my:)(\2)(>)",
-                match => templateDocXml.IndexOf(match.Groups[0].Value.Replace(">false<", ">0<").Replace(">true<", ">1<")) != -1
-                             ? match.Groups[0].Value.Replace(">false<", ">0<").Replace(">true<", ">1<")
+                match => templateDocXml.IndexOf(match.Groups[0].Value.Replace(">false<", ">0<")
+                                                     .Replace(">true<", ">1<")) != -1
+                             ? match.Groups[0].Value.Replace(">false<", ">0<")
+                                    .Replace(">true<", ">1<")
                              : match.Groups[0].Value,
                 RegexOptions.Singleline | RegexOptions.Multiline);
         }
@@ -134,7 +137,8 @@ namespace Rudine.Interpreters.Xsn
         /// </summary>
         /// <param name= NavKey.DocTypeName></param>
         /// <returns></returns>
-        public override string GetDescription(string DocTypeName) => ParseAttributeValue(TemplateController.Instance.OpenText(DocTypeName, "manifest.xsf"), "description");
+        public override string GetDescription(string DocTypeName) =>
+            ParseAttributeValue(TemplateController.Instance.OpenText(DocTypeName, "manifest.xsf"), "description");
 
         /// <summary>
         ///     Parses the given form's "solutionVersion" number from the manifest.xsf. Note,
@@ -142,18 +146,21 @@ namespace Rudine.Interpreters.Xsn
         /// </summary>
         /// <param name= NavKey.DocTypeName></param>
         /// <returns></returns>
-        public string GetDocRev(string DocData) { return ReadDocRev(DocData); }
+        public string GetDocRev(string DocData) =>
+            ReadDocRev(DocData);
 
-        public override string HrefVirtualFilename(string DocTypeName, string DocRev) => "manifest.xsf";
+        public override string HrefVirtualFilename(string DocTypeName, string DocRev) =>
+            "manifest.xsf";
 
-        private static string parseReadDocTypeName(string DocData)
-        {
-            return Regex.Match(DocData,
-                @"(urn:schemas-microsoft-com:office:infopath:)(?<DocTypeName>\w+)(:-myXSD-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})",
-                RegexOptions.IgnoreCase).Groups["DocTypeName"].Value;
-        }
+        private static string parseReadDocTypeName(string DocData) =>
+            Regex.Match(DocData,
+                     @"(urn:schemas-microsoft-com:office:infopath:)(?<DocTypeName>\w+)(:-myXSD-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})",
+                     RegexOptions.IgnoreCase)
+                 .Groups["DocTypeName"].Value;
 
-        private static string ParseAttributeValue(string DocData, string attributeName) { return Regex.Match(DocData, string.Format("(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline).Value; }
+        private static string ParseAttributeValue(string DocData, string attributeName) =>
+            Regex.Match(DocData, string.Format("(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline)
+                 .Value;
 
         public override bool Processable(string DocTypeName, string DocRev)
         {
@@ -204,7 +211,7 @@ namespace Rudine.Interpreters.Xsn
             using (StringReader _StringReader = new StringReader(CollapsedElementsDocXml))
             using (XmlTextReader _XmlTextReader = new XmlTextReader(_StringReader))
                 return SetPI(
-                    (BaseDoc) new XmlSerializer(BaseDocType).Deserialize(_XmlTextReader),
+                    (BaseDoc)new XmlSerializer(BaseDocType).Deserialize(_XmlTextReader),
                     pi,
                     DocTypeName,
                     DocRev);
@@ -226,7 +233,8 @@ namespace Rudine.Interpreters.Xsn
             foreach (XmlProcessingInstruction _XmlProcessingInstruction in _XmlDocument.ChildNodes.OfType<XmlProcessingInstruction>())
             {
                 if (_DocIdRegEx.IsMatch(_XmlProcessingInstruction.InnerText))
-                    _DocProcessingInstructions.SetDocId(_DocIdRegEx.Match(_XmlProcessingInstruction.InnerText).Value);
+                    _DocProcessingInstructions.SetDocId(_DocIdRegEx.Match(_XmlProcessingInstruction.InnerText)
+                                                                   .Value);
 
                 foreach (var _Kv in typeof(DocProcessingInstructions)
                     .GetProperties()
@@ -238,16 +246,16 @@ namespace Rudine.Interpreters.Xsn
                     if (_Kv.property.CanWrite)
                         if (_Kv.matcher.IsMatch(_XmlProcessingInstruction.InnerText))
                             _Kv.property.SetValue(
-                                _DocProcessingInstructions,
-                                Convert.ChangeType(
-                                    _Kv
-                                        .matcher
-                                        .Match(_XmlProcessingInstruction.InnerText)
-                                        .Value,
-                                    ExpressionParser
-                                        .GetNonNullableType(_Kv.property.PropertyType),
-                                    null),
-                                null);
+                                   _DocProcessingInstructions,
+                                   Convert.ChangeType(
+                                       _Kv
+                                           .matcher
+                                           .Match(_XmlProcessingInstruction.InnerText)
+                                           .Value,
+                                       ExpressionParser
+                                           .GetNonNullableType(_Kv.property.PropertyType),
+                                       null),
+                                   null);
             }
 
             _DocProcessingInstructions.solutionVersion = GetDocRev(SrcDocXml);
@@ -261,11 +269,14 @@ namespace Rudine.Interpreters.Xsn
         /// </summary>
         /// <param name= NavKey.DocTypeName></param>
         /// <returns></returns>
-        public override string ReadDocRev(string DocData) { return ParseAttributeValue(DocData, "solutionVersion"); }
+        public override string ReadDocRev(string DocData) =>
+            ParseAttributeValue(DocData, "solutionVersion");
 
-        public override string ReadDocTypeName(string DocData) { return parseReadDocTypeName(DocData); }
+        public override string ReadDocTypeName(string DocData) =>
+            parseReadDocTypeName(DocData);
 
-        public static string RemoveInvalidDateElementText(string DocData) { return DocXmlInvalidDateStringRegEx.Replace(DocData, string.Empty); }
+        public static string RemoveInvalidDateElementText(string DocData) =>
+            DocXmlInvalidDateStringRegEx.Replace(DocData, string.Empty);
 
         /// <summary>
         ///     a side-effect of the XmlSerializer working on a PropertyOverlay-ApplyUninitializedObject object processing before
@@ -307,7 +318,8 @@ namespace Rudine.Interpreters.Xsn
         /// </summary>
         /// <param name= NavKey.DocTypeName></param>
         /// <param name="xml"></param>
-        public override void Validate(string DocData) { new SchemaValidator().Validate(DocData, Read(DocData, true)); }
+        public override void Validate(string DocData) =>
+            new SchemaValidator().Validate(DocData, Read(DocData, true));
 
         private XmlWriter WriteInfoPathProcessingInstructions(DocProcessingInstructions pi, XmlWriter _XmlTextWriter)
         {
@@ -334,13 +346,11 @@ namespace Rudine.Interpreters.Xsn
             return _XmlTextWriter;
         }
 
-        public override string WritePI(string DocData, DocProcessingInstructions _ManifestInfo)
-        {
-            return string.Format(
-                "{0}{1}",
-                WriteText(_ManifestInfo),
-                Regex.Replace(DocData, XmlProcessingInstructionMatch, ""));
-        }
+        public override string WritePI(string DocData, DocProcessingInstructions _ManifestInfo) => 
+            string.Format(
+            "{0}{1}",
+            WriteText(_ManifestInfo),
+            Regex.Replace(DocData, XmlProcessingInstructionMatch, ""));
 
         /// <summary>
         ///     Renders an XML document using an XmlSerializer, applies the given DocTypeName's template.xml
@@ -412,10 +422,10 @@ namespace Rudine.Interpreters.Xsn
                 using (StringReader _StringReader = new StringReader(DocData))
                 using (XmlTextReader _XmlTextReader = new XmlTextReader(_StringReader))
                 using (XmlValidatingReader _XmlValidatingReader = new XmlValidatingReader(_XmlTextReader)
-                    {
-                        ValidationType = ValidationType.Schema
-                    })
-                    //TODO:Use XmlReader to perform validation instead of XmlValidatingReader (http://msdn.microsoft.com/en-us/library/hdf992b8%28v=VS.80%29.aspx)
+                {
+                    ValidationType = ValidationType.Schema
+                })
+                //TODO:Use XmlReader to perform validation instead of XmlValidatingReader (http://msdn.microsoft.com/en-us/library/hdf992b8%28v=VS.80%29.aspx)
                 {
                     // Grab the xml namescape that was expressed as an attribute of the class the XsnTransform.cmd auto generated
                     ValidatingNamespace = t
@@ -447,18 +457,23 @@ namespace Rudine.Interpreters.Xsn
                         if (_T.Contains("Signature(s)"))
                             FieldErrors.Add(_T);
                         else if (regexObj.IsMatch(_T))
-                            FieldErrors.Add(StringTransform.Wordify(regexObj.Match(_T).Groups[1].Value.Trim().Trim(':')));
+                            FieldErrors.Add(StringTransform.Wordify(regexObj.Match(_T)
+                                                                            .Groups[1].Value.Trim()
+                                                                            .Trim(':')));
                         else
                             foreach (PropertyInfo p in t.GetProperties())
                                 if (Regex.IsMatch(_T, string.Format(@"\b(?=\w){0}\b(?!\w)", p.Name)))
-                                    FieldErrors.Add(StringTransform.Wordify(p.Name).Trim().Trim(':'));
+                                    FieldErrors.Add(StringTransform.Wordify(p.Name)
+                                                                   .Trim()
+                                                                   .Trim(':'));
 
                     if (FieldErrors.Count > 0)
                     {
                         string ValidationMessageMarkDown =
                             string.Format(
                                 "\t\t{0}",
-                                string.Join("\r\n\t\t", FieldErrors.Where(m => !string.IsNullOrWhiteSpace(m)).Distinct()));
+                                string.Join("\r\n\t\t", FieldErrors.Where(m => !string.IsNullOrWhiteSpace(m))
+                                                                   .Distinct()));
 
                         int ValidationMessagesCount = FieldErrors.Count;
                         ValidationMessages.Clear();
@@ -474,6 +489,12 @@ namespace Rudine.Interpreters.Xsn
             }
         }
 
+        /// <summary>
+        ///     Handles request only for manifest.xsf files. A manifest.xsf response requires the URL requested to be written to
+        ///     the csd file itself so the remaing files it documents can be downloaded in other requests the Microsoft InfoPath
+        ///     Filler application performs.
+        /// </summary>
+        /// <param name="context"></param>
         public override void ProcessRequest(HttpContext context)
         {
             TemplateFileInfo _TemplateFileInfo = TemplateController.ParseTemplateFileInfo(context);
@@ -494,7 +515,8 @@ namespace Rudine.Interpreters.Xsn
                 string UrlReferrer_AbsoluteUri = context.Request.UrlReferrer == null ? "" : context.Request.UrlReferrer.AbsoluteUri;
 
                 string filename;
-                string[] lines = TemplateController.Instance.OpenText(context, out filename).Split('\n', '\r');
+                string[] lines = TemplateController.Instance.OpenText(context, out filename)
+                                                   .Split('\n', '\r');
 
                 // render the publishUrl as the calling request or that of a registered listener
                 string publishUrl = UrlReferrer_AbsoluteUri.Contains("/" + ReverseProxy.DirectoryName)
@@ -505,9 +527,9 @@ namespace Rudine.Interpreters.Xsn
 
                 for (int i = 0; i < lines.Length; i++)
                     context.Response.Write(
-                        regPublishUrl.IsMatch(lines[i]) ?
-                            regPublishUrl.Replace(lines[i], publishUrl) :
-                            lines[i]);
+                               regPublishUrl.IsMatch(lines[i]) ?
+                                   regPublishUrl.Replace(lines[i], publishUrl) :
+                                   lines[i]);
 
                 context.Response.ContentType = "text/xml";
             }
