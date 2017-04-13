@@ -78,7 +78,7 @@ namespace Rudine.Template
             MemoryStream _MemoryStream = null;
 
             foreach (ITemplateController _OtherIDocResourceController in _OtherIDocResourceControllers
-                .Where(m => (DocTypeName == "DOCREV") == (typeof(EmbededTemplateController) == m.GetType())))
+                .Where(m => (DocTypeName == EmbededTemplateController.MY_ONLY_DOC_NAME) == (typeof(EmbededTemplateController) == m.GetType())))
                 if (_MemoryStream != null)
                     break;
                 else
@@ -151,7 +151,7 @@ namespace Rudine.Template
                                _DefaultTopDocFilesystemTemplateController.TopDocRev(DocTypeName)
                                ?? _OtherIDocResourceControllers
                                    //DOCREVs should always come from the embedded controller
-                                   .Where(m => (DocTypeName == "DOCREV") == (typeof(EmbededTemplateController) == m.GetType()))
+                                   .Where(m => (DocTypeName == EmbededTemplateController.MY_ONLY_DOC_NAME) == (typeof(EmbededTemplateController) == m.GetType()))
                                    .Select(m => m.TopDocRev(DocTypeName))
                                    .Where(DocRev => !string.IsNullOrWhiteSpace(DocRev))
                                    .OrderByDescending(DocRev => new Version(DocRev))

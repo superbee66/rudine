@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Rudine.Template.Embeded;
 using Rudine.Util.Cabs;
 using Rudine.Web.Util;
 
@@ -32,7 +33,7 @@ namespace Rudine.Template.Docdb
 
         public string TopDocRev(string DocTypeName) =>
             DocExchange.LuceneController.List(
-                           new List<string> { "DOCREV" },
+                           new List<string> { EmbededTemplateController.MY_ONLY_DOC_NAME },
                            new Dictionary<string, List<string>>
                            {
                                {
@@ -57,12 +58,12 @@ namespace Rudine.Template.Docdb
                                string DocSrc;
 
                                object o = DocExchange.LuceneController.Get(
-                                   "DOCREV",
+                                   EmbededTemplateController.MY_ONLY_DOC_NAME,
                                    new Dictionary<string, string> { { "TargetDocTypeVer", DocTypeVer }, { "TargetDocTypeName", DocTypeName } });
 
                                if (o == null)
                                    o = DocExchange.LuceneController.Get(
-                                       "DOCREV",
+                                       EmbededTemplateController.MY_ONLY_DOC_NAME,
                                        new Dictionary<string, string> { { "DocTypeVer", DocTypeVer }, { "DocTypeName", DocTypeName } });
 
                                byte[] decodedAttachment = null;

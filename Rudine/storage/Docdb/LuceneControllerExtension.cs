@@ -7,6 +7,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Rudine.Exceptions;
 using Rudine.Interpreters;
+using Rudine.Template.Embeded;
 using Rudine.Web;
 using Directory = System.IO.Directory;
 
@@ -32,7 +33,7 @@ namespace Rudine.Storage.Docdb
                         false,
                         IndexWriter.MaxFieldLength.UNLIMITED))
                     {
-                        foreach (string DocTypeName in o.List(new List<string> { "DOCREV" }).Select(_LightDoc => _LightDoc.GetTargetDocName()).Distinct())
+                        foreach (string DocTypeName in o.List(new List<string> { EmbededTemplateController.MY_ONLY_DOC_NAME }).Select(_LightDoc => _LightDoc.GetTargetDocName()).Distinct())
                         {
                             int PageIndex = 0, hashcode = 0;
                             List<Document> _ListDocument = new List<Document>();

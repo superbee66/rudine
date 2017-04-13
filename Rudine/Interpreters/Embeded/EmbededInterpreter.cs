@@ -7,15 +7,20 @@ namespace Rudine.Interpreters.Embeded
     public class EmbededInterpreter : DocByteInterpreter
     {
         public override string ContentFileExtension =>
-            "docrev";
+         EmbededTemplateController.MY_ONLY_DOC_NAME;
 
         public override string ContentType =>
             "application/octet-stream";
 
-        public override BaseDoc Create(string DocTypeName) =>
-            Runtime.ActivateBaseDoc(
+        public override BaseDoc Create(string DocTypeName)
+        {
+            if (!DocTypeName.Equals(EmbededTemplateController.MY_ONLY_DOC_NAME, System.StringComparison.InvariantCultureIgnoreCase))
+                throw new System.ArgumentException(string.Empty, nameof(DocTypeName));
+
+            return Runtime.ActivateBaseDoc(
                 EmbededTemplateController.MY_ONLY_DOC_NAME,
                 EmbededTemplateController.MY_ONLY_DOC_VERSION.ToString());
+        }
 
         public override string GetDescription(string DocTypeName) =>
             null;

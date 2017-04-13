@@ -12,6 +12,7 @@ using Microsoft.Deployment.Compression.Cab;
 using Newtonsoft.Json;
 using Rudine.Exceptions;
 using Rudine.Interpreters;
+using Rudine.Template.Embeded;
 using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Util.Cabs;
@@ -23,8 +24,7 @@ namespace Rudine
 {
     public static class ImporterController
     {
-        public static string DirectoryFullName
-        {
+        public static string DirectoryFullName {
             get { return RequestPaths.GetPhysicalApplicationPath("import"); }
         }
 
@@ -118,7 +118,7 @@ namespace Rudine
             string DocTypeName = FilesystemTemplateController.ScanContentFolder(_DirectoryInfo, out DocTypeVer, out DocMD5);
             if (!DocExchange.LuceneController.List(new List<string>
             {
-                "DOCREV"
+                EmbededTemplateController.MY_ONLY_DOC_NAME
             }, null, null, DocMD5).Any())
                 try
                 {
@@ -145,7 +145,7 @@ namespace Rudine
                         _CompressionEngine.Pack(_ArchiveMemoryStreamContext, files.Keys);
 
                         string fileName = Path.GetFileName(cabFilePath);
-                        uint fileNameLength = (uint) fileName.Length + 1;
+                        uint fileNameLength = (uint)fileName.Length + 1;
                         byte[] fileNameBytes = Encoding.Unicode.GetBytes(fileName);
 
                         using (MemoryStream CabFileMemoryStream = _ArchiveMemoryStreamContext.DictionaryStringMemoryStream.Values.First())
@@ -161,12 +161,12 @@ namespace Rudine
                                 });
 
                                 // Write the default header information.
-                                _BinaryWriter.Write((uint) 0x14); // size
-                                _BinaryWriter.Write((uint) 0x01); // version
-                                _BinaryWriter.Write((uint) 0x00); // reserved
+                                _BinaryWriter.Write((uint)0x14); // size
+                                _BinaryWriter.Write((uint)0x01); // version
+                                _BinaryWriter.Write((uint)0x00); // reserved
 
                                 // Write the file size.
-                                _BinaryWriter.Write((uint) _BinaryReader.BaseStream.Length);
+                                _BinaryWriter.Write((uint)_BinaryReader.BaseStream.Length);
 
                                 // Write the size of the file name.
                                 _BinaryWriter.Write(fileNameLength);
@@ -192,13 +192,13 @@ namespace Rudine
                             }
 
                             // these contents will be stored in yet another document as an attached cab file
-                            IDocRev DocRevBaseDoc = (IDocRev) DocInterpreter.Instance.Create("DOCREV");
+                            IDocRev DocRevBaseDoc = (IDocRev)DocInterpreter.Instance.Create(EmbededTemplateController.MY_ONLY_DOC_NAME);
 
                             DocRevBaseDoc.DocChecksum = int.MinValue;
                             DocRevBaseDoc.DocKeys = DocKeys;
                             DocRevBaseDoc.DocStatus = true;
                             DocRevBaseDoc.DocTitle = String.Format("{0} {1}", DocTypeName, DocTypeVer);
-                            DocRevBaseDoc.DocTypeName = "DOCREV";
+                            DocRevBaseDoc.DocTypeName = EmbededTemplateController.MY_ONLY_DOC_NAME;
                             DocRevBaseDoc.TargetDocTypeFiles = _TargetDocTypeFilesMemoryStream.ToArray();
                             DocRevBaseDoc.TargetDocTypeName = DocTypeName;
                             DocRevBaseDoc.TargetDocTypeVer = DocTypeVer;
@@ -208,11 +208,14 @@ namespace Rudine
                                 new ImporterLightDoc
                                 {
                                     LightDoc = DocExchange.Instance.Import(
-                                        DocInterpreter.Instance.WriteStream((BaseDoc) DocRevBaseDoc))
+                                        DocInterpreter.Instance.WriteStream((BaseDoc)DocRevBaseDoc))
                                 });
                         }
                     }
-                } catch (ThreadAbortException) {} catch (NoChangesSinceLastSubmitException) {} catch (Exception)
+                }
+                catch (ThreadAbortException) { }
+                catch (NoChangesSinceLastSubmitException) { }
+                catch (Exception)
                 {
                     /*TODO:Need to handle this trapped exception correctly*/
                 }
@@ -361,7 +364,7 @@ namespace Rudine
                             PI = DocExchange.Instance.ReadStream(File.OpenRead(path))
                         })
                         .Where(file => !string.IsNullOrWhiteSpace(file.PI.DocTypeName))
-                        .OrderBy(file => !file.PI.DocTypeName.Equals("DOCREV", StringComparison.CurrentCultureIgnoreCase))
+                        .OrderBy(file => !file.PI.DocTypeName.Equals(EmbededTemplateController.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase))
                         .ThenBy(file => file.PI.DocTypeName)
                         .ThenBy(file => Version.Parse(file.PI.solutionVersion))
                         .ToArray()
@@ -379,7 +382,8 @@ namespace Rudine
                                                 {
                                                     LightDoc = DocExchange.Instance.Import(_Stream)
                                                 };
-                                        } catch (Exception ex)
+                                        }
+                                        catch (Exception ex)
                                         {
                                             _LightDoc = new ImporterLightDoc
                                             {
@@ -391,7 +395,8 @@ namespace Rudine
                                             };
                                             if (ex.InnerException != null)
                                                 _LightDoc.ExceptionMessage = string.Format("{0} {1} {3}", _LightDoc.ExceptionMessage, ex.InnerException.Message, ex.StackTrace);
-                                        } finally
+                                        }
+                                        finally
                                         {
                                             _LightDoc.ImportDocSrc = file.path;
 

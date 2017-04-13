@@ -73,7 +73,7 @@ namespace Rudine.Template.Embeded {
         /// </summary>
         internal static string DOCREV {
             get {
-                return ResourceManager.GetString("DOCREV", resourceCulture);
+                return ResourceManager.GetString(EmbededTemplateController.MY_ONLY_DOC_NAME, resourceCulture);
             }
         }
     }
