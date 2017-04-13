@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +14,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.CSharp;
 using Rudine.Template;
+using Rudine.Template.Embeded;
 using Rudine.Util;
 using Rudine.Util.Xsds;
 using Rudine.Web;
@@ -31,30 +33,26 @@ namespace Rudine
         /// <summary>
         ///     created only when #DEBUG preprocessor variable is defined
         /// </summary>
-        public const string FOLDER_FOR_COMPILE_TEMPORARY_FILES = "activate";
+        private const string FOLDER_FOR_COMPILE_TEMPORARY_FILES = "activate";
 
         /// <summary>
         ///     Utilized by CompileAssembly
         /// </summary>
-        public static readonly Dictionary<string, string> USING_NAMESPACES = new[]
-        {
+        private static readonly Dictionary<string, string> USING_NAMESPACES = new[] {
             typeof(List<>),
             typeof(DataContractSerializer),
             typeof(XmlAttribute),
             typeof(XmlSerializer),
             typeof(IBaseDocController),
-            typeof(Runtime)
+            typeof(Runtime),
+            typeof(GeneratedCodeAttribute),
+            typeof(DesignerCategoryAttribute)
         }.ToDictionary(m => m.Namespace, n => Path.GetFileName(n.Assembly.Location));
-
-        public static string DirectoryPath
-        {
-            get { return RequestPaths.GetPhysicalApplicationPath(FOLDER_FOR_COMPILE_TEMPORARY_FILES); }
-        }
 
         public const string MYSCHEMA_XSD_FILE_NAME = "myschema.xsd";
 
         public static BaseDoc ActivateBaseDoc(string DocTypeName, string DocRev, params string[] AdditionalRootNames) =>
-            (BaseDoc) Activator.CreateInstance(ActivateBaseDocType(DocTypeName, DocRev, AdditionalRootNames));
+            (BaseDoc)Activator.CreateInstance(ActivateBaseDocType(DocTypeName, DocRev, AdditionalRootNames));
 
         private static readonly ConcurrentDictionary<string, Type> ActivateBaseDocTypeDictionary = new ConcurrentDictionary<string, Type>();
 
@@ -70,8 +68,7 @@ namespace Rudine
         private static Type ActivateBaseDocType_Internal(string DocTypeName, string DocRev, params string[] AdditionalRootNames)
         {
             return FindBaseDocType(
-                MakeBaseDocAssembly(new[]
-                    {
+                MakeBaseDocAssembly(new[] {
                         TemplateController.Instance.OpenText(DocTypeName, DocRev, MYSCHEMA_XSD_FILE_NAME)
                     },
                     DocTypeName,
@@ -83,7 +80,10 @@ namespace Rudine
         private static readonly CSharpCodeProvider CSharpCodeProvider = new CSharpCodeProvider();
         private static string CompileCSharpCodeDefaultOutDirectory;
         private static readonly ConcurrentDictionary<int, Assembly> CompileCSharpCodeAssemblies = new ConcurrentDictionary<int, Assembly>();
-        public static Assembly CompileCSharpCode(string cSharpCode) { return CompileCSharpCode(() => cSharpCode); }
+
+        public static Assembly CompileCSharpCode(string cSharpCode) =>
+            CompileCSharpCode(() =>
+                                      cSharpCode);
 
         public static Assembly CompileCSharpCode(Func<string> cSharpCodeFactory, string OutputName = default(string))
         {
@@ -107,7 +107,8 @@ namespace Rudine
                                ^ OutputName.GetHashCode()
                                ^ IncludeDebugInformation.GetHashCode()
                                ^ typeof(Runtime).Assembly.FullName.GetHashCode()
-                               ^ WindowsIdentity.GetCurrent().User.Value.GetHashCode() // just incase the user changes due to an apppool change
+                               ^ WindowsIdentity.GetCurrent()
+                                                .User.Value.GetHashCode() // just incase the user changes due to an apppool change
             );
 
             if (!CompileCSharpCodeAssemblies.ContainsKey(key))
@@ -146,15 +147,18 @@ namespace Rudine
 
                     lock (CSharpCodeProvider)
                     {
-                        // Combine & normalize (different paths that load to the same dll) lists of referenced assemblies. Consider our custom list (UsingNamespaces.Values) & whatever is currently loaded into the AppDomain.This ensures the newly compiled object will have everything it needs.
+                        // Combine & normalize (different paths that load to the same dll) lists of referenced assemblies. 
+                        // Consider our custom list (UsingNamespaces.Values) & whatever is currently loaded into the AppDomain.
+                        // This ensures the newly compiled object will have everything it needs.
                         Dictionary<string, string> ReferenceAssembliesDic = new Dictionary<string, string>();
                         foreach (string AppDomainAssemFileName in
-                            AppDomain.CurrentDomain.GetAssemblies().Where(m => !m.IsDynamic).Select(m => m.Location))
+                            AppDomain.CurrentDomain.GetAssemblies()
+                                     .Where(m => !m.IsDynamic)
+                                     .Select(m => m.Location))
                             if (File.Exists(AppDomainAssemFileName))
                                 foreach (
                                     string DirectoryName in
-                                    new[]
-                                    {
+                                    new[] {
                                         new FileInfo(AppDomainAssemFileName).DirectoryName,
                                         @".",
                                         @".\bin",
@@ -178,9 +182,11 @@ namespace Rudine
                         {
                             CompileCSharpCodeDefaultOutDirectory = Path.GetDirectoryName(_CompilerResults.PathToAssembly);
                             CompileCSharpCodeAssemblies[key] = _CompilerResults.CompiledAssembly;
-                        } else
+                        }
+                        else
                         {
-                            new DirectoryInfo(RequestPaths.GetPhysicalApplicationPath(FOLDER_FOR_COMPILE_TEMPORARY_FILES)).mkdir().Attributes = FileAttributes.Hidden;
+                            new DirectoryInfo(RequestPaths.GetPhysicalApplicationPath(FOLDER_FOR_COMPILE_TEMPORARY_FILES)).mkdir()
+                                                                                                                          .Attributes = FileAttributes.Hidden;
 
                             int i = 0;
                             DirectoryInfo _DirectoryInfo = null;
@@ -193,7 +199,11 @@ namespace Rudine
                                     RequestPaths
                                         .GetPhysicalApplicationPath(FOLDER_FOR_COMPILE_TEMPORARY_FILES, string.Format("{0}_{1}", Base36.Encode(key), i++)));
 
-                                try { _DirectoryInfo.rmdir(); } catch (Exception) {}
+                                try
+                                {
+                                    _DirectoryInfo.rmdir();
+                                }
+                                catch (Exception) { }
                             }
                             while (_DirectoryInfo.Exists);
 
@@ -243,21 +253,18 @@ namespace Rudine
                 PrimaryTypeParentType = typeof(BaseDoc);
 
             if (PrimaryTypeAppliedInterfaces == null || PrimaryTypeAppliedInterfaces.Length == 0)
-                PrimaryTypeAppliedInterfaces = DocTypeName == "DOCREV"
-                                                   ? new[]
-                                                   {
+                PrimaryTypeAppliedInterfaces = DocTypeName == EmbededTemplateController.MY_ONLY_DOC_NAME
+                                                   ? new[] {
                                                        typeof(IDocIdentifiers).Name,
                                                        (cSharpCode.Contains("TargetDocTypeFiles")
                                                             ? typeof(IDocRev).Name
                                                             : typeof(IDocRev).Name)
                                                    }
-                                                   : new[]
-                                                   {
+                                                   : new[] {
                                                        typeof(IDocIdentifiers).Name
                                                    };
 
-            string ApplyToPrimaryClass = string.Format("{0}", string.Join(", ", new[]
-            {
+            string ApplyToPrimaryClass = string.Format("{0}", string.Join(", ", new[] {
                 PrimaryTypeParentType.Name
             }.Union(PrimaryTypeAppliedInterfaces)));
 
@@ -268,21 +275,18 @@ namespace Rudine
                 SecondaryTypesAppliedInterfaces = new string[]
                     { };
 
-            string ApplyToSecondayClasses = string.Format("{0}", string.Join(", ", new[]
-            {
+            string ApplyToSecondayClasses = string.Format("{0}", string.Join(", ", new[] {
                 SecondaryTypeParentType.Name
             }.Union(SecondaryTypesAppliedInterfaces)));
 
             #endregion Apply_Defaults
 
-            List<string> IgnoreDataTypePropertiesMapped = new List<string>
-            {
+            List<string> IgnoreDataTypePropertiesMapped = new List<string> {
                 "byte",
                 "System.Xml.XmlElement",
                 "System.Xml.XmlElement"
             };
-            List<string> IgnorePropertyPrefixes = new List<string>
-            {
+            List<string> IgnorePropertyPrefixes = new List<string> {
                 "field", "calc", "tmp", "signatures1", "signatures2"
             };
 
@@ -351,8 +355,7 @@ namespace Rudine
                 string.Empty,
                 RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-            string[] DocTypeNames =
-            {
+            string[] DocTypeNames = {
                 DocTypeName
             };
 
@@ -431,13 +434,27 @@ this is applied to all classes.
             cSharpCode = cSharpCode.Replace("private System.Xml.XmlElement[]", "[System.NonSerialized] private System.Xml.XmlElement[]");
 
             // add using statements to beginning to top of the document
-            cSharpCode = string.Join("", USING_NAMESPACES.Keys.OrderBy(ns => ns).Select(ns => string.Format("using {0};\n", ns))) + cSharpCode;
+            cSharpCode = string.Format("{0}{1}",
+                string
+                    .Join("",
+                        USING_NAMESPACES
+                            .Keys
+                            .OrderBy(ns => ns)
+                            .Select(ns => string.Format("using {0};\n", ns))), cSharpCode);
 
             return cSharpCode;
         }
 
-        public static BaseDoc FindBaseDoc(Assembly BaseDocAssembly, string DocTypeName) { return (BaseDoc) Activator.CreateInstance(FindBaseDocType(BaseDocAssembly, DocTypeName)); }
-        public static Type FindBaseDocType(Assembly BaseDocAssembly, string DocTypeName) { return BaseDocAssembly.GetTypes().First(m => m.Name == DocTypeName); }
+        public static BaseDoc FindBaseDoc(Assembly BaseDocAssembly, string DocTypeName)
+        {
+            return (BaseDoc)Activator.CreateInstance(FindBaseDocType(BaseDocAssembly, DocTypeName));
+        }
+
+        public static Type FindBaseDocType(Assembly BaseDocAssembly, string DocTypeName)
+        {
+            return BaseDocAssembly.GetTypes()
+                                  .First(m => m.Name == DocTypeName);
+        }
 
         internal static string GenerateCode(string[] DocXsds, string DocTypeName, string DocRev, params string[] AdditionalRootNames)
         {
@@ -463,7 +480,7 @@ this is applied to all classes.
         internal static Assembly MakeBaseDocAssembly(string[] DocXsds, string DocTypeName, string DocRev, params string[] AdditionalRootNames)
         {
             return CompileCSharpCode(() =>
-                                         GenerateCode(DocXsds, DocTypeName, DocRev, AdditionalRootNames),
+                                             GenerateCode(DocXsds, DocTypeName, DocRev, AdditionalRootNames),
                 RuntimeTypeNamer.CalcCSharpNamespace(DocTypeName, DocRev, AdditionalRootNames));
         }
     }
