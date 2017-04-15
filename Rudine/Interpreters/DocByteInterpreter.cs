@@ -1,7 +1,9 @@
+using System.Runtime.Serialization;
 using Rudine.Web;
 
 namespace Rudine.Interpreters
 {
+    [DataContract]
     public abstract class DocByteInterpreter : DocBaseInterpreter, IDocByteInterpreter
     {
         /// <summary>

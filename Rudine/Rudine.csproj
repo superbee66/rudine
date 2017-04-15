@@ -99,6 +99,9 @@
     <Compile Include="..\Rudine.Web\IDocURN.cs">
       <Link>Web\IDocURN.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\InterpreterInfo.cs">
+      <Link>Web\InterpreterInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\LightDoc.cs">
       <Link>Web\LightDoc.cs</Link>
     </Compile>
@@ -140,12 +143,13 @@
     <Compile Include="DocExchangeWsdlExporter.cs" />
     <Compile Include="DocKeyEncrypter.cs" />
     <Compile Include="DocProcessingInstructionsExtensions.cs" />
+    <Compile Include="ImporterController.cs" />
+    <Compile Include="ImporterLightDoc.cs" />
     <Compile Include="Interpreters\DocTempleter.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreter.cs" />
     <Compile Include="Interpreters\IDocBaseInterpreter.cs" />
     <Compile Include="Interpreters\IDocByteInterpreter.cs" />
     <Compile Include="Interpreters\IDocTextInterpreter.cs" />
-    <Compile Include="ImporterLightDoc.cs" />
     <Compile Include="Exceptions\ImportException.cs" />
     <Compile Include="Exceptions\InterpreterLocationException.cs" />
     <Compile Include="Exceptions\NoChangesSinceLastSubmitException.cs" />
@@ -180,7 +184,6 @@
     <Compile Include="Template\ITemplateController.cs" />
     <Compile Include="Exceptions\DocDataException.cs" />
     <Compile Include="IDocRev.cs" />
-    <Compile Include="ImporterController.cs" />
     <Compile Include="Template\TemplateFileInfo.cs" />
     <Compile Include="Util\Cabs\ArchiveMemoryStreamContext.cs" />
     <Compile Include="Util\Cabs\CabInfoExtensions.cs" />

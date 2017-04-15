@@ -1,4 +1,5 @@
-﻿using Rudine.Template.Embeded;
+﻿using System;
+using Rudine.Template.Embeded;
 using Rudine.Util.Zips;
 using Rudine.Web;
 
@@ -6,16 +7,10 @@ namespace Rudine.Interpreters.Embeded
 {
     public class EmbededInterpreter : DocByteInterpreter
     {
-        public override string ContentFileExtension =>
-         EmbededTemplateController.MY_ONLY_DOC_NAME;
-
-        public override string ContentType =>
-            "application/octet-stream";
-
         public override BaseDoc Create(string DocTypeName)
         {
-            if (!DocTypeName.Equals(EmbededTemplateController.MY_ONLY_DOC_NAME, System.StringComparison.InvariantCultureIgnoreCase))
-                throw new System.ArgumentException(string.Empty, nameof(DocTypeName));
+            if (!DocTypeName.Equals(EmbededTemplateController.MY_ONLY_DOC_NAME, StringComparison.InvariantCultureIgnoreCase))
+                throw new ArgumentException(string.Empty, nameof(DocTypeName));
 
             return Runtime.ActivateBaseDoc(
                 EmbededTemplateController.MY_ONLY_DOC_NAME,
@@ -52,5 +47,12 @@ namespace Rudine.Interpreters.Embeded
 
         public override byte[] WritePI(byte[] DocData, DocProcessingInstructions pi) =>
             WriteByte(SetPI(Read(DocData), pi));
+
+        public override ContentInfo ContentInfo =>
+            new ContentInfo
+            {
+                ContentFileExtension = EmbededTemplateController.MY_ONLY_DOC_NAME,
+                ContentType = "application/octet-stream"
+            };
     }
 }

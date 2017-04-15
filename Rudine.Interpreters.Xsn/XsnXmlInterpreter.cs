@@ -56,16 +56,14 @@ namespace Rudine.Interpreters.Xsn
         /// </summary>
         private readonly WriteXmlProcessingInstructions WriteXmlProcessingInstructions;
 
-        public XsnXmlInterpreter()
-        {
-            WriteXmlProcessingInstructions = WriteInfoPathProcessingInstructions;
-        }
+        public XsnXmlInterpreter() { WriteXmlProcessingInstructions = WriteInfoPathProcessingInstructions; }
 
-        public override string ContentFileExtension =>
-            "xml";
-
-        public override string ContentType =>
-            "application/vnd.ms-infopath";
+        public override ContentInfo ContentInfo =>
+            new ContentInfo
+            {
+                ContentFileExtension = "xml",
+                ContentType = "application/vnd.ms-infopath"
+            };
 
         /// <summary>
         ///     Removes empty elements from xml. Achieving the same rendering (or lack of) DefaultValue(0)
@@ -152,15 +150,15 @@ namespace Rudine.Interpreters.Xsn
         public override string HrefVirtualFilename(string DocTypeName, string DocRev) =>
             "manifest.xsf";
 
+        private static string ParseAttributeValue(string DocData, string attributeName) =>
+            Regex.Match(DocData, string.Format("(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline)
+                 .Value;
+
         private static string parseReadDocTypeName(string DocData) =>
             Regex.Match(DocData,
                      @"(urn:schemas-microsoft-com:office:infopath:)(?<DocTypeName>\w+)(:-myXSD-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})",
                      RegexOptions.IgnoreCase)
                  .Groups["DocTypeName"].Value;
-
-        private static string ParseAttributeValue(string DocData, string attributeName) =>
-            Regex.Match(DocData, string.Format("(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline)
-                 .Value;
 
         public override bool Processable(string DocTypeName, string DocRev)
         {
@@ -173,6 +171,54 @@ namespace Rudine.Interpreters.Xsn
                 ReadDocTypeName(template_xml) == DocTypeName
                 &&
                 GetDocRev(template_xml) == DocRev;
+        }
+
+        /// <summary>
+        ///     Handles request only for manifest.xsf files. A manifest.xsf response requires the URL requested to be written to
+        ///     the csd file itself so the remaing files it documents can be downloaded in other requests the Microsoft InfoPath
+        ///     Filler application performs.
+        /// </summary>
+        /// <param name="context"></param>
+        public override void ProcessRequest(HttpContext context)
+        {
+            TemplateFileInfo _TemplateFileInfo = TemplateController.ParseTemplateFileInfo(context);
+
+            if (!_TemplateFileInfo.FileName.Equals(HrefVirtualFilename(_TemplateFileInfo.DocTypeName, _TemplateFileInfo.solutionVersion), StringComparison.InvariantCultureIgnoreCase))
+            {
+                base.ProcessRequest(context);
+            }
+            else
+            {
+                context.Response.DisableKernelCache();
+                context.Response.Clear();
+                context.Response.ClearContent();
+                context.Response.ClearHeaders();
+
+                Regex regPublishUrl = new Regex("(?<=publishUrl=\")(.*?)(?=\")", RegexOptions.Multiline);
+
+                // The publish URL within this file needs to be updated to the current requested URL for the InfoPath application form to like it
+                //string ManifestPath = context.Request.MapPath(new Uri(RequestPaths.AbsoluteUri).LocalPath);
+                string UrlReferrer_AbsoluteUri = context.Request.UrlReferrer == null ? "" : context.Request.UrlReferrer.AbsoluteUri;
+
+                string filename;
+                string[] lines = TemplateController.Instance.OpenText(context, out filename)
+                                                   .Split('\n', '\r');
+
+                // render the publishUrl as the calling request or that of a registered listener
+                string publishUrl = UrlReferrer_AbsoluteUri.Contains("/" + ReverseProxy.DirectoryName)
+                                        ? UrlReferrer_AbsoluteUri
+                                        : RequestPaths.AbsoluteUri;
+
+                context.Response.ClearContent();
+
+                for (int i = 0; i < lines.Length; i++)
+                    context.Response.Write(
+                        regPublishUrl.IsMatch(lines[i]) ?
+                            regPublishUrl.Replace(lines[i], publishUrl) :
+                            lines[i]);
+
+                context.Response.ContentType = "text/xml";
+            }
         }
 
         /// <summary>
@@ -210,11 +256,13 @@ namespace Rudine.Interpreters.Xsn
 
             using (StringReader _StringReader = new StringReader(CollapsedElementsDocXml))
             using (XmlTextReader _XmlTextReader = new XmlTextReader(_StringReader))
+            {
                 return SetPI(
                     (BaseDoc)new XmlSerializer(BaseDocType).Deserialize(_XmlTextReader),
                     pi,
                     DocTypeName,
                     DocRev);
+            }
         }
 
         /// <summary>
@@ -246,16 +294,16 @@ namespace Rudine.Interpreters.Xsn
                     if (_Kv.property.CanWrite)
                         if (_Kv.matcher.IsMatch(_XmlProcessingInstruction.InnerText))
                             _Kv.property.SetValue(
-                                   _DocProcessingInstructions,
-                                   Convert.ChangeType(
-                                       _Kv
-                                           .matcher
-                                           .Match(_XmlProcessingInstruction.InnerText)
-                                           .Value,
-                                       ExpressionParser
-                                           .GetNonNullableType(_Kv.property.PropertyType),
-                                       null),
-                                   null);
+                                _DocProcessingInstructions,
+                                Convert.ChangeType(
+                                    _Kv
+                                        .matcher
+                                        .Match(_XmlProcessingInstruction.InnerText)
+                                        .Value,
+                                    ExpressionParser
+                                        .GetNonNullableType(_Kv.property.PropertyType),
+                                    null),
+                                null);
             }
 
             _DocProcessingInstructions.solutionVersion = GetDocRev(SrcDocXml);
@@ -346,11 +394,11 @@ namespace Rudine.Interpreters.Xsn
             return _XmlTextWriter;
         }
 
-        public override string WritePI(string DocData, DocProcessingInstructions _ManifestInfo) => 
+        public override string WritePI(string DocData, DocProcessingInstructions _ManifestInfo) =>
             string.Format(
-            "{0}{1}",
-            WriteText(_ManifestInfo),
-            Regex.Replace(DocData, XmlProcessingInstructionMatch, ""));
+                "{0}{1}",
+                WriteText(_ManifestInfo),
+                Regex.Replace(DocData, XmlProcessingInstructionMatch, ""));
 
         /// <summary>
         ///     Renders an XML document using an XmlSerializer, applies the given DocTypeName's template.xml
@@ -486,52 +534,6 @@ namespace Rudine.Interpreters.Xsn
                     }
                 }
                 ValidationMessages.Clear();
-            }
-        }
-
-        /// <summary>
-        ///     Handles request only for manifest.xsf files. A manifest.xsf response requires the URL requested to be written to
-        ///     the csd file itself so the remaing files it documents can be downloaded in other requests the Microsoft InfoPath
-        ///     Filler application performs.
-        /// </summary>
-        /// <param name="context"></param>
-        public override void ProcessRequest(HttpContext context)
-        {
-            TemplateFileInfo _TemplateFileInfo = TemplateController.ParseTemplateFileInfo(context);
-
-            if (!_TemplateFileInfo.FileName.Equals(HrefVirtualFilename(_TemplateFileInfo.DocTypeName, _TemplateFileInfo.solutionVersion), StringComparison.InvariantCultureIgnoreCase))
-                base.ProcessRequest(context);
-            else
-            {
-                context.Response.DisableKernelCache();
-                context.Response.Clear();
-                context.Response.ClearContent();
-                context.Response.ClearHeaders();
-
-                Regex regPublishUrl = new Regex("(?<=publishUrl=\")(.*?)(?=\")", RegexOptions.Multiline);
-
-                // The publish URL within this file needs to be updated to the current requested URL for the InfoPath application form to like it
-                //string ManifestPath = context.Request.MapPath(new Uri(RequestPaths.AbsoluteUri).LocalPath);
-                string UrlReferrer_AbsoluteUri = context.Request.UrlReferrer == null ? "" : context.Request.UrlReferrer.AbsoluteUri;
-
-                string filename;
-                string[] lines = TemplateController.Instance.OpenText(context, out filename)
-                                                   .Split('\n', '\r');
-
-                // render the publishUrl as the calling request or that of a registered listener
-                string publishUrl = UrlReferrer_AbsoluteUri.Contains("/" + ReverseProxy.DirectoryName)
-                                        ? UrlReferrer_AbsoluteUri
-                                        : RequestPaths.AbsoluteUri;
-
-                context.Response.ClearContent();
-
-                for (int i = 0; i < lines.Length; i++)
-                    context.Response.Write(
-                               regPublishUrl.IsMatch(lines[i]) ?
-                                   regPublishUrl.Replace(lines[i], publishUrl) :
-                                   lines[i]);
-
-                context.Response.ContentType = "text/xml";
             }
         }
     }

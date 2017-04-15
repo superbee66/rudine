@@ -216,5 +216,8 @@ namespace Rudine {
 
             return _LightDoc;
         }
+
+        public override List<ContentInfo> Interpreters() =>
+            DocInterpreter.ContentInterpreterInstances.Select(m=>m.ContentInfo).ToList();
     }
 }

@@ -11,40 +11,9 @@ namespace Rudine.Interpreters
 {
     public abstract class DocBaseInterpreter : IDocBaseInterpreter, IHttpHandler
     {
-        /// <summary>
-        ///     File extensions that should be used when serving the rendered document to the client.
-        ///     PERMANENT!!! This should not change at anytime though out the entire software development life cycle
-        /// </summary>
-        public abstract string ContentFileExtension { get; }
+        public abstract ContentInfo ContentInfo { get; }
 
-        /// <summary>
-        ///     PERMANENT!!! This should not change at anytime though out the entire software development life cycle
-        /// </summary>
-        /// <returns></returns>
-        public abstract string ContentType { get; }
-
-        public abstract BaseDoc Create(string DocTypeName);
-
-        /// <summary>
-        ///     should operate on the data itself while avoiding serialization operations that may alter the DocData
-        /// </summary>
-        /// <param name="DocTypeName"></param>
-        /// <returns></returns>
-        public abstract string GetDescription(string DocTypeName);
-
-        /// <summary>
-        ///     Should be backed by a httphandler. For InfoPath there is a manifest.xsf the InfoPath Desktop Application will be
-        ///     searching for. For JsonInterpreter a mycontents.cab will be targeted.
-        /// </summary>
-        public abstract string HrefVirtualFilename(string DocTypeName, string DocRev);
-
-        /// <summary>
-        ///     Should this instance of an interpreter actually process the given document if it were passed?
-        /// </summary>
-        /// <param name="DocTypeName"></param>
-        /// <param name="DocRev"></param>
-        /// <returns></returns>
-        public abstract bool Processable(string DocTypeName, string DocRev);
+        public bool IsReusable => false;
 
         internal static string BuildHref(HttpContext context, string DocTypeName, string solutionVersion)
         {
@@ -74,31 +43,36 @@ namespace Rudine.Interpreters
             return href;
         }
 
-        public static string GetFilename(DocProcessingInstructions _DocProcessingInstructions, string ContentFileExtension = null)
-        {
-            return string.Format(
+        public abstract BaseDoc Create(string DocTypeName);
+
+        /// <summary>
+        ///     should operate on the data itself while avoiding serialization operations that may alter the DocData
+        /// </summary>
+        /// <param name="DocTypeName"></param>
+        /// <returns></returns>
+        public abstract string GetDescription(string DocTypeName);
+
+        public static string GetFilename(DocProcessingInstructions _DocProcessingInstructions, string ContentFileExtension = null) =>
+            string.Format(
                 "{0}.{1}",
                 FileSystem.CleanFileName(_DocProcessingInstructions.DocTitle).Trim(),
                 string.IsNullOrWhiteSpace(ContentFileExtension)
-                    ? DocInterpreter.InstanceLocatorByName<DocBaseInterpreter>(_DocProcessingInstructions.DocTypeName, _DocProcessingInstructions.solutionVersion).ContentFileExtension
+                    ? DocInterpreter.InstanceLocatorByName<DocBaseInterpreter>(_DocProcessingInstructions.DocTypeName, _DocProcessingInstructions.solutionVersion).ContentInfo.ContentFileExtension
                     : ContentFileExtension);
-        }
 
         /// <summary>
-        ///     simple helper method to assign values from a DocProcessingInstruction type to a BaseDoc
+        ///     Should be backed by a httphandler. For InfoPath there is a manifest.xsf the InfoPath Desktop Application will be
+        ///     searching for. For JsonInterpreter a mycontents.cab will be targeted.
         /// </summary>
-        /// <param name="dstBaseDoc"></param>
-        /// <param name="pi"></param>
+        public abstract string HrefVirtualFilename(string DocTypeName, string DocRev);
+
+        /// <summary>
+        ///     Should this instance of an interpreter actually process the given document if it were passed?
+        /// </summary>
         /// <param name="DocTypeName"></param>
         /// <param name="DocRev"></param>
         /// <returns></returns>
-        public static BaseDoc SetPI(BaseDoc dstBaseDoc, DocProcessingInstructions pi, string DocTypeName = null, string DocRev = null)
-        {
-            dstBaseDoc = (BaseDoc) PropertyOverlay.Overlay(pi, dstBaseDoc);
-            dstBaseDoc.DocTypeName = DocTypeName ?? pi.DocTypeName;
-            dstBaseDoc.solutionVersion = DocRev ?? pi.solutionVersion;
-            return dstBaseDoc;
-        }
+        public abstract bool Processable(string DocTypeName, string DocRev);
 
         /// <summary>
         ///     locate versions of what were once physical files utilizing form/DocTypeName/VersionNumber/*.*
@@ -123,6 +97,20 @@ namespace Rudine.Interpreters
             }
         }
 
-        public bool IsReusable => false;
+        /// <summary>
+        ///     simple helper method to assign values from a DocProcessingInstruction type to a BaseDoc
+        /// </summary>
+        /// <param name="dstBaseDoc"></param>
+        /// <param name="pi"></param>
+        /// <param name="DocTypeName"></param>
+        /// <param name="DocRev"></param>
+        /// <returns></returns>
+        public static BaseDoc SetPI(BaseDoc dstBaseDoc, DocProcessingInstructions pi, string DocTypeName = null, string DocRev = null)
+        {
+            dstBaseDoc = (BaseDoc)PropertyOverlay.Overlay(pi, dstBaseDoc);
+            dstBaseDoc.DocTypeName = DocTypeName ?? pi.DocTypeName;
+            dstBaseDoc.solutionVersion = DocRev ?? pi.solutionVersion;
+            return dstBaseDoc;
+        }
     }
 }

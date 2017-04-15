@@ -89,6 +89,7 @@
     <Compile Include="IDocIdentifiers.cs" />
     <Compile Include="IDocModel.cs" />
     <Compile Include="IDocURN.cs" />
+    <Compile Include="InterpreterInfo.cs" />
     <Compile Include="LightDoc.cs" />
     <Compile Include="Parm.cs" />
     <Compile Include="SignatureVerifier.cs" />

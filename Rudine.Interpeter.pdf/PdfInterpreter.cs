@@ -18,8 +18,13 @@ namespace Rudine.Interpreters.Pdf
     public class PdfInterpreter : DocByteInterpreter
     {
         private const string TEMPLATE_PDF = "template.pdf";
-        public override string ContentFileExtension { get; } = "pdf";
-        public override string ContentType { get; } = "application/pdf";
+
+        public override ContentInfo ContentInfo =>
+            new ContentInfo
+            {
+                ContentFileExtension = "pdf",
+                ContentType = "application/pdf"
+            };
 
         public override BaseDoc Create(string DocTypeName) { throw new NotImplementedException(); }
 
@@ -88,7 +93,9 @@ namespace Rudine.Interpreters.Pdf
         {
             using (MemoryStream _MemoryStream = new MemoryStream(DocData))
             using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.InformationOnly))
+            {
                 return ReadDocPI(_PdfDocument);
+            }
         }
 
         private static DocProcessingInstructions ReadDocPI(PdfDocument _PdfDocument)

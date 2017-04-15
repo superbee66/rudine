@@ -27,6 +27,9 @@ namespace Rudine.Web
         DocTypeInfo Info(string DocTypeName);
 
         [OperationContract]
+        List<ContentInfo> Interpreters();
+
+        [OperationContract]
         List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null);
 
         [OperationContract]

@@ -27,20 +27,18 @@ namespace Rudine.Web
             _UnderlyingControllerType = _UnderlyingWSClient.GetType();
         }
 
-        public string DefaultRelayUrl
-        {
+        public string DefaultRelayUrl {
             get { return _defaultRelayUrl; }
             set { _defaultRelayUrl = value; }
         }
 
-        public TClientBaseT UnderlyingWSClient
-        {
+        public TClientBaseT UnderlyingWSClient {
             get { return _UnderlyingWSClient; }
         }
 
         public override List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null)
         {
-            return (List<LightDoc>) GetMethodInfo(DocCmd.Audit)
+            return (List<LightDoc>)GetMethodInfo(DocCmd.Audit)
                 .Invoke(UnderlyingWSClient,
                     new object[]
                     {
@@ -69,7 +67,7 @@ namespace Rudine.Web
                 }
             };
 
-            BaseDoc form = (BaseDoc) GetMethodInfo(DocCmd.Create).Invoke(UnderlyingWSClient, _Parms);
+            BaseDoc form = (BaseDoc)GetMethodInfo(DocCmd.Create).Invoke(UnderlyingWSClient, _Parms);
 
             return form;
         }
@@ -88,7 +86,7 @@ namespace Rudine.Web
                 { Parm.RelayUrl, RelayUrl }
             };
 
-            BaseDoc form = (BaseDoc) GetMethodInfo(DocCmd.Get).Invoke(UnderlyingWSClient, parms);
+            BaseDoc form = (BaseDoc)GetMethodInfo(DocCmd.Get).Invoke(UnderlyingWSClient, parms);
 
             return form;
         }
@@ -107,8 +105,8 @@ namespace Rudine.Web
         {
             MemoryStream _MemoryStream = new MemoryStream();
             //TODO:Relocate this to a more appropriate class
-            HttpWebRequest _HttpWebRequest = (HttpWebRequest) WebRequest.Create(new Uri(DocSrc));
-            using (HttpWebResponse _HttpWebResponse = (HttpWebResponse) _HttpWebRequest.GetResponse())
+            HttpWebRequest _HttpWebRequest = (HttpWebRequest)WebRequest.Create(new Uri(DocSrc));
+            using (HttpWebResponse _HttpWebResponse = (HttpWebResponse)_HttpWebRequest.GetResponse())
             {
                 filename = Regex.Match(_HttpWebResponse.Headers["content-disposition"], "filename=\"([^\"]+)\"").Groups[1].Value;
                 _HttpWebResponse.GetResponseStream().CopyTo(_MemoryStream);
@@ -137,17 +135,16 @@ namespace Rudine.Web
         /// <param name= NavKey.DocTypeName></param>
         /// <param name="DocTypeName"></param>
         /// <returns></returns>
-        private MethodInfo GetMethodInfo(DocCmd MethodPrefix) { return _UnderlyingControllerType.GetMethod(string.Format("{0}", MethodPrefix)); }
+        private MethodInfo GetMethodInfo(DocCmd MethodPrefix) =>
+            _UnderlyingControllerType.GetMethod(string.Format("{0}", MethodPrefix));
 
-        public override DocTypeInfo Info(string DocTypeName)
-        {
-            // don't cache the call if it appears to be a DocData payload being inquired about
-            return CacheMan.Cache(() => (DocTypeInfo) GetMethodInfo(DocCmd.Info).Invoke(UnderlyingWSClient, new object[] { DocTypeName }),
+        public override DocTypeInfo Info(string DocTypeName) =>
+            CacheMan.Cache(() =>
+                               (DocTypeInfo)GetMethodInfo(DocCmd.Info).Invoke(UnderlyingWSClient, new object[] { DocTypeName }),
                 false,
                 "DocTypeInfo",
                 DocTypeName,
                 DocCmd.Info);
-        }
 
         public override List<LightDoc> List(List<string> DocTypes, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null)
         {
@@ -167,7 +164,7 @@ namespace Rudine.Web
             };
             MethodInfo _MethodInfo = GetMethodInfo(DocCmd.List);
 
-            return (List<LightDoc>) _MethodInfo.Invoke(UnderlyingWSClient, parms);
+            return (List<LightDoc>)_MethodInfo.Invoke(UnderlyingWSClient, parms);
         }
 
         private BaseDoc Read(object DocData, string RelayUrl)
@@ -182,27 +179,27 @@ namespace Rudine.Web
                 { Parm.RelayUrl, RelayUrl }
             };
 
-            BaseDoc _Form = (BaseDoc) GetMethodInfo(DocData is byte[] ? DocCmd.ReadBytes : DocCmd.ReadText).Invoke(UnderlyingWSClient, _Parms);
+            BaseDoc _Form = (BaseDoc)GetMethodInfo(DocData is byte[] ? DocCmd.ReadBytes : DocCmd.ReadText).Invoke(UnderlyingWSClient, _Parms);
             return _Form;
         }
 
-        public override BaseDoc ReadBytes(byte[] DocData, string RelayUrl = null) { return Read(DocData, RelayUrl); }
+        public override BaseDoc ReadBytes(byte[] DocData, string RelayUrl = null) => 
+            Read(DocData, RelayUrl);
 
-        public override BaseDoc ReadText(string DocData, string RelayUrl = null) { return Read(DocData, RelayUrl); }
+        public override BaseDoc ReadText(string DocData, string RelayUrl = null) =>
+            Read(DocData, RelayUrl);
 
-        public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null)
-        {
-            return (LightDoc) GetMethodInfo(DocCmd.Status)
-                .Invoke(UnderlyingWSClient,
-                    new object[]
-                    {
-                        DocTypeName,
-                        DocKeys,
-                        DocStatus,
-                        DocSubmittedByEmail,
-                        RelayUrl
-                    });
-        }
+        public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null) => 
+            (LightDoc)GetMethodInfo(DocCmd.Status)
+            .Invoke(UnderlyingWSClient,
+                new object[]
+                {
+                    DocTypeName,
+                    DocKeys,
+                    DocStatus,
+                    DocSubmittedByEmail,
+                    RelayUrl
+                });
 
         private LightDoc Submit(object DocData, string DocSubmittedByEmail, string RelayUrl, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle)
         {
@@ -210,7 +207,7 @@ namespace Rudine.Web
                            ? DefaultRelayUrl
                            : RelayUrl;
 
-            return (LightDoc) GetMethodInfo(DocData is byte[] ? DocCmd.SubmitBytes : DocCmd.ReadText)
+            return (LightDoc)GetMethodInfo(DocData is byte[] ? DocCmd.SubmitBytes : DocCmd.SubmitText)
                 .Invoke(UnderlyingWSClient,
                     new[]
                     {
@@ -224,8 +221,15 @@ namespace Rudine.Web
                     });
         }
 
-        public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) { return Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle); }
+        public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
+            Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
-        public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) { return Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle); }
+        public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
+            Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
+
+        public override List<ContentInfo> Interpreters() =>
+            (List<ContentInfo>)_UnderlyingControllerType.GetMethod(nameof(Interpreters))
+                                                         .Invoke(UnderlyingWSClient,
+                                                             new object[] { });
     }
 }

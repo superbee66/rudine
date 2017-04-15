@@ -5,16 +5,10 @@ namespace Rudine.Interpreters
     public interface IDocBaseInterpreter
     {
         /// <summary>
-        ///     File extensions that should be used when serving the rendered document to the client.
-        ///     PERMANENT!!! This should not change at anytime though out the entire software development life cycle
+        /// file/mime information usually accociated with the document read & written
         /// </summary>
-        string ContentFileExtension { get; }
+        ContentInfo ContentInfo { get; }
 
-        /// <summary>
-        ///     PERMANENT!!! This should not change at anytime though out the entire software development life cycle
-        /// </summary>
-        /// <returns></returns>
-        string ContentType { get; }
 
         BaseDoc Create(string DocTypeName);
 

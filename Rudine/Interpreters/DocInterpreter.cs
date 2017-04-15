@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
@@ -19,7 +20,7 @@ namespace Rudine.Interpreters {
     ///     formats supported
     /// </summary>
     internal class DocInterpreter : IDocTextInterpreter, IDocByteInterpreter {
-        private static readonly DocBaseInterpreter[] _DocBaseInterpreterInstances =
+        internal static readonly DocBaseInterpreter[] ContentInterpreterInstances =
             Reflection
                 .LoadBinDlls()
                 .SelectMany(a => a.GetTypes())
@@ -166,7 +167,7 @@ namespace Rudine.Interpreters {
 
         internal static T InstanceLocatorByName<T>(string DocTypeName, string DocRev = null) where T : DocBaseInterpreter =>
             CacheMan.Cache(() => {
-                               foreach (T _IDocDataInterpreter in _DocBaseInterpreterInstances.OfType<T>())
+                               foreach (T _IDocDataInterpreter in ContentInterpreterInstances.OfType<T>())
                                    //TODO:Need a better way of discovering what IDocDataInterpreter can process the given document; it needs to consider the DocRev also
                                    if (_IDocDataInterpreter.Processable(DocTypeName, DocRev))
                                        return _IDocDataInterpreter;
@@ -174,14 +175,14 @@ namespace Rudine.Interpreters {
                            }, false, "InstanceLocatorByName", DocTypeName, DocRev ?? String.Empty);
 
         private static DocTextInterpreter LocateInstance(string DocData) {
-            foreach (DocTextInterpreter _IDocDataInterpreter in _DocBaseInterpreterInstances.OfType<DocTextInterpreter>())
+            foreach (DocTextInterpreter _IDocDataInterpreter in ContentInterpreterInstances.OfType<DocTextInterpreter>())
                 if (!String.IsNullOrWhiteSpace(_IDocDataInterpreter.ReadDocTypeName(DocData)) && !String.IsNullOrWhiteSpace(_IDocDataInterpreter.ReadDocRev(DocData)))
                     return _IDocDataInterpreter;
             throw new InterpreterLocationException();
         }
 
         private static DocByteInterpreter LocateInstance(byte[] DocData) {
-            foreach (DocByteInterpreter _IDocDataInterpreter in _DocBaseInterpreterInstances.OfType<DocByteInterpreter>())
+            foreach (DocByteInterpreter _IDocDataInterpreter in ContentInterpreterInstances.OfType<DocByteInterpreter>())
                 if (!String.IsNullOrWhiteSpace(_IDocDataInterpreter.ReadDocTypeName(DocData)) && !String.IsNullOrWhiteSpace(_IDocDataInterpreter.ReadDocRev(DocData)))
                     return _IDocDataInterpreter;
             throw new InterpreterLocationException();
@@ -296,7 +297,7 @@ namespace Rudine.Interpreters {
                     context.Response.Write((string) docData);
                 }
 
-                context.Response.ContentType = _DocBaseInterpreter.ContentType;
+                context.Response.ContentType = _DocBaseInterpreter.ContentInfo.ContentType;
                 context.Response.AddHeader(
                            "content-disposition",
                            string.Format(
@@ -304,5 +305,6 @@ namespace Rudine.Interpreters {
                                DocBaseInterpreter.GetFilename(_DocProcessingInstructions, context.Request.Params["ContentFileExtension"])));
             }
         }
+        public ContentInfo ContentInfo => null;
     }
 }
