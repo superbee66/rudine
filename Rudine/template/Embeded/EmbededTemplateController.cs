@@ -7,7 +7,7 @@ namespace Rudine.Template.Embeded
     internal class EmbededTemplateController : ITemplateController
     {
         internal const string MY_ONLY_DOC_NAME = "DOCREV";
-        internal static Version MY_ONLY_DOC_VERSION = new Version(1, 0, 0, 0);
+        internal static readonly Version MY_ONLY_DOC_VERSION = new Version(1, 0, 0, 0);
 
         public MemoryStream OpenRead(string DocTypeName, string DocRev, string filename)
         {
