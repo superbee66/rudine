@@ -142,8 +142,8 @@ namespace Rudine.Storage.Docdb
             foreach (Document _Document in ListDocuments(new List<string> { DocTypeName }, _RequiredDocKeys, null, null, 1, 0, RelayUrl, DirectoryPath))
             {
                 _BaseDoc = _Document.AsDocSubmissions().Last().Key.DocIsBinary
-                               ? DocInterpreter.Instance.Read((byte[]) _Document.AsDocSubmissions().Last().Value, true)
-                               : DocInterpreter.Instance.Read((string) _Document.AsDocSubmissions().Last().Value, true);
+                               ? DocInterpreter.Instance.Read((byte[])_Document.AsDocSubmissions().Last().Value, true)
+                               : DocInterpreter.Instance.Read((string)_Document.AsDocSubmissions().Last().Value, true);
 
                 if (_BaseDoc.DocKeys.Count == DocKeys.Count)
                 {
@@ -167,8 +167,8 @@ namespace Rudine.Storage.Docdb
                                   .Value;
         }
 
-        public string GetDocDataText(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (string) GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
-        public byte[] GetDocDataBytes(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (byte[]) GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
+        public string GetDocDataText(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (string)GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
+        public byte[] GetDocDataBytes(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (byte[])GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
 
         #region private
 
@@ -221,9 +221,9 @@ namespace Rudine.Storage.Docdb
                 ScoreDoc[] _ScoreDoc = _Searcher.Search(new MultiFieldQueryParser(LUCENE_VERSION,
                         _Fields.ToArray(),
                         _PerFieldAnalyzerWrapper)
-                    {
-                        AllowLeadingWildcard = false
-                    }.Parse(_QueryString),
+                {
+                    AllowLeadingWildcard = false
+                }.Parse(_QueryString),
                     null,
                     PageIndex * PageSize + PageSize,
                     _ListDocumentsSort).ScoreDocs;
@@ -294,7 +294,7 @@ namespace Rudine.Storage.Docdb
 
         private bool CreateNeeded()
         {
-            DirectoryPath = RequestPaths.GetPhysicalApplicationPath("App_Data\\Docdb");
+            DirectoryPath = RequestPaths.GetPhysicalApplicationPath("doc_db");
 
             // ensure the import folder actually exists
             if (!Directory.Exists(DirectoryPath))

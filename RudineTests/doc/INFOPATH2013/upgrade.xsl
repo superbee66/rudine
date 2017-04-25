@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:my="http://schemas.microsoft.com/office/infopath/2003/myXSD/2017-04-25T02:31:05" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:my="http://schemas.microsoft.com/office/infopath/2003/myXSD/2017-04-25T02:31:05" xmlns:xd="http://schemas.microsoft.com/office/infopath/2003" version="1.0">
 	<xsl:output encoding="UTF-8" method="xml"/>
 	<xsl:template match="text() | *[namespace-uri()='http://www.w3.org/1999/xhtml']" mode="RichText">
 		<xsl:copy-of select="."/>
@@ -7,18 +7,18 @@
 	<xsl:template match="/">
 		<xsl:copy-of select="processing-instruction() | comment()"/>
 		<xsl:choose>
-			<xsl:when test="my:XSN_EXAMPLE">
-				<xsl:apply-templates select="my:XSN_EXAMPLE" mode="_0"/>
+			<xsl:when test="my:INFOPATH2013">
+				<xsl:apply-templates select="my:INFOPATH2013" mode="_0"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:variable name="var">
-					<xsl:element name="my:XSN_EXAMPLE"/>
+					<xsl:element name="my:INFOPATH2013"/>
 				</xsl:variable>
 				<xsl:apply-templates select="msxsl:node-set($var)/*" mode="_0"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	<xsl:template match="my:XSN_EXAMPLE" mode="_0">
+	<xsl:template match="my:INFOPATH2013" mode="_0">
 		<xsl:copy>
 			<xsl:element name="my:field1">
 				<xsl:copy-of select="my:field1/text()[1]"/>

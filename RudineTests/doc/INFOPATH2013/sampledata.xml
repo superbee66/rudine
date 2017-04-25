@@ -1,0 +1,13 @@
+<my:INFOPATH2013 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:my="http://schemas.microsoft.com/office/infopath/2003/myXSD/2017-04-25T02:31:05" xmlns:xd="http://schemas.microsoft.com/office/infopath/2003">
+	<my:field1/>
+	<my:field2/>
+	<my:field3/>
+	<my:field4/>
+	<my:field5>false</my:field5>
+	<my:field6/>
+	<xd:SchemaInfo LocalName="INFOPATH2013" NamespaceURI="http://schemas.microsoft.com/office/infopath/2003/myXSD/2017-04-25T02:31:05">
+		<xd:Namespaces>
+			<xd:Namespace LocalName="INFOPATH2013" NamespaceURI="http://schemas.microsoft.com/office/infopath/2003/myXSD/2017-04-25T02:31:05"/>
+		</xd:Namespaces>
+	</xd:SchemaInfo>
+</my:INFOPATH2013>

@@ -52,20 +52,24 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="ImporterControllerTests.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreterTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="doc\XSN_EXAMPLE\manifest.xsf">
+    <None Include="doc\INFOPATH2013\manifest.xsf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="doc\XSN_EXAMPLE\myschema.xsd">
+    </None>
+    <None Include="doc\INFOPATH2013\myschema.xsd">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="doc\XSN_EXAMPLE\XSN_EXAMPLE.xsn" />
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rudine.Interpreters.Xsn\Rudine.Interpreters.Xsn.csproj">
+      <Project>{89527749-556d-4e8d-8213-d2b0d869506b}</Project>
+      <Name>Rudine.Interpreters.Xsn</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rudine\Rudine.csproj">
       <Project>{C9065636-B397-4FB3-B9DE-8FE5A754210A}</Project>
       <Name>Rudine</Name>
@@ -75,16 +79,16 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="doc\XSN_EXAMPLE\sampledata.xml">
+    <Content Include="doc\INFOPATH2013\sampledata.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="doc\XSN_EXAMPLE\template.xml">
+    <Content Include="doc\INFOPATH2013\template.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="doc\XSN_EXAMPLE\upgrade.xsl">
+    <Content Include="doc\INFOPATH2013\upgrade.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="doc\XSN_EXAMPLE\view1.xsl">
+    <Content Include="doc\INFOPATH2013\view1.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
