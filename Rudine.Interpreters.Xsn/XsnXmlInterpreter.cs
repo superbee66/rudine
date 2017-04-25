@@ -154,6 +154,7 @@ namespace Rudine.Interpreters.Xsn
             Regex.Match(DocData, string.Format("(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline)
                  .Value;
 
+        //BUG:<DocTypeName> may have hyphens & will not change when InfoPath designer changes the root node in the editor
         private static string parseReadDocTypeName(string DocData) =>
             Regex.Match(DocData,
                      @"(urn:schemas-microsoft-com:office:infopath:)(?<DocTypeName>\w+)(:-myXSD-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})",

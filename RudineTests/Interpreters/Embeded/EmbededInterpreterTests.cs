@@ -14,8 +14,9 @@ namespace Rudine.Interpreters.Embeded.Tests
         [Test()]
         public void CreateTest()
         {
-            var basedoc = new EmbededInterpreter().Create(string.Empty);
+            var basedoc = new EmbededInterpreter().Create("DOCREV");
             Assert.IsTrue(basedoc is BaseDoc);
+            Assert.IsTrue(basedoc is DOCREV);
         }
     }
 }
