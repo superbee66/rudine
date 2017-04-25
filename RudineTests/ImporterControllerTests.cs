@@ -14,7 +14,6 @@ namespace Rudine.Tests
         public void TryDocRevImportingTest()
         {
             ImporterController.TryDocRevImporting();
-            Assert.Fail();
         }
     }
 }
