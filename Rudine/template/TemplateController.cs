@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using Rudine.Interpreters.Embeded;
-
 using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Web.Util;
@@ -56,7 +55,7 @@ namespace Rudine.Template
                 .Where(t => t._Type != GetType())
                 .Where(t => !t._Type.IsInterface)
                 .Where(t => t._Type.GetInterfaces().Any(i => i == typeof(ITemplateController)))
-                .Select(t => ((ITemplateController)Activator.CreateInstance(t._Type)))
+                .Select(t => ((ITemplateController) Activator.CreateInstance(t._Type)))
                 .ToArray();
         }
 
@@ -148,14 +147,16 @@ namespace Rudine.Template
         /// <returns>string.Empty if nothing is found</returns>
         public string TopDocRev(string DocTypeName, bool forceRefresh) =>
             CacheMan.Cache(() =>
-                               _DefaultTopDocFilesystemTemplateController.TopDocRev(DocTypeName)
-                               ?? _OtherIDocResourceControllers
-                                   //DOCREVs should always come from the embedded controller
-                                   .Select(m => m.TopDocRev(DocTypeName))
-                                   .Where(DocRev => !string.IsNullOrWhiteSpace(DocRev))
-                                   .OrderByDescending(DocRev => new Version(DocRev))
-                                   .ToArray()
-                                   .FirstOrDefault(),
+                               DocTypeName.Equals(EmbededInterpreter.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase)
+                                   ? EmbededInterpreter.MY_ONLY_DOC_VERSION.ToString()
+                                   : _DefaultTopDocFilesystemTemplateController.TopDocRev(DocTypeName)
+                                     ?? _OtherIDocResourceControllers
+                                         //DOCREVs should always come from the embedded controller
+                                         .Select(m => m.TopDocRev(DocTypeName))
+                                         .Where(DocRev => !string.IsNullOrWhiteSpace(DocRev))
+                                         .OrderByDescending(DocRev => new Version(DocRev))
+                                         .ToArray()
+                                         .FirstOrDefault(),
                 forceRefresh,
                 "TopDocRev",
                 DocTypeName);
