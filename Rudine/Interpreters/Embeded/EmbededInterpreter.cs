@@ -24,15 +24,17 @@ namespace Rudine.Interpreters.Embeded
             if (!DocTypeName.Equals(MY_ONLY_DOC_NAME, StringComparison.InvariantCultureIgnoreCase))
                 throw new ArgumentException(String.Empty, nameof(DocTypeName));
 
+            return Create();
+        }
+
+        private static DOCREV Create()
+        {
             return new DOCREV
             {
                 DocTypeName = MY_ONLY_DOC_NAME,
                 FileList = new List<DocRevEntry>(),
                 solutionVersion = MY_ONLY_DOC_VERSION.ToString(),
-                Target = new DocURN
-                {
-                    DocTypeName = DocTypeName
-                }
+                Target = new DocURN { }
             };
         }
 
@@ -45,34 +47,31 @@ namespace Rudine.Interpreters.Embeded
             &&
             DocRev.Equals(MY_ONLY_DOC_VERSION.ToString());
 
+        /// <summary>
+        /// extracts contents of the zip file into a DOCREV object
+        /// </summary>
+        /// <param name="DocData"></param>
+        /// <param name="DocRevStrict"></param>
+        /// <returns></returns>
         public override BaseDoc Read(byte[] DocData, bool DocRevStrict = false)
         {
-            DOCREV _DOCREV = new DOCREV
-            {
-                FileList = new List<DocRevEntry>(),
-                Target = new DocURN(),
-                DocTypeName = MY_ONLY_DOC_NAME,
-                solutionVersion = MY_ONLY_DOC_VERSION.ToString()
-            };
+            DOCREV _DOCREV = Create();
 
             using (MemoryStream _MemoryStream = new MemoryStream(DocData))
-            using (ZipInputStream _ZipInputStream = new ZipInputStream(_MemoryStream) { IsStreamOwner = false })
-            {
-                ZipEntry _NextEntry;
-
-                //TODO:ZipInputStream not reading
-                while ((_NextEntry = _ZipInputStream.GetNextEntry()) != null)
-                {
-                    _DOCREV.FileList.Add(
+            using (ZipFile _ZipFile = new ZipFile(_MemoryStream))
+                foreach (ZipEntry _ZipEntry in _ZipFile)
+                    if (_ZipEntry.IsFile)
+                    {
+                        _DOCREV.FileList.Add(
                         new DocRevEntry
                         {
-                            Bytes = _ZipInputStream.AsBytes(),
-                            Name = string.Join("\\", _NextEntry.Name.Split('\\').Skip(2).ToArray())
+                            Bytes = _ZipFile.GetInputStream(_ZipEntry).AsBytes(),
+                            Name = string.Join("\\", _ZipEntry.Name.Split('\\').Skip(2).ToArray())
                         });
-                    _DOCREV.Target.DocTypeName = _NextEntry.Name.Split('\\')[0];
-                    _DOCREV.Target.solutionVersion = _NextEntry.Name.Split('\\')[1];
-                }
-            }
+                        _DOCREV.Target.DocTypeName = _ZipEntry.Name.Split('\\')[0];
+                        _DOCREV.Target.solutionVersion = _ZipEntry.Name.Split('\\')[1];
+                    }
+
             _DOCREV.DocKeys = new Dictionary<string, string>
             {
                 { "TargetDocTypeName", _DOCREV.Target.DocTypeName },
@@ -94,7 +93,7 @@ namespace Rudine.Interpreters.Embeded
             using (MemoryStream fsOut = new MemoryStream())
             using (ZipOutputStream _ZipOutputStream = new ZipOutputStream(fsOut) { IsStreamOwner = false })
             {
-                IDocRev _DocRev = (IDocRev) source;
+                IDocRev _DocRev = (IDocRev)source;
                 _ZipOutputStream.SetLevel(9); //0-9, 9 being the highest level of compression
 
                 foreach (DocRevEntry file in _DocRev.FileList)
