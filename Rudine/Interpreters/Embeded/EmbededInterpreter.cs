@@ -10,6 +10,10 @@ using Rudine.Web.Util;
 
 namespace Rudine.Interpreters.Embeded
 {
+    /// <summary>
+    ///     a glorified set of zipping routines that convert to and from a BaseDoc holding bytes that represent supporting
+    ///     content for that BaseDoc/DocRev definition
+    /// </summary>
     public class EmbededInterpreter : DocByteInterpreter
     {
         internal const string MY_ONLY_DOC_NAME = "DOCREV";
@@ -20,12 +24,12 @@ namespace Rudine.Interpreters.Embeded
             if (!DocTypeName.Equals(MY_ONLY_DOC_NAME, StringComparison.InvariantCultureIgnoreCase))
                 throw new ArgumentException(String.Empty, nameof(DocTypeName));
 
-            return new DOCREV()
+            return new DOCREV
             {
                 DocTypeName = MY_ONLY_DOC_NAME,
                 FileList = new List<DocRevEntry>(),
                 solutionVersion = MY_ONLY_DOC_VERSION.ToString(),
-                Target = new DocURN()
+                Target = new DocURN
                 {
                     DocTypeName = DocTypeName
                 }
@@ -90,7 +94,7 @@ namespace Rudine.Interpreters.Embeded
             using (MemoryStream fsOut = new MemoryStream())
             using (ZipOutputStream _ZipOutputStream = new ZipOutputStream(fsOut) { IsStreamOwner = false })
             {
-                IDocRev _DocRev = (IDocRev)source;
+                IDocRev _DocRev = (IDocRev) source;
                 _ZipOutputStream.SetLevel(9); //0-9, 9 being the highest level of compression
 
                 foreach (DocRevEntry file in _DocRev.FileList)
