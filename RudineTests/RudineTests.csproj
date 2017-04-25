@@ -55,6 +55,14 @@
     <Compile Include="Interpreters\Embeded\EmbededInterpreterTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="doc\XSN_EXAMPLE\manifest.xsf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="doc\XSN_EXAMPLE\myschema.xsd">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="doc\XSN_EXAMPLE\XSN_EXAMPLE.xsn" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +73,20 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="doc\XSN_EXAMPLE\sampledata.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="doc\XSN_EXAMPLE\template.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="doc\XSN_EXAMPLE\upgrade.xsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="doc\XSN_EXAMPLE\view1.xsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

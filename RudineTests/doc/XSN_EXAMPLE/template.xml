@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?mso-infoPathSolution name="urn:schemas-microsoft-com:office:infopath:XSN-EXAMPLE:-myXSD-2017-04-25T02-31-05" href="manifest.xsf" solutionVersion="1.0.0.2" productVersion="15.0.0" PIVersion="1.0.0.0" ?>
+<?mso-application progid="InfoPath.Document" versionProgid="InfoPath.Document.4"?>
+<my:XSN_EXAMPLE xmlns:my="http://schemas.microsoft.com/office/infopath/2003/myXSD/2017-04-25T02:31:05">
+	<my:field1></my:field1>
+	<my:field2></my:field2>
+	<my:field3></my:field3>
+	<my:field4></my:field4>
+	<my:field5>false</my:field5>
+	<my:field6></my:field6>
+</my:XSN_EXAMPLE>
