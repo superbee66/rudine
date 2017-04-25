@@ -20,7 +20,17 @@ namespace Rudine.Interpreters.Embeded
             if (!DocTypeName.Equals(MY_ONLY_DOC_NAME, StringComparison.InvariantCultureIgnoreCase))
                 throw new ArgumentException(String.Empty, nameof(DocTypeName));
 
-            return new DOCREV();
+            return new DOCREV()
+            {
+                DocTypeName = MY_ONLY_DOC_NAME,
+                FileList = new List<DocRevEntry>(),
+                solutionVersion = MY_ONLY_DOC_VERSION.ToString(),
+                Target = new DocURN()
+                {
+                    DocTypeName = DocTypeName
+                },
+
+            };
         }
 
         public override string GetDescription(string DocTypeName) => null;
@@ -80,7 +90,7 @@ namespace Rudine.Interpreters.Embeded
             using (MemoryStream fsOut = new MemoryStream())
             using (ZipOutputStream _ZipOutputStream = new ZipOutputStream(fsOut) { IsStreamOwner = false })
             {
-                IDocRev _DocRev = (IDocRev) source;
+                IDocRev _DocRev = (IDocRev)source;
                 _ZipOutputStream.SetLevel(9); //0-9, 9 being the highest level of compression
 
                 foreach (DocRevEntry file in _DocRev.FileList)
