@@ -33,7 +33,7 @@ namespace Rudine.Template
         private static ITemplateController[] _OtherIDocResourceControllers;
 
         /// <summary>
-        ///     Seeds the underlying datastore with a single DOCREV document if it does not exist. Without this document not would
+        ///     Seeds the underlying datastore with a single DocRev document if it does not exist. Without this document not would
         ///     exist.  Scans current AppDomain for BaseDoc instances & fabricates a form/* folder with what is now the emerging
         ///     technique
         ///     of serving the forms, the JsonInterpreter.
@@ -140,8 +140,8 @@ namespace Rudine.Template
         }
 
         /// <summary>
-        ///     Reads the DOCREV from the local AppDomain working_folder\form\*. When nothing is found the Docdb store for the most
-        ///     current DOCREV. The first item in descending string order.
+        ///     Reads the DocRev from the local AppDomain working_folder\form\*. When nothing is found the Docdb store for the most
+        ///     current DocRev. The first item in descending string order.
         /// </summary>
         /// <param name="DocTypeName"></param>
         /// <returns>string.Empty if nothing is found</returns>

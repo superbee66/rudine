@@ -230,7 +230,7 @@ namespace Rudine
         /// <param name="DocTypeName"></param>
         /// <param name="cSharpCode"></param>
         /// <param name="PrimaryTypeParentType">default is typeof(BaseDoc)</param>
-        /// <param name="PrimaryTypeAppliedInterfaces">default is IDocIdentifiers, if DocTypeName is DOCREV IDocRev also</param>
+        /// <param name="PrimaryTypeAppliedInterfaces">default is IDocIdentifiers, if DocTypeName is DocRev IDocRev also</param>
         /// <param name="SecondaryTypeParentType">default is typeof(BaseAutoIdent)</param>
         /// <param name="SecondaryTypesAppliedInterfaces">nothing is applied when null</param>
         /// <returns></returns>
@@ -245,8 +245,8 @@ namespace Rudine
             #region Apply_Defaults
 
             /*
-             BANDAID: DOCREV
-             (search for this though out the code for more on DOCREV snafus in general),
+             BANDAID: DocRev
+             (search for this though out the code for more on DocRev snafus in general),
              class inheritance should code customization should not be performed like this. This is specifically to cater toward IDocRev and nothing more.
             */
             if (PrimaryTypeParentType == null)

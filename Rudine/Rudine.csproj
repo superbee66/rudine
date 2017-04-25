@@ -146,7 +146,7 @@
     <Compile Include="ImporterController.cs" />
     <Compile Include="ImporterLightDoc.cs" />
     <Compile Include="Interpreters\DocTempleter.cs" />
-    <Compile Include="Interpreters\Embeded\DOCREV.cs" />
+    <Compile Include="Interpreters\Embeded\DocRev.cs" />
     <Compile Include="Interpreters\Embeded\DocRevEntry.cs" />
     <Compile Include="Interpreters\Embeded\DocURN.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreter.cs" />

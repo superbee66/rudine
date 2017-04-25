@@ -8,7 +8,7 @@ namespace Rudine.Interpreters.Embeded
     [XmlType(AnonymousType = true, Namespace = "urn:rudine.progablab.com")]
     [XmlRoot(Namespace = "urn:rudine.progablab.com", IsNullable = false)]
     [Serializable]
-    public class DOCREV : BaseDoc, IDocRev
+    public class DocRev : BaseDoc, IDocRev
     {
         private string mD5Field;
 

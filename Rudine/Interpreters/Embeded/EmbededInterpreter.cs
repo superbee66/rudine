@@ -16,7 +16,7 @@ namespace Rudine.Interpreters.Embeded
     /// </summary>
     public class EmbededInterpreter : DocByteInterpreter
     {
-        internal const string MY_ONLY_DOC_NAME = "DOCREV";
+        internal const string MY_ONLY_DOC_NAME = "DocRev";
         internal static readonly Version MY_ONLY_DOC_VERSION = new Version(1, 0, 0, 0);
 
         public override BaseDoc Create(string DocTypeName)
@@ -27,9 +27,9 @@ namespace Rudine.Interpreters.Embeded
             return Create();
         }
 
-        private static DOCREV Create()
+        private static DocRev Create()
         {
-            return new DOCREV
+            return new DocRev
             {
                 DocTypeName = MY_ONLY_DOC_NAME,
                 FileList = new List<DocRevEntry>(),
@@ -48,14 +48,14 @@ namespace Rudine.Interpreters.Embeded
             DocRev.Equals(MY_ONLY_DOC_VERSION.ToString());
 
         /// <summary>
-        /// extracts contents of the zip file into a DOCREV object
+        /// extracts contents of the zip file into a DocRev object
         /// </summary>
         /// <param name="DocData"></param>
         /// <param name="DocRevStrict"></param>
         /// <returns></returns>
         public override BaseDoc Read(byte[] DocData, bool DocRevStrict = false)
         {
-            DOCREV _DOCREV = Create();
+            DocRev _DOCREV = Create();
 
             using (MemoryStream _MemoryStream = new MemoryStream(DocData))
             using (ZipFile _ZipFile = new ZipFile(_MemoryStream))
