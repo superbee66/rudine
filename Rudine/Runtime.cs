@@ -14,7 +14,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.CSharp;
 using Rudine.Template;
-using Rudine.Template.Embeded;
+
 using Rudine.Util;
 using Rudine.Util.Xsds;
 using Rudine.Web;
@@ -253,16 +253,7 @@ namespace Rudine
                 PrimaryTypeParentType = typeof(BaseDoc);
 
             if (PrimaryTypeAppliedInterfaces == null || PrimaryTypeAppliedInterfaces.Length == 0)
-                PrimaryTypeAppliedInterfaces = DocTypeName == EmbededTemplateController.MY_ONLY_DOC_NAME
-                                                   ? new[] {
-                                                       typeof(IDocIdentifiers).Name,
-                                                       (cSharpCode.Contains("TargetDocTypeFiles")
-                                                            ? typeof(IDocRev).Name
-                                                            : typeof(IDocRev).Name)
-                                                   }
-                                                   : new[] {
-                                                       typeof(IDocIdentifiers).Name
-                                                   };
+                PrimaryTypeAppliedInterfaces = new[] { nameof(IDocIdentifiers) };
 
             string ApplyToPrimaryClass = string.Format("{0}", string.Join(", ", new[] {
                 PrimaryTypeParentType.Name

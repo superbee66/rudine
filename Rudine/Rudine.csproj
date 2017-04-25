@@ -146,6 +146,9 @@
     <Compile Include="ImporterController.cs" />
     <Compile Include="ImporterLightDoc.cs" />
     <Compile Include="Interpreters\DocTempleter.cs" />
+    <Compile Include="Interpreters\Embeded\DOCREV.cs" />
+    <Compile Include="Interpreters\Embeded\DocRevEntry.cs" />
+    <Compile Include="Interpreters\Embeded\DocURN.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreter.cs" />
     <Compile Include="Interpreters\IDocBaseInterpreter.cs" />
     <Compile Include="Interpreters\IDocByteInterpreter.cs" />
@@ -172,12 +175,6 @@
     <Compile Include="Exceptions\SubmissionException.cs" />
     <Compile Include="Exceptions\SubmitDeniedException.cs" />
     <Compile Include="Tasker.cs" />
-    <Compile Include="Template\Embeded\DOCREV_SCHEMAS.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DOCREV_SCHEMAS.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Template\Embeded\EmbededTemplateController.cs" />
     <Compile Include="Template\Filesystem\FilesystemTemplateController.cs" />
     <Compile Include="Template\Docdb\DocdbTemplateController.cs" />
     <Compile Include="Template\TemplateController.cs" />
@@ -272,16 +269,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Template\Embeded\DOCREV_SCHEMAS.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>DOCREV_SCHEMAS.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Template\Embeded\DOCREV.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

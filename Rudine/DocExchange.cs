@@ -7,9 +7,10 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Rudine.Exceptions;
 using Rudine.Interpreters;
+using Rudine.Interpreters.Embeded;
 using Rudine.Storage.Docdb;
 using Rudine.Template;
-using Rudine.Template.Embeded;
+
 using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Web;
@@ -116,7 +117,7 @@ namespace Rudine {
             //#if !FAST
             Version existingVersion;
             // DOCREVs are only submitted via Text, there is no need to worry about them enter the system in another fusion. 
-            if (_LightDoc.DocTypeName == EmbededTemplateController.MY_ONLY_DOC_NAME)
+            if (_LightDoc.DocTypeName == EmbededInterpreter.MY_ONLY_DOC_NAME)
                 // if the DOCREV submitted supersedes the current or this is no current..
                 if (!Version.TryParse(TemplateController.Instance.TopDocRev(TargetDocName), out existingVersion) || Version.Parse(TargetDocVer) >= existingVersion)
                     // if there is no representation of this DOCREV as a directory in the file system (as this trumps the submitted one no matter what

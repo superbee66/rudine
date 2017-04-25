@@ -1,11 +1,10 @@
 using Rudine.Web;
+using DocURN = Rudine.Interpreters.Embeded.DocURN;
 
 namespace Rudine.Template
 {
-    public class TemplateFileInfo : IDocURN
+    public class TemplateFileInfo : DocURN
     {
         public string FileName { get; set; }
-        public string DocTypeName { get; set; }
-        public string solutionVersion { get; set; }
     }
 }

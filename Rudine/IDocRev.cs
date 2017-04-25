@@ -1,12 +1,14 @@
+using System.Collections.Generic;
+using Rudine.Interpreters.Embeded;
 using Rudine.Web;
+using DocURN = Rudine.Interpreters.Embeded.DocURN;
 
 namespace Rudine
 {
     public interface IDocRev : IBaseDoc
     {
-        string TargetDocMD5 { get; set; }
-        byte[] TargetDocTypeFiles { get; set; }
-        string TargetDocTypeName { get; set; }
-        string TargetDocTypeVer { get; set; }
+        string MD5 { get; set; }
+        DocURN Target { get; set; }
+        List<DocRevEntry> FileList { get; set; }
     }
 }

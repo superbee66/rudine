@@ -2,7 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Web;
-using Rudine.Template.Embeded;
+using Rudine.Interpreters.Embeded;
+
 using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Web.Util;
@@ -55,7 +56,7 @@ namespace Rudine.Template
                 .Where(t => t._Type != GetType())
                 .Where(t => !t._Type.IsInterface)
                 .Where(t => t._Type.GetInterfaces().Any(i => i == typeof(ITemplateController)))
-                .Select(t => ((ITemplateController) Activator.CreateInstance(t._Type)))
+                .Select(t => ((ITemplateController)Activator.CreateInstance(t._Type)))
                 .ToArray();
         }
 
@@ -77,8 +78,7 @@ namespace Rudine.Template
         {
             MemoryStream _MemoryStream = null;
 
-            foreach (ITemplateController _OtherIDocResourceController in _OtherIDocResourceControllers
-                .Where(m => (DocTypeName == EmbededTemplateController.MY_ONLY_DOC_NAME) == (typeof(EmbededTemplateController) == m.GetType())))
+            foreach (ITemplateController _OtherIDocResourceController in _OtherIDocResourceControllers)
                 if (_MemoryStream != null)
                     break;
                 else
@@ -151,7 +151,6 @@ namespace Rudine.Template
                                _DefaultTopDocFilesystemTemplateController.TopDocRev(DocTypeName)
                                ?? _OtherIDocResourceControllers
                                    //DOCREVs should always come from the embedded controller
-                                   .Where(m => (DocTypeName == EmbededTemplateController.MY_ONLY_DOC_NAME) == (typeof(EmbededTemplateController) == m.GetType()))
                                    .Select(m => m.TopDocRev(DocTypeName))
                                    .Where(DocRev => !string.IsNullOrWhiteSpace(DocRev))
                                    .OrderByDescending(DocRev => new Version(DocRev))

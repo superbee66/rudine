@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -7,12 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
+using ICSharpCode.SharpZipLib.Zip;
+using ICSharpCode.SharpZipLib.Core;
 using Microsoft.Deployment.Compression;
 using Microsoft.Deployment.Compression.Cab;
 using Newtonsoft.Json;
 using Rudine.Exceptions;
 using Rudine.Interpreters;
-using Rudine.Template.Embeded;
+using Rudine.Interpreters.Embeded;
+
 using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Util.Cabs;
@@ -116,109 +120,44 @@ namespace Rudine
 
             string DocMD5, DocTypeVer;
             string DocTypeName = FilesystemTemplateController.ScanContentFolder(_DirectoryInfo, out DocTypeVer, out DocMD5);
-            if (!DocExchange.LuceneController.List(new List<string>
+            if (!DocExchange.LuceneController.List(new List<string> { EmbededInterpreter.MY_ONLY_DOC_NAME }, null, null, DocMD5).Any())
             {
-                EmbededTemplateController.MY_ONLY_DOC_NAME
-            }, null, null, DocMD5).Any())
-                try
-                {
-                    IList<string> relativeFilePathsInDirectoryTree = GetRelativeFilePathsInDirectoryTree(_DirectoryInfo.FullName, true);
-                    IDictionary<string, string> files = CreateStringDictionary(relativeFilePathsInDirectoryTree, relativeFilePathsInDirectoryTree);
+                IList<string> relativeFilePathsInDirectoryTree = GetRelativeFilePathsInDirectoryTree(_DirectoryInfo.FullName, true);
+                IDictionary<string, string> files = CreateStringDictionary(relativeFilePathsInDirectoryTree, relativeFilePathsInDirectoryTree);
+                IDocRev DocRevBaseDoc = (IDocRev)DocInterpreter.Instance.Create(EmbededInterpreter.MY_ONLY_DOC_NAME);
 
-                    //the folder's contents compressed
-                    string cabFilePath = string.Format(@"{0}\{1}_{2}.cab", workingFolderPath, DocTypeName, FileSystem.CleanFileName(DocTypeVer));
-
-                    Dictionary<string, string> DocKeys = new Dictionary<string, string>
+                DocRevBaseDoc.Target.DocTypeName = DocTypeName;
+                DocRevBaseDoc.Target.solutionVersion = DocTypeVer;
+                DocRevBaseDoc.DocChecksum = int.MinValue;
+                DocRevBaseDoc.DocStatus = true;
+                DocRevBaseDoc.DocTitle = String.Format("{0} {1}", DocTypeName, DocTypeVer);
+                DocRevBaseDoc.DocTypeName = EmbededInterpreter.MY_ONLY_DOC_NAME;
+                DocRevBaseDoc.MD5 = DocMD5;
+                DocRevBaseDoc.DocKeys = new Dictionary<string, string>
                     {
-                        {
-                            "TargetDocTypeName", DocTypeName
-                        },
-                        {
-                            "TargetDocTypeVer", DocTypeVer
-                        }
+                        { "TargetDocTypeName", DocTypeName },
+                        { "TargetDocTypeVer", DocTypeVer }
                     };
 
-                    using (CompressionEngine _CompressionEngine = new CabEngine { CompressionLevel = CompressionLevel.Max })
-                    using (ArchiveMemoryStreamContext _ArchiveMemoryStreamContext = new ArchiveMemoryStreamContext(cabFilePath, sourceFolderPath, files) { EnableOffsetOpen = true })
-                    using (MemoryStream _TargetDocTypeFilesMemoryStream = new MemoryStream())
-                    {
-                        _CompressionEngine.Pack(_ArchiveMemoryStreamContext, files.Keys);
-
-                        string fileName = Path.GetFileName(cabFilePath);
-                        uint fileNameLength = (uint)fileName.Length + 1;
-                        byte[] fileNameBytes = Encoding.Unicode.GetBytes(fileName);
-
-                        using (MemoryStream CabFileMemoryStream = _ArchiveMemoryStreamContext.DictionaryStringMemoryStream.Values.First())
-                        {
-                            CabFileMemoryStream.Position = 0;
-                            using (BinaryReader _BinaryReader = new BinaryReader(CabFileMemoryStream))
-                            using (BinaryWriter _BinaryWriter = new BinaryWriter(_TargetDocTypeFilesMemoryStream))
-                            {
-                                // Write the InfoPath attachment signature. 
-                                _BinaryWriter.Write(new byte[]
-                                {
-                                    0xC7, 0x49, 0x46, 0x41
-                                });
-
-                                // Write the default header information.
-                                _BinaryWriter.Write((uint)0x14); // size
-                                _BinaryWriter.Write((uint)0x01); // version
-                                _BinaryWriter.Write((uint)0x00); // reserved
-
-                                // Write the file size.
-                                _BinaryWriter.Write((uint)_BinaryReader.BaseStream.Length);
-
-                                // Write the size of the file name.
-                                _BinaryWriter.Write(fileNameLength);
-
-                                // Write the file name (Unicode encoded).
-                                _BinaryWriter.Write(fileNameBytes);
-
-                                // Write the file name terminator. This is two nulls in Unicode.
-                                _BinaryWriter.Write(new byte[]
-                                {
-                                    0, 0
-                                });
-
-                                // Iterate through the file reading data and writing it to the outbuffer.
-                                byte[] data = new byte[64 * 1024];
-                                int bytesRead = 1;
-
-                                while (bytesRead > 0)
-                                {
-                                    bytesRead = _BinaryReader.Read(data, 0, data.Length);
-                                    _BinaryWriter.Write(data, 0, bytesRead);
-                                }
-                            }
-
-                            // these contents will be stored in yet another document as an attached cab file
-                            IDocRev DocRevBaseDoc = (IDocRev)DocInterpreter.Instance.Create(EmbededTemplateController.MY_ONLY_DOC_NAME);
-
-                            DocRevBaseDoc.DocChecksum = int.MinValue;
-                            DocRevBaseDoc.DocKeys = DocKeys;
-                            DocRevBaseDoc.DocStatus = true;
-                            DocRevBaseDoc.DocTitle = String.Format("{0} {1}", DocTypeName, DocTypeVer);
-                            DocRevBaseDoc.DocTypeName = EmbededTemplateController.MY_ONLY_DOC_NAME;
-                            DocRevBaseDoc.TargetDocTypeFiles = _TargetDocTypeFilesMemoryStream.ToArray();
-                            DocRevBaseDoc.TargetDocTypeName = DocTypeName;
-                            DocRevBaseDoc.TargetDocTypeVer = DocTypeVer;
-                            DocRevBaseDoc.TargetDocMD5 = DocMD5;
-
-                            List_ImporterLightDoc.Add(
-                                new ImporterLightDoc
-                                {
-                                    LightDoc = DocExchange.Instance.Import(
-                                        DocInterpreter.Instance.WriteStream((BaseDoc)DocRevBaseDoc))
-                                });
-                        }
-                    }
-                }
-                catch (ThreadAbortException) { }
-                catch (NoChangesSinceLastSubmitException) { }
-                catch (Exception)
+                foreach (KeyValuePair<string, string> file in files)
                 {
-                    /*TODO:Need to handle this trapped exception correctly*/
+
+                    FileInfo AddFileInfo = new FileInfo(file.Value);
+                    DocRevBaseDoc.FileList.Add(
+                        new DocRevEntry()
+                        {
+                            Bytes = AddFileInfo.OpenRead().AsBytes(),
+                            Name = file.Key
+                        });
+
+                    List_ImporterLightDoc.Add(
+                        new ImporterLightDoc
+                        {
+                            LightDoc = DocExchange.Instance.Import(
+                                DocInterpreter.Instance.WriteStream((BaseDoc)DocRevBaseDoc))
+                        });
                 }
+            }
             return List_ImporterLightDoc;
         }
 
@@ -305,42 +244,42 @@ namespace Rudine
         /// </summary>
         public static void TryDocRevImporting() =>
             CacheMan.Cache(() =>
-                                                                  {
-                                                                      ReadIDocModelCSharpCode();
+                           {
+                               ReadIDocModelCSharpCode();
 
-                                                                      dirs.PushRange(Directory
-                                                                          .EnumerateDirectories(FilesystemTemplateController.DirectoryPath)
-                                                                          .Select(dirpath => new DirectoryInfo(dirpath).FullName)
-                                                                          .Where(dirpath => !dirs.Contains(dirpath))
-                                                                          .OrderByDescending(dirpath =>
-                                                                                                 new[]
-                                                                                                     {
-                                                                                                         Directory.GetLastWriteTime(dirpath).Ticks
-                                                                                                     }
-                                                                                                     .Union(
-                                                                                                         GetRelativeFilePathsInDirectoryTree(dirpath, true)
-                                                                                                             .Select(filepath => File.GetLastWriteTimeUtc(filepath).Ticks))
-                                                                                                     .Max())
-                                                                          .ToArray());
+                               dirs.PushRange(Directory
+                                   .EnumerateDirectories(FilesystemTemplateController.DirectoryPath)
+                                   .Select(dirpath => new DirectoryInfo(dirpath).FullName)
+                                   .Where(dirpath => !dirs.Contains(dirpath))
+                                   .OrderByDescending(dirpath =>
+                                                          new[]
+                                                              {
+                                                                  Directory.GetLastWriteTime(dirpath).Ticks
+                                                              }
+                                                              .Union(
+                                                                  GetRelativeFilePathsInDirectoryTree(dirpath, true)
+                                                                      .Select(filepath => File.GetLastWriteTimeUtc(filepath).Ticks))
+                                                              .Max())
+                                   .ToArray());
 
-                                                                      // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
-                                                                      string dir;
-                                                                      while (dirs.TryPop(out dir) && ImportContentFolder(dir).Any()) { }
+                               // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
+                               string dir;
+                               while (dirs.TryPop(out dir) && ImportContentFolder(dir).Any()) { }
 
-                                                                      // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
-                                                                      if (!dirs.IsEmpty)
-                                                                          Tasker.StartNewTask(() =>
-                                                                                              {
-                                                                                                  while (dirs.TryPop(out dir))
-                                                                                                      ImportContentFolder(dir);
-                                                                                                  return true;
-                                                                                              });
+                               // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
+                               if (!dirs.IsEmpty)
+                                   Tasker.StartNewTask(() =>
+                                                       {
+                                                           while (dirs.TryPop(out dir))
+                                                               ImportContentFolder(dir);
+                                                           return true;
+                                                       });
 
-                                                                      return new object();
-                                                                  },
-            false,
-            "ImportDocModelsRunOnce"
-        );
+                               return new object();
+                           },
+                false,
+                "ImportDocModelsRunOnce"
+            );
 
         /// <summary>
         ///     Enumerates infopath format files (*.xml) in the /import folder. At this time only Infopath formats are processed.
@@ -364,7 +303,7 @@ namespace Rudine
                             PI = DocExchange.Instance.ReadStream(File.OpenRead(path))
                         })
                         .Where(file => !string.IsNullOrWhiteSpace(file.PI.DocTypeName))
-                        .OrderBy(file => !file.PI.DocTypeName.Equals(EmbededTemplateController.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase))
+                        .OrderBy(file => !file.PI.DocTypeName.Equals(EmbededInterpreter.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase))
                         .ThenBy(file => file.PI.DocTypeName)
                         .ThenBy(file => Version.Parse(file.PI.solutionVersion))
                         .ToArray()
