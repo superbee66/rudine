@@ -142,21 +142,21 @@ namespace Rudine
                 foreach (KeyValuePair<string, string> file in files)
                 {
 
-                    FileInfo AddFileInfo = new FileInfo(file.Value);
+                    FileInfo AddFileInfo = new FileInfo(_DirectoryInfo.FullName + "\\" + file.Value);
                     DocRevBaseDoc.FileList.Add(
                         new DocRevEntry()
                         {
                             Bytes = AddFileInfo.OpenRead().AsBytes(),
                             Name = file.Key
                         });
-
-                    List_ImporterLightDoc.Add(
-                        new ImporterLightDoc
-                        {
-                            LightDoc = DocExchange.Instance.Import(
-                                DocInterpreter.Instance.WriteStream((BaseDoc)DocRevBaseDoc))
-                        });
                 }
+
+                List_ImporterLightDoc.Add(
+                     new ImporterLightDoc
+                     {
+                         LightDoc = DocExchange.Instance.Import(
+                             DocInterpreter.Instance.WriteStream((BaseDoc)DocRevBaseDoc))
+                     });
             }
             return List_ImporterLightDoc;
         }

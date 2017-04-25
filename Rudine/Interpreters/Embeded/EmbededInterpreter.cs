@@ -28,8 +28,7 @@ namespace Rudine.Interpreters.Embeded
                 Target = new DocURN()
                 {
                     DocTypeName = DocTypeName
-                },
-
+                }
             };
         }
 
@@ -57,6 +56,7 @@ namespace Rudine.Interpreters.Embeded
             {
                 ZipEntry _NextEntry;
 
+                //TODO:ZipInputStream not reading
                 while ((_NextEntry = _ZipInputStream.GetNextEntry()) != null)
                 {
                     _DOCREV.FileList.Add(
@@ -117,9 +117,9 @@ namespace Rudine.Interpreters.Embeded
                             StreamUtils.Copy(streamReader, _ZipOutputStream, buffer);
                             _ZipOutputStream.CloseEntry();
                         }
-                        _ZipOutputStream.Close();
                     }
 
+                _ZipOutputStream.Close();
                 return fsOut.ToBytes();
             }
         }
