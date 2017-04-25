@@ -1,9 +1,11 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 using Rudine.Web;
 
 namespace Rudine.Interpreters.Embeded
 {
     [XmlType(Namespace = "urn:rudine.progablab.com")]
+    [Serializable]
     public class DocRevEntry : BaseAutoIdent
     {
         private byte[] bytesField;
