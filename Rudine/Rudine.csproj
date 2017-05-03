@@ -120,6 +120,9 @@
     <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
       <Link>Web\Util\FileSystem.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\Util\MD5Extensions.cs">
+      <Link>Web\MD5Extensions.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\Util\PropertyDefaultValue.cs">
       <Link>Web\Util\PropertyDefaultValue.cs</Link>
     </Compile>

@@ -15,31 +15,38 @@ namespace Rudine.Interpreters
 
         public bool IsReusable => false;
 
+        internal static string BuildHref(string DocTypeName, string solutionVersion)
+            => BuildHref(DocTypeName, solutionVersion, new Uri(RequestPaths.ApplicationPath));
+
         internal static string BuildHref(HttpContext context, string DocTypeName, string solutionVersion)
         {
-            string ashxFilename = context.Request.Url.AbsoluteUri.Substring(context.Request.Url.AbsoluteUri.LastIndexOf('/') + 1).Replace(context.Request.Url.Query, "");
-            string href = string.Empty;
-            href = new Uri(string.Format("{0}/{1}/{2}/{3}/{4}",
-                context
-                    .Request
-                    .Url
+            string href = BuildHref(DocTypeName, solutionVersion, context.Request.Url);
+
+            return !string.IsNullOrWhiteSpace(context.Request.Params[Parm.RelayUrl])
+                ? // Is this request coming in from a "proxying listener"?
+                string.Format("{0}{1}",
+                    context.Request.Params[Parm.RelayUrl],
+                    href.Substring(href.IndexOf(context.Request.ApplicationPath, StringComparison.Ordinal) + context.Request.ApplicationPath.Length))
+                    : href;
+        }
+
+        private static string BuildHref(string DocTypeName, string solutionVersion, Uri _uri)
+        {
+            string basePath = _uri.Query.Length > 0
+                ? _uri.AbsoluteUri.Substring(_uri.AbsoluteUri.LastIndexOf('/') + 1).Replace(_uri.Query, "")
+                : _uri.AbsoluteUri;
+            string href = new Uri(string.Format("{0}/{1}/{2}/{3}/{4}",
+               _uri.Query.Length > 0
+               ? _uri
                     .AbsoluteUri
-                    .Replace(context.Request.Url.Query, "")
-                    .Replace(ashxFilename, "")
-                    .TrimEnd('/'),
+                    .Replace(_uri.Query, "")
+                    .Replace(basePath, "")
+                    .TrimEnd('/')
+                    : _uri.AbsoluteUri,
                 FilesystemTemplateController.DirectoryName,
                 DocTypeName,
                 solutionVersion,
                 DocInterpreter.Instance.HrefVirtualFilename(DocTypeName, solutionVersion))).ToString();
-
-            // Is this request coming in from a "proxying listener"?
-            if (!string.IsNullOrWhiteSpace(context.Request.Params[Parm.RelayUrl]))
-                href =
-                    context.Request.Params[Parm.RelayUrl]
-                    + href.Substring(
-                        href.ToLower().IndexOf(context.Request.ApplicationPath.ToLower())
-                        + context.Request.ApplicationPath.Length);
-
             return href;
         }
 
@@ -55,9 +62,11 @@ namespace Rudine.Interpreters
         public static string GetFilename(DocProcessingInstructions _DocProcessingInstructions, string ContentFileExtension = null) =>
             string.Format(
                 "{0}.{1}",
-                FileSystem.CleanFileName(_DocProcessingInstructions.DocTitle).Trim(),
+                FileSystem.CleanFileName(_DocProcessingInstructions.DocTitle)
+                          .Trim(),
                 string.IsNullOrWhiteSpace(ContentFileExtension)
-                    ? DocInterpreter.InstanceLocatorByName<DocBaseInterpreter>(_DocProcessingInstructions.DocTypeName, _DocProcessingInstructions.solutionVersion).ContentInfo.ContentFileExtension
+                    ? DocInterpreter.InstanceLocatorByName<DocBaseInterpreter>(_DocProcessingInstructions.DocTypeName, _DocProcessingInstructions.solutionVersion)
+                                    .ContentInfo.ContentFileExtension
                     : ContentFileExtension);
 
         /// <summary>

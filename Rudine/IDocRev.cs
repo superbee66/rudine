@@ -7,7 +7,7 @@ namespace Rudine
 {
     public interface IDocRev : IBaseDoc
     {
-        string MD5 { get; set; }
+        string MD5 { get; }
         DocURN Target { get; set; }
         List<DocRevEntry> FileList { get; set; }
     }

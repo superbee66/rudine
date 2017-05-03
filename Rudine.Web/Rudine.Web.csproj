@@ -105,6 +105,7 @@
     <Compile Include="Util\FileSystem.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Util\MD5Extensions.cs" />
     <Compile Include="Util\MethodInfoExtensions.cs" />
     <Compile Include="Util\Null.cs">
       <SubType>Code</SubType>

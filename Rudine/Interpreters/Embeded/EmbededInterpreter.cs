@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using Rudine.Util.Zips;
@@ -34,7 +33,7 @@ namespace Rudine.Interpreters.Embeded
                 DocTypeName = MY_ONLY_DOC_NAME,
                 FileList = new List<DocRevEntry>(),
                 solutionVersion = MY_ONLY_DOC_VERSION.ToString(),
-                Target = new DocURN { }
+                Target = new DocURN()
             };
         }
 
@@ -59,6 +58,7 @@ namespace Rudine.Interpreters.Embeded
 
             using (MemoryStream _MemoryStream = new MemoryStream(DocData))
             using (ZipFile _ZipFile = new ZipFile(_MemoryStream))
+            {
                 foreach (ZipEntry _ZipEntry in _ZipFile)
                     if (_ZipEntry.IsFile)
                     {
@@ -66,11 +66,11 @@ namespace Rudine.Interpreters.Embeded
                         new DocRevEntry
                         {
                             Bytes = _ZipFile.GetInputStream(_ZipEntry).AsBytes(),
-                            Name = string.Join("\\", _ZipEntry.Name.Split('\\').Skip(2).ToArray())
+                            Name = _ZipFile.Name,
+                            ModDate = _ZipEntry.DateTime
                         });
-                        _DOCREV.Target.DocTypeName = _ZipEntry.Name.Split('\\')[0];
-                        _DOCREV.Target.solutionVersion = _ZipEntry.Name.Split('\\')[1];
                     }
+            }
 
             _DOCREV.DocKeys = new Dictionary<string, string>
             {
@@ -90,32 +90,40 @@ namespace Rudine.Interpreters.Embeded
 
         public override byte[] WriteByte<T>(T source, bool includeProcessingInformation = true)
         {
-            using (MemoryStream fsOut = new MemoryStream())
-            using (ZipOutputStream _ZipOutputStream = new ZipOutputStream(fsOut) { IsStreamOwner = false })
+            using (MemoryStream memoryStream = new MemoryStream())
+            using (ZipOutputStream _ZipOutputStream = new ZipOutputStream(memoryStream) { IsStreamOwner = false })
             {
                 IDocRev _DocRev = (IDocRev)source;
                 _ZipOutputStream.SetLevel(9); //0-9, 9 being the highest level of compression
 
-                foreach (DocRevEntry file in _DocRev.FileList)
-                    if (file.Bytes.Length > 0)
+                // processing instructions
+                _ZipOutputStream.PutNextEntry(
+                    new ZipEntry(Parm.DocSrc)
+                    {
+                        IsUnicodeText = true,
+                        Comment = BuildHref(_DocRev.Target.DocTypeName, _DocRev.Target.solutionVersion)
+                    });
+
+                foreach (DocRevEntry docRevEntry in _DocRev.FileList)
+                    if (docRevEntry.Bytes.Length > 0)
                     {
                         // Zip the file in buffered chunks
                         // the "using" will close the stream even if an exception occurs
                         byte[] buffer = new byte[4096];
 
-                        using (MemoryStream streamReader = new MemoryStream(file.Bytes))
+                        using (MemoryStream streamReader = new MemoryStream(docRevEntry.Bytes))
                         {
                             _ZipOutputStream.PutNextEntry(
-                                new ZipEntry(string.Format("{0}\\{1}\\{2}", _DocRev.Target.DocTypeName, _DocRev.Target.solutionVersion, file.Name))
+                                new ZipEntry(docRevEntry.Name)
                                 {
                                     // Note the zip format stores 2 second granularity
-                                    DateTime = DateTime.Now,
+                                    DateTime = docRevEntry.ModDate,
                                     // To permit the zip to be unpacked by built-in extractor in WinXP and Server2003, WinZip 8, Java, and other older code,
                                     // you need to do one of the following: Specify UseZip64.Off, or set the Size.
                                     // If the file may be bigger than 4GB, or you do not need WinXP built-in compatibility, you do not need either,
                                     // but the zip will be in Zip64 format which not all utilities can understand.
                                     //   zipStream.UseZip64 = UseZip64.Off;
-                                    Size = file.Bytes.Length
+                                    Size = docRevEntry.Bytes.Length
                                 });
                             StreamUtils.Copy(streamReader, _ZipOutputStream, buffer);
                             _ZipOutputStream.CloseEntry();
@@ -123,7 +131,7 @@ namespace Rudine.Interpreters.Embeded
                     }
 
                 _ZipOutputStream.Close();
-                return fsOut.ToBytes();
+                return memoryStream.ToBytes();
             }
         }
 

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Xml.Serialization;
 using Rudine.Web;
+using Rudine.Web.Util;
 
 namespace Rudine.Interpreters.Embeded
 {
@@ -10,29 +12,23 @@ namespace Rudine.Interpreters.Embeded
     [Serializable]
     public class DocRev : BaseDoc, IDocRev
     {
-        private string mD5Field;
-
-        private DocURN targetField;
-
-        private List<DocRevEntry> fileListField;
-
-        public string MD5
-        {
-            get { return mD5Field; }
-            set { mD5Field = value; }
+        public string MD5 {
+            get {
+                using (MD5 md5 = System.Security.Cryptography.MD5.Create())
+                {
+                    foreach (DocRevEntry docRevEntry in FileList)
+                    {
+                        md5.TransformString(docRevEntry.Name);
+                        md5.TransformBytes(docRevEntry.Bytes);
+                    }
+                    return BitConverter.ToString(md5.Hash);
+                }
+            }
         }
 
-        public DocURN Target
-        {
-            get { return targetField; }
-            set { targetField = value; }
-        }
+        public DocURN Target { get; set; }
 
         [XmlElement("FileList")]
-        public List<DocRevEntry> FileList
-        {
-            get { return fileListField; }
-            set { fileListField = value; }
-        }
+        public List<DocRevEntry> FileList { get; set; }
     }
 }

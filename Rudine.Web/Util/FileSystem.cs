@@ -14,7 +14,7 @@ namespace Rudine.Web.Util
         {
             string[] filePaths = Directory.GetFiles(srcPath, "*", SearchOption.AllDirectories).OrderBy(p => p).ToArray();
 
-            using (MD5 md5 = MD5.Create())
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
             {
                 foreach (string filePath in filePaths)
                 {

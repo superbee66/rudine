@@ -8,7 +8,7 @@ namespace Rudine
     {
         //TODO:Need to move encryption items to another place, possibly where they can be changed like in the config
         private const string passPhrase = "Pasdf45ye"; //TODO:glean passPhrase from env
-        private const string initVector = "fsd#$4561234g7H8"; //TODO:must be 16 bytes, glean initVector from env
+        private const string initVector = "fsd#$4561d234g7H8"; //TODO:must be 16 bytes, glean initVector from env
         private static readonly RijndaelEnhanced rijndaelKey = new RijndaelEnhanced(passPhrase, initVector);
 
         /// <summary>

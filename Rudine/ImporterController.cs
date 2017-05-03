@@ -132,7 +132,6 @@ namespace Rudine
                 DocRevBaseDoc.DocStatus = true;
                 DocRevBaseDoc.DocTitle = String.Format("{0} {1}", DocTypeName, DocTypeVer);
                 DocRevBaseDoc.DocTypeName = EmbededInterpreter.MY_ONLY_DOC_NAME;
-                DocRevBaseDoc.MD5 = DocMD5;
                 DocRevBaseDoc.DocKeys = new Dictionary<string, string>
                     {
                         { "TargetDocTypeName", DocTypeName },
