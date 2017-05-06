@@ -1,11 +1,15 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Rudine.Web.Util;
 
+#endregion
+
 namespace Rudine.Web
 {
-    public abstract class BaseDocController : IBaseDocController
+    public abstract class BaseDocController : IBaseDocController, IBaseDocTemplateBuilder
     {
         public abstract List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null);
         public abstract BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null);
@@ -52,5 +56,7 @@ namespace Rudine.Web
                 streamAsValue => SubmitText(streamAsValue, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle));
         }
         public abstract LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        public abstract DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null);
+        public abstract List<ContentInfo> TemplateSources();
     }
 }

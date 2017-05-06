@@ -1,16 +1,13 @@
-using System;
-using System.Runtime.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 
 namespace Rudine.Web
 {
-    [DataContract(Namespace = "urn:rudine.progablab.com")]
+    [XmlType(Namespace = "urn:rudine.progablab.com")]
     [Serializable]
-    public class DocURN
+    public class DocURN : BaseAutoIdent
     {
-        [DataMember(EmitDefaultValue = false)]
-        public string DocTypeVer { get; set; }
-
-        [DataMember(EmitDefaultValue = false)]
         public string DocTypeName { get; set; }
+        public string solutionVersion { get; set; }
     }
 }

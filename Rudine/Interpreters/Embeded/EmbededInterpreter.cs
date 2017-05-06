@@ -15,12 +15,12 @@ namespace Rudine.Interpreters.Embeded
     /// </summary>
     public class EmbededInterpreter : DocByteInterpreter
     {
-        internal const string MY_ONLY_DOC_NAME = "DocRev";
-        internal static readonly Version MY_ONLY_DOC_VERSION = new Version(1, 0, 0, 0);
+        public override ContentInfo ContentInfo =>
+            new ContentInfo { ContentFileExtension = DocRev.MY_ONLY_DOC_NAME, ContentType = "application/octet-stream" };
 
         public override BaseDoc Create(string DocTypeName)
         {
-            if (!DocTypeName.Equals(MY_ONLY_DOC_NAME, StringComparison.InvariantCultureIgnoreCase))
+            if (!DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME, StringComparison.InvariantCultureIgnoreCase))
                 throw new ArgumentException(String.Empty, nameof(DocTypeName));
 
             return Create();
@@ -30,10 +30,8 @@ namespace Rudine.Interpreters.Embeded
         {
             return new DocRev
             {
-                DocTypeName = MY_ONLY_DOC_NAME,
-                FileList = new List<DocRevEntry>(),
-                solutionVersion = MY_ONLY_DOC_VERSION.ToString(),
-                Target = new DocURN()
+                DocFiles = new List<DocRevEntry>(),
+                DocURN = new DocURN()
             };
         }
 
@@ -41,13 +39,13 @@ namespace Rudine.Interpreters.Embeded
 
         public override string HrefVirtualFilename(string DocTypeName, string DocRev) => null;
 
-        public override bool Processable(string DocTypeName, string DocRev) =>
-            DocTypeName.Equals(MY_ONLY_DOC_NAME)
+        public override bool Processable(string DocTypeName, string docRev) =>
+            DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME)
             &&
-            DocRev.Equals(MY_ONLY_DOC_VERSION.ToString());
+            docRev.Equals(DocRev.MY_ONLY_DOC_VERSION);
 
         /// <summary>
-        /// extracts contents of the zip file into a DocRev object
+        ///     extracts contents of the zip file into a DocRev object
         /// </summary>
         /// <param name="DocData"></param>
         /// <param name="DocRevStrict"></param>
@@ -62,29 +60,32 @@ namespace Rudine.Interpreters.Embeded
                 foreach (ZipEntry _ZipEntry in _ZipFile)
                     if (_ZipEntry.IsFile)
                     {
-                        _DOCREV.FileList.Add(
-                        new DocRevEntry
-                        {
-                            Bytes = _ZipFile.GetInputStream(_ZipEntry).AsBytes(),
-                            Name = _ZipFile.Name,
-                            ModDate = _ZipEntry.DateTime
-                        });
+                        _DOCREV.DocFiles.Add(
+                            new DocRevEntry
+                            {
+                                Bytes = _ZipFile.GetInputStream(_ZipEntry).AsBytes(),
+                                Name = _ZipFile.Name,
+                                ModDate = _ZipEntry.DateTime
+                            });
                     }
             }
 
             _DOCREV.DocKeys = new Dictionary<string, string>
             {
-                { "TargetDocTypeName", _DOCREV.Target.DocTypeName },
-                { "TargetDocTypeVer", _DOCREV.Target.solutionVersion }
+                { "TargetDocTypeName", _DOCREV.DocURN.DocTypeName },
+                { "TargetDocTypeVer", _DOCREV.DocURN.solutionVersion }
             };
             return _DOCREV;
         }
 
         public override DocProcessingInstructions ReadDocPI(byte[] DocData) => Read(DocData);
 
+        public override string ReadDocRev(byte[] DocData) => ReadDocPI(DocData).solutionVersion;
+
         public override string ReadDocTypeName(byte[] DocData) => ReadDocPI(DocData).DocTypeName;
 
-        public override string ReadDocRev(byte[] DocData) => ReadDocPI(DocData).solutionVersion;
+        public override List<ContentInfo> TemplateSources() =>
+            new List<ContentInfo> { ContentInfo };
 
         public override void Validate(byte[] DocData) { }
 
@@ -101,10 +102,10 @@ namespace Rudine.Interpreters.Embeded
                     new ZipEntry(Parm.DocSrc)
                     {
                         IsUnicodeText = true,
-                        Comment = BuildHref(_DocRev.Target.DocTypeName, _DocRev.Target.solutionVersion)
+                        Comment = BuildHref(_DocRev.DocURN.DocTypeName, _DocRev.DocURN.solutionVersion)
                     });
 
-                foreach (DocRevEntry docRevEntry in _DocRev.FileList)
+                foreach (DocRevEntry docRevEntry in _DocRev.DocFiles)
                     if (docRevEntry.Bytes.Length > 0)
                     {
                         // Zip the file in buffered chunks
@@ -136,12 +137,5 @@ namespace Rudine.Interpreters.Embeded
         }
 
         public override byte[] WritePI(byte[] DocData, DocProcessingInstructions pi) => WriteByte(SetPI(Read(DocData), pi));
-
-        public override ContentInfo ContentInfo =>
-            new ContentInfo
-            {
-                ContentFileExtension = MY_ONLY_DOC_NAME,
-                ContentType = "application/octet-stream"
-            };
     }
 }

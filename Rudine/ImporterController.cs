@@ -28,7 +28,8 @@ namespace Rudine
 {
     public static class ImporterController
     {
-        public static string DirectoryFullName {
+        public static string DirectoryFullName
+        {
             get { return RequestPaths.GetPhysicalApplicationPath("import"); }
         }
 
@@ -108,55 +109,55 @@ namespace Rudine
         {
             List<ImporterLightDoc> List_ImporterLightDoc = new List<ImporterLightDoc>();
 
-            DirectoryInfo _DirectoryInfo = new DirectoryInfo(sourceFolderPath);
+            //DirectoryInfo _DirectoryInfo = new DirectoryInfo(sourceFolderPath);
 
-            if (workingFolderPath == null)
-                workingFolderPath = RequestPaths.GetPhysicalApplicationPath("import");
+            //if (workingFolderPath == null)
+            //    workingFolderPath = RequestPaths.GetPhysicalApplicationPath("import");
 
-            //// ensure the import folder actually exists
-            new DirectoryInfo(workingFolderPath)
-                .mkdir()
-                .Attributes = FileAttributes.NotContentIndexed | FileAttributes.Hidden;
+            ////// ensure the import folder actually exists
+            //new DirectoryInfo(workingFolderPath)
+            //    .mkdir()
+            //    .Attributes = FileAttributes.NotContentIndexed | FileAttributes.Hidden;
 
-            string DocMD5, DocTypeVer;
-            string DocTypeName = FilesystemTemplateController.ScanContentFolder(_DirectoryInfo, out DocTypeVer, out DocMD5);
-            if (!DocExchange.LuceneController.List(new List<string> { EmbededInterpreter.MY_ONLY_DOC_NAME }, null, null, DocMD5).Any())
-            {
-                IList<string> relativeFilePathsInDirectoryTree = GetRelativeFilePathsInDirectoryTree(_DirectoryInfo.FullName, true);
-                IDictionary<string, string> files = CreateStringDictionary(relativeFilePathsInDirectoryTree, relativeFilePathsInDirectoryTree);
-                IDocRev DocRevBaseDoc = (IDocRev)DocInterpreter.Instance.Create(EmbededInterpreter.MY_ONLY_DOC_NAME);
+            //string DocMD5, DocTypeVer;
+            //string DocTypeName = FilesystemTemplateController.ScanContentFolder(_DirectoryInfo, out DocTypeVer, out DocMD5);
+            //if (!DocExchange.LuceneController.List(new List<string> { DocRev.MY_ONLY_DOC_NAME }, null, null, DocMD5).Any())
+            //{
+            //    IList<string> relativeFilePathsInDirectoryTree = GetRelativeFilePathsInDirectoryTree(_DirectoryInfo.FullName, true);
+            //    IDictionary<string, string> files = CreateStringDictionary(relativeFilePathsInDirectoryTree, relativeFilePathsInDirectoryTree);
+            //    IDocRev DocRevBaseDoc = (IDocRev)DocInterpreter.Instance.Create(DocRev.MY_ONLY_DOC_NAME);
 
-                DocRevBaseDoc.Target.DocTypeName = DocTypeName;
-                DocRevBaseDoc.Target.solutionVersion = DocTypeVer;
-                DocRevBaseDoc.DocChecksum = int.MinValue;
-                DocRevBaseDoc.DocStatus = true;
-                DocRevBaseDoc.DocTitle = String.Format("{0} {1}", DocTypeName, DocTypeVer);
-                DocRevBaseDoc.DocTypeName = EmbededInterpreter.MY_ONLY_DOC_NAME;
-                DocRevBaseDoc.DocKeys = new Dictionary<string, string>
-                    {
-                        { "TargetDocTypeName", DocTypeName },
-                        { "TargetDocTypeVer", DocTypeVer }
-                    };
+            //    DocRevBaseDoc.DocURN.DocTypeName = DocTypeName;
+            //    DocRevBaseDoc.DocURN.solutionVersion = DocTypeVer;
+            //    DocRevBaseDoc.DocChecksum = int.MinValue;
+            //    DocRevBaseDoc.DocStatus = true;
+            //    DocRevBaseDoc.DocTitle = String.Format("{0} {1}", DocTypeName, DocTypeVer);
+            //    DocRevBaseDoc.DocTypeName = DocRev.MY_ONLY_DOC_NAME;
+            //    DocRevBaseDoc.DocKeys = new Dictionary<string, string>
+            //        {
+            //            { "TargetDocTypeName", DocTypeName },
+            //            { "TargetDocTypeVer", DocTypeVer }
+            //        };
 
-                foreach (KeyValuePair<string, string> file in files)
-                {
+            //    foreach (KeyValuePair<string, string> file in files)
+            //    {
 
-                    FileInfo AddFileInfo = new FileInfo(_DirectoryInfo.FullName + "\\" + file.Value);
-                    DocRevBaseDoc.FileList.Add(
-                        new DocRevEntry()
-                        {
-                            Bytes = AddFileInfo.OpenRead().AsBytes(),
-                            Name = file.Key
-                        });
-                }
+            //        FileInfo AddFileInfo = new FileInfo(_DirectoryInfo.FullName + "\\" + file.Value);
+            //        DocRevBaseDoc.FileList.Add(
+            //            new DocRevEntry()
+            //            {
+            //                Bytes = AddFileInfo.OpenRead().AsBytes(),
+            //                Name = file.Key
+            //            });
+            //    }
 
-                List_ImporterLightDoc.Add(
-                     new ImporterLightDoc
-                     {
-                         LightDoc = DocExchange.Instance.Import(
-                             DocInterpreter.Instance.WriteStream((BaseDoc)DocRevBaseDoc))
-                     });
-            }
+            //    List_ImporterLightDoc.Add(
+            //         new ImporterLightDoc
+            //         {
+            //             LightDoc = DocExchange.Instance.Import(
+            //                 DocInterpreter.Instance.WriteStream((BaseDoc)DocRevBaseDoc))
+            //         });
+            //}
             return List_ImporterLightDoc;
         }
 
@@ -263,7 +264,8 @@ namespace Rudine
 
                                // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
                                string dir;
-                               while (dirs.TryPop(out dir) && ImportContentFolder(dir).Any()) { }
+                               while (dirs.TryPop(out dir) && ImportContentFolder(dir).Any())
+                               { }
 
                                // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
                                if (!dirs.IsEmpty)
@@ -302,7 +304,7 @@ namespace Rudine
                             PI = DocExchange.Instance.ReadStream(File.OpenRead(path))
                         })
                         .Where(file => !string.IsNullOrWhiteSpace(file.PI.DocTypeName))
-                        .OrderBy(file => !file.PI.DocTypeName.Equals(EmbededInterpreter.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase))
+                        .OrderBy(file => !file.PI.DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase))
                         .ThenBy(file => file.PI.DocTypeName)
                         .ThenBy(file => Version.Parse(file.PI.solutionVersion))
                         .ToArray()

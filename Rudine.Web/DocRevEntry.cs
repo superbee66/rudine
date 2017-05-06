@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
-using Rudine.Web;
 
-namespace Rudine.Interpreters.Embeded
+namespace Rudine.Web
 {
     [XmlType(Namespace = "urn:rudine.progablab.com")]
     [Serializable]

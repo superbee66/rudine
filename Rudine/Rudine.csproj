@@ -69,6 +69,12 @@
     <Compile Include="..\Rudine.Web\DocProcessingInstructions.cs">
       <Link>Web\DocProcessingInstructions.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\DocRev.cs">
+      <Link>Web\DocRev.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\DocRevEntry.cs">
+      <Link>Web\DocRevEntry.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\DocTerm.cs">
       <Link>Web\DocTerm.cs</Link>
     </Compile>
@@ -84,6 +90,9 @@
     <Compile Include="..\Rudine.Web\IBaseDocController.cs">
       <Link>Web\IBaseDocController.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\IBaseDocTemplateBuilder.cs">
+      <Link>Web\IBaseDocTemplateBuilder.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\IDocIdentifiers.cs">
       <Link>Web\IDocIdentifiers.cs</Link>
     </Compile>
@@ -92,6 +101,9 @@
     </Compile>
     <Compile Include="..\Rudine.Web\IDocModel.cs">
       <Link>Web\IDocModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IDocRev.cs">
+      <Link>Web\IDocRev.cs</Link>
     </Compile>
     <Compile Include="..\Rudine.Web\IDocRevKnownTypes.cs">
       <Link>Web\IDocRevKnownTypes.cs</Link>
@@ -114,11 +126,23 @@
     <Compile Include="..\Rudine.Web\Util\CacheMan.cs">
       <Link>Web\Util\CacheMan.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\Util\CompositeProperty.cs">
+      <Link>Web\Util\CompositeProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\CompositeSignature.cs">
+      <Link>Web\Util\CompositeSignature.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\CompositeType.cs">
+      <Link>Web\Util\CompositeType.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\Util\Dynamic.cs">
       <Link>Web\Util\Dynamic.cs</Link>
     </Compile>
     <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
       <Link>Web\Util\FileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\ImplicitTypeConversionExtension.cs">
+      <Link>Web\Util\ImplicitTypeConversionExtension.cs</Link>
     </Compile>
     <Compile Include="..\Rudine.Web\Util\MD5Extensions.cs">
       <Link>Web\MD5Extensions.cs</Link>
@@ -148,10 +172,6 @@
     <Compile Include="DocProcessingInstructionsExtensions.cs" />
     <Compile Include="ImporterController.cs" />
     <Compile Include="ImporterLightDoc.cs" />
-    <Compile Include="Interpreters\DocTempleter.cs" />
-    <Compile Include="Interpreters\Embeded\DocRev.cs" />
-    <Compile Include="Interpreters\Embeded\DocRevEntry.cs" />
-    <Compile Include="Interpreters\Embeded\DocURN.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreter.cs" />
     <Compile Include="Interpreters\IDocBaseInterpreter.cs" />
     <Compile Include="Interpreters\IDocByteInterpreter.cs" />
@@ -183,7 +203,6 @@
     <Compile Include="Template\TemplateController.cs" />
     <Compile Include="Template\ITemplateController.cs" />
     <Compile Include="Exceptions\DocDataException.cs" />
-    <Compile Include="IDocRev.cs" />
     <Compile Include="Template\TemplateFileInfo.cs" />
     <Compile Include="Util\Cabs\ArchiveMemoryStreamContext.cs" />
     <Compile Include="Util\Cabs\CabInfoExtensions.cs" />
@@ -193,10 +212,6 @@
     <Compile Include="Util\Reflection.cs" />
     <Compile Include="Util\SelfMarshalByRefObject.cs" />
     <Compile Include="Util\StringExtensions.cs" />
-    <Compile Include="Util\Types\CompositeProperty.cs" />
-    <Compile Include="Util\Types\CompositeSignature.cs" />
-    <Compile Include="Util\Types\CompositeType.cs" />
-    <Compile Include="Util\Types\ImplicitTypeConversionExtension.cs" />
     <Compile Include="Util\Xsds\Res.cs" />
     <Compile Include="Util\MimeExtensionHelper.cs" />
     <Compile Include="Storage\Docdb\LuceneController.cs" />
@@ -274,7 +289,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
   </PropertyGroup>

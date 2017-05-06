@@ -78,7 +78,11 @@
     <Compile Include="BaseDocController.cs" />
     <Compile Include="DocKnownTypesProber.cs" />
     <Compile Include="DocProcessingInstructions.cs" />
+    <Compile Include="DocRev.cs" />
+    <Compile Include="DocRevEntry.cs" />
     <Compile Include="DocURN.cs" />
+    <Compile Include="IBaseDocTemplateBuilder.cs" />
+    <Compile Include="IDocRev.cs" />
     <Compile Include="IDocRevKnownTypes.cs" />
     <Compile Include="DocTerm.cs" />
     <Compile Include="DocXmlParser.cs" />
@@ -93,6 +97,10 @@
     <Compile Include="LightDoc.cs" />
     <Compile Include="Parm.cs" />
     <Compile Include="SignatureVerifier.cs" />
+    <Compile Include="Util\CompositeProperty.cs" />
+    <Compile Include="Util\CompositeSignature.cs" />
+    <Compile Include="Util\CompositeType.cs" />
+    <Compile Include="Util\ImplicitTypeConversionExtension.cs" />
     <Compile Include="Util\CacheMan.cs">
       <SubType>Code</SubType>
     </Compile>

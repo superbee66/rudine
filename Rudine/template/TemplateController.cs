@@ -5,6 +5,7 @@ using System.Web;
 using Rudine.Interpreters.Embeded;
 using Rudine.Template.Filesystem;
 using Rudine.Util;
+using Rudine.Web;
 using Rudine.Web.Util;
 
 namespace Rudine.Template
@@ -147,8 +148,8 @@ namespace Rudine.Template
         /// <returns>string.Empty if nothing is found</returns>
         public string TopDocRev(string DocTypeName, bool forceRefresh) =>
             CacheMan.Cache(() =>
-                               DocTypeName.Equals(EmbededInterpreter.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase)
-                                   ? EmbededInterpreter.MY_ONLY_DOC_VERSION.ToString()
+                               DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase)
+                                   ? DocRev.MY_ONLY_DOC_VERSION.ToString()
                                    : _DefaultTopDocFilesystemTemplateController.TopDocRev(DocTypeName)
                                      ?? _OtherIDocResourceControllers
                                          //DOCREVs should always come from the embedded controller

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.AcroForms;
 using PdfSharp.Pdf.IO;
 using Rudine.Template;
-using Rudine.Util.Types;
 using Rudine.Web;
+using Rudine.Web.Util;
 
 namespace Rudine.Interpreters.Pdf
 {
@@ -19,12 +20,7 @@ namespace Rudine.Interpreters.Pdf
     {
         private const string TEMPLATE_PDF = "template.pdf";
 
-        public override ContentInfo ContentInfo =>
-            new ContentInfo
-            {
-                ContentFileExtension = "pdf",
-                ContentType = "application/pdf"
-            };
+        public override ContentInfo ContentInfo => new ContentInfo { ContentFileExtension = "pdf", ContentType = "application/pdf" };
 
         public override BaseDoc Create(string DocTypeName) { throw new NotImplementedException(); }
 
@@ -34,23 +30,45 @@ namespace Rudine.Interpreters.Pdf
         public override bool Processable(string DocTypeName, string DocRev) { throw new NotImplementedException(); }
 
         /// <summary>
+        ///     enumerate each PdfAcroField, convert it's value to clr type, use reflection to set that value to the clr object
+        ///     BaseDoc.
         /// </summary>
-        /// <param name="DocTypeName"></param>
-        /// <param name="FileData"></param>
-        /// <param name="DocRev"></param>
+        /// <param name="docFiles"></param>
+        /// <param name="docTypeName">default will be the original pdf's filename without the extension & only alpha numerics</param>
+        /// <param name="docRev"></param>
+        /// <param name="docProperties"></param>
         /// <returns></returns>
-        public BaseDoc Publish(string DocTypeName, byte[] FileData)
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null)
         {
-            using (MemoryStream _MemoryStream = new MemoryStream(FileData))
-            using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.ReadOnly))
-            {
-                PdfAcroForm AcroForm = _PdfDocument.AcroForm;
-                List<CompositeProperty> _CompositePropertyList = new List<CompositeProperty>();
-                for (int i = 0; i < AcroForm.Fields.Elements.Count; i++)
-                    _CompositePropertyList.Add(AcroForm.Fields[i].AsCompositeProperty());
+            if (docProperties.Count == 0)
+                foreach (var docData in docFiles.Where(docFile => docFile.Name.EndsWith(ContentInfo.ContentFileExtension, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(docFile => docFile.ModDate))
+                {
+                    if (docProperties.Count == 0)
+                        using (MemoryStream _MemoryStream = new MemoryStream(docData.Bytes))
+                        using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.ReadOnly))
+                        {
+                            PdfAcroForm AcroForm = _PdfDocument.AcroForm;
 
-                return DocTempleter.Templify(DocTypeName, _CompositePropertyList);
-            }
+                            for (int i = 0; i < AcroForm.Fields.Elements.Count; i++)
+                                docProperties.Add(AcroForm.Fields[i].AsCompositeProperty());
+                        }
+
+                    if (docProperties.Count > 0)
+                    {
+                        docTypeName = string.IsNullOrWhiteSpace(docTypeName)
+                            ? new FileInfo(docData.Name).Name
+                            : docTypeName;
+                        break;
+                    }
+                }
+
+            return docProperties.Count == 0
+                       ? null
+                       : base.CreateTemplate(
+                           docFiles,
+                           docTypeName,
+                           docRev,
+                           docProperties);
         }
 
         /// <summary>
@@ -71,7 +89,8 @@ namespace Rudine.Interpreters.Pdf
                     _DocProcessingInstructions.DocTypeName,
                     DocRevStrict
                         ? _DocProcessingInstructions.solutionVersion
-                        : TemplateController.Instance.TopDocRev(_DocProcessingInstructions.DocTypeName));
+                        : TemplateController.Instance.TopDocRev(_DocProcessingInstructions.DocTypeName),
+                    DocExchange.Instance);
 
                 Type _BaseDocType = _BaseDoc.GetType();
 
@@ -116,6 +135,9 @@ namespace Rudine.Interpreters.Pdf
         public override string ReadDocRev(byte[] DocData) => ReadDocPI(DocData).solutionVersion;
 
         public override string ReadDocTypeName(byte[] DocData) => ReadDocPI(DocData).DocTypeName;
+
+        public override List<ContentInfo> TemplateSources() =>
+            new List<ContentInfo> { ContentInfo };
 
         public override void Validate(byte[] DocData) { throw new NotImplementedException(); }
 

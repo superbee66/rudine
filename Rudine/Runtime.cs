@@ -13,8 +13,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.CSharp;
-using Rudine.Template;
-
+using Rudine.Interpreters.Embeded;
 using Rudine.Util;
 using Rudine.Util.Xsds;
 using Rudine.Web;
@@ -38,7 +37,8 @@ namespace Rudine
         /// <summary>
         ///     Utilized by CompileAssembly
         /// </summary>
-        private static readonly Dictionary<string, string> USING_NAMESPACES = new[] {
+        private static readonly Dictionary<string, string> USING_NAMESPACES = new[]
+        {
             typeof(List<>),
             typeof(DataContractSerializer),
             typeof(XmlAttribute),
@@ -51,30 +51,48 @@ namespace Rudine
 
         public const string MYSCHEMA_XSD_FILE_NAME = "myschema.xsd";
 
-        public static BaseDoc ActivateBaseDoc(string DocTypeName, string DocRev, params string[] AdditionalRootNames) =>
-            (BaseDoc)Activator.CreateInstance(ActivateBaseDocType(DocTypeName, DocRev, AdditionalRootNames));
+        public static BaseDoc ActivateBaseDoc(string DocTypeName, string DocRev, IBaseDocController baseDocController, params string[] AdditionalRootNames) =>
+            (BaseDoc)Activator.CreateInstance(ActivateBaseDocType(DocTypeName, DocRev, baseDocController, AdditionalRootNames));
 
         private static readonly ConcurrentDictionary<string, Type> ActivateBaseDocTypeDictionary = new ConcurrentDictionary<string, Type>();
 
-        public static Type ActivateBaseDocType(string DocTypeName, string DocRev, params string[] AdditionalRootNames)
+        public static Type ActivateBaseDocType(string DocTypeName, string DocRev, IBaseDocController baseDocController, params string[] AdditionalRootNames)
         {
             string FullName = RuntimeTypeNamer.CalcCSharpFullName(DocTypeName, DocRev, AdditionalRootNames);
             return ActivateBaseDocTypeDictionary.ContainsKey(FullName)
                        ? ActivateBaseDocTypeDictionary[FullName]
                        : (ActivateBaseDocTypeDictionary[FullName] =
-                              ActivateBaseDocType_Internal(DocTypeName, DocRev, AdditionalRootNames));
+                              ActivateBaseDocType_Internal(DocTypeName, DocRev, baseDocController, AdditionalRootNames));
         }
 
-        private static Type ActivateBaseDocType_Internal(string DocTypeName, string DocRev, params string[] AdditionalRootNames)
+        internal static string GetDocSchema(string docTypeName, string docRev, IBaseDocController baseDocController)
+        {
+            return ((IDocRev)baseDocController.Get(
+                            docTypeName,
+                            DocRev.MakeDocKeys(
+                                new DocURN
+                                {
+                                    DocTypeName = docTypeName,
+                                    solutionVersion = docRev
+                                }))).DocSchema;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="docTypeName"></param>
+        /// <param name="docRev"></param>
+        /// <param name="baseDocController">source the DocSchema can be downloaded from</param>
+        /// <param name="additionalRootNames"></param>
+        /// <returns></returns>
+        private static Type ActivateBaseDocType_Internal(string docTypeName, string docRev, IBaseDocController baseDocController, params string[] additionalRootNames)
         {
             return FindBaseDocType(
-                MakeBaseDocAssembly(new[] {
-                        TemplateController.Instance.OpenText(DocTypeName, DocRev, MYSCHEMA_XSD_FILE_NAME)
-                    },
-                    DocTypeName,
-                    DocRev,
-                    AdditionalRootNames),
-                DocTypeName);
+                MakeBaseDocAssembly(new[] { GetDocSchema(docTypeName, docRev, baseDocController) },
+                    docTypeName,
+                    docRev,
+                    additionalRootNames),
+                docTypeName);
         }
 
         private static readonly CSharpCodeProvider CSharpCodeProvider = new CSharpCodeProvider();
@@ -83,7 +101,7 @@ namespace Rudine
 
         public static Assembly CompileCSharpCode(string cSharpCode) =>
             CompileCSharpCode(() =>
-                                      cSharpCode);
+                                  cSharpCode);
 
         public static Assembly CompileCSharpCode(Func<string> cSharpCodeFactory, string OutputName = default(string))
         {
@@ -158,7 +176,8 @@ namespace Rudine
                             if (File.Exists(AppDomainAssemFileName))
                                 foreach (
                                     string DirectoryName in
-                                    new[] {
+                                    new[]
+                                    {
                                         new FileInfo(AppDomainAssemFileName).DirectoryName,
                                         @".",
                                         @".\bin",
@@ -255,7 +274,8 @@ namespace Rudine
             if (PrimaryTypeAppliedInterfaces == null || PrimaryTypeAppliedInterfaces.Length == 0)
                 PrimaryTypeAppliedInterfaces = new[] { nameof(IDocIdentifiers) };
 
-            string ApplyToPrimaryClass = string.Format("{0}", string.Join(", ", new[] {
+            string ApplyToPrimaryClass = string.Format("{0}", string.Join(", ", new[]
+            {
                 PrimaryTypeParentType.Name
             }.Union(PrimaryTypeAppliedInterfaces)));
 
@@ -266,18 +286,21 @@ namespace Rudine
                 SecondaryTypesAppliedInterfaces = new string[]
                     { };
 
-            string ApplyToSecondayClasses = string.Format("{0}", string.Join(", ", new[] {
+            string ApplyToSecondayClasses = string.Format("{0}", string.Join(", ", new[]
+            {
                 SecondaryTypeParentType.Name
             }.Union(SecondaryTypesAppliedInterfaces)));
 
             #endregion Apply_Defaults
 
-            List<string> IgnoreDataTypePropertiesMapped = new List<string> {
+            List<string> IgnoreDataTypePropertiesMapped = new List<string>
+            {
                 "byte",
                 "System.Xml.XmlElement",
                 "System.Xml.XmlElement"
             };
-            List<string> IgnorePropertyPrefixes = new List<string> {
+            List<string> IgnorePropertyPrefixes = new List<string>
+            {
                 "field", "calc", "tmp", "signatures1", "signatures2"
             };
 
@@ -346,7 +369,8 @@ namespace Rudine
                 string.Empty,
                 RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-            string[] DocTypeNames = {
+            string[] DocTypeNames =
+            {
                 DocTypeName
             };
 
@@ -436,10 +460,7 @@ this is applied to all classes.
             return cSharpCode;
         }
 
-        public static BaseDoc FindBaseDoc(Assembly BaseDocAssembly, string DocTypeName)
-        {
-            return (BaseDoc)Activator.CreateInstance(FindBaseDocType(BaseDocAssembly, DocTypeName));
-        }
+        public static BaseDoc FindBaseDoc(Assembly BaseDocAssembly, string DocTypeName) { return (BaseDoc)Activator.CreateInstance(FindBaseDocType(BaseDocAssembly, DocTypeName)); }
 
         public static Type FindBaseDocType(Assembly BaseDocAssembly, string DocTypeName)
         {
@@ -471,7 +492,7 @@ this is applied to all classes.
         internal static Assembly MakeBaseDocAssembly(string[] DocXsds, string DocTypeName, string DocRev, params string[] AdditionalRootNames)
         {
             return CompileCSharpCode(() =>
-                                             GenerateCode(DocXsds, DocTypeName, DocRev, AdditionalRootNames),
+                                         GenerateCode(DocXsds, DocTypeName, DocRev, AdditionalRootNames),
                 RuntimeTypeNamer.CalcCSharpNamespace(DocTypeName, DocRev, AdditionalRootNames));
         }
     }

@@ -253,7 +253,8 @@ namespace Rudine.Interpreters.Xsn
                 DocTypeName,
                 DocRevStrict
                     ? DocRev
-                    : TemplateController.Instance.TopDocRev(DocTypeName));
+                    : TemplateController.Instance.TopDocRev(DocTypeName),
+                DocExchange.Instance);
 
             using (StringReader _StringReader = new StringReader(CollapsedElementsDocXml))
             using (XmlTextReader _XmlTextReader = new XmlTextReader(_StringReader))
@@ -361,6 +362,9 @@ namespace Rudine.Interpreters.Xsn
                              : match.Groups[0].Value,
                 RegexOptions.Singleline | RegexOptions.Multiline);
         }
+
+        public override List<ContentInfo> TemplateSources() =>
+            new List<ContentInfo> { new ContentInfo { ContentFileExtension = "xsn", ContentType = "application/vnd.ms-infopath" } };
 
         /// <summary>
         ///     Runs a given form's xml schema against it throwing an exception if it fails to validate
@@ -492,7 +496,8 @@ namespace Rudine.Interpreters.Xsn
                         _XmlValidatingReader.ValidationEventHandler += _XmlValidatingReader_ValidationEventHandler;
                         //Start validating
 
-                        while (_XmlValidatingReader.Read()) { }
+                        while (_XmlValidatingReader.Read())
+                        { }
                     }
                 }
 

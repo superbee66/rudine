@@ -1,8 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Rudine.Interpreters.Embeded;
+using Rudine.Util.Xsds;
 using Rudine.Web;
 
 namespace Rudine.Interpreters
 {
-    public interface IDocBaseInterpreter
+    public interface IDocBaseInterpreter : IBaseDocTemplateBuilder
     {
         /// <summary>
         /// file/mime information usually accociated with the document read & written

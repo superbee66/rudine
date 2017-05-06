@@ -50,7 +50,10 @@ namespace Rudine
                 {
                     // the datacontracts are the things that are dynamic & change according to what DocTypes are present
                     XsdDataContractExporter _XsdDataContractExporter = new XsdDataContractExporter();
-                    Type DocType = Runtime.ActivateBaseDocType(_DirectoryInfo.Name, TemplateController.Instance.TopDocRev(_DirectoryInfo.Name));
+                    Type DocType = Runtime.ActivateBaseDocType(
+                        _DirectoryInfo.Name,
+                        TemplateController.Instance.TopDocRev(_DirectoryInfo.Name),
+                        DocExchange.Instance);
                     _XsdDataContractExporter.Export(DocType);
                     // _XsdDataContractExporter.Schemas.CompilationSettings.EnableUpaCheck = true;
                     _XsdDataContractExporter.Schemas.Compile();

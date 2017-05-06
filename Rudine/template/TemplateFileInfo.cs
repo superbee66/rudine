@@ -1,5 +1,4 @@
 using Rudine.Web;
-using DocURN = Rudine.Interpreters.Embeded.DocURN;
 
 namespace Rudine.Template
 {

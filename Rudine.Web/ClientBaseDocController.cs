@@ -27,12 +27,14 @@ namespace Rudine.Web
             _UnderlyingControllerType = _UnderlyingWSClient.GetType();
         }
 
-        public string DefaultRelayUrl {
+        public string DefaultRelayUrl
+        {
             get { return _defaultRelayUrl; }
             set { _defaultRelayUrl = value; }
         }
 
-        public TClientBaseT UnderlyingWSClient {
+        public TClientBaseT UnderlyingWSClient
+        {
             get { return _UnderlyingWSClient; }
         }
 
@@ -183,23 +185,23 @@ namespace Rudine.Web
             return _Form;
         }
 
-        public override BaseDoc ReadBytes(byte[] DocData, string RelayUrl = null) => 
+        public override BaseDoc ReadBytes(byte[] DocData, string RelayUrl = null) =>
             Read(DocData, RelayUrl);
 
         public override BaseDoc ReadText(string DocData, string RelayUrl = null) =>
             Read(DocData, RelayUrl);
 
-        public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null) => 
+        public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null) =>
             (LightDoc)GetMethodInfo(DocCmd.Status)
-            .Invoke(UnderlyingWSClient,
-                new object[]
-                {
-                    DocTypeName,
-                    DocKeys,
-                    DocStatus,
-                    DocSubmittedByEmail,
-                    RelayUrl
-                });
+                .Invoke(UnderlyingWSClient,
+                    new object[]
+                    {
+                        DocTypeName,
+                        DocKeys,
+                        DocStatus,
+                        DocSubmittedByEmail,
+                        RelayUrl
+                    });
 
         private LightDoc Submit(object DocData, string DocSubmittedByEmail, string RelayUrl, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle)
         {
@@ -227,9 +229,22 @@ namespace Rudine.Web
         public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
             Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
-        public override List<ContentInfo> Interpreters() =>
-            (List<ContentInfo>)_UnderlyingControllerType.GetMethod(nameof(Interpreters))
-                                                         .Invoke(UnderlyingWSClient,
-                                                             new object[] { });
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null) =>
+            (DocRev)_UnderlyingControllerType.GetMethod(nameof(CreateTemplate))
+                                              .Invoke(UnderlyingWSClient,
+                                                  new object[]
+                                                  {
+                                                      docFiles,
+                                                      docTypeName,
+                                                      docRev,
+                                                      docProperties
+                                                  });
+
+        public override List<ContentInfo> TemplateSources() =>
+               (List<ContentInfo>)_UnderlyingControllerType.GetMethod(nameof(TemplateSources))
+                                              .Invoke(UnderlyingWSClient,
+                                                  new object[] { });
+
+        public override List<ContentInfo> Interpreters() { return null; }
     }
 }
