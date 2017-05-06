@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Rudine.Web.Util;
 
-namespace Rudine.Util.Types
+namespace Rudine.Web.Util
 {
     /// <summary>
     ///     TODO:Clean this up

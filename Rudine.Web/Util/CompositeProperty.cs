@@ -1,6 +1,6 @@
 using System;
 
-namespace Rudine.Util.Types
+namespace Rudine.Web.Util
 {
     public class CompositeProperty
     {

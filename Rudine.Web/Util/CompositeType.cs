@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Rudine.Util.Types
+namespace Rudine.Web.Util
 {
     /// <summary>
     ///     supports runtime created self & child-parent type referencing properties defined at runtime (chicken before the egg
