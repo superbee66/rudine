@@ -112,7 +112,7 @@ namespace Rudine.Interpreters.Xsn
         ///     potentially write them as "1" & "0".
         /// </summary>
         /// <param name="docXml"></param>
-        /// <param name="DocTypeName"></param>
+        /// <param name=DocRev.MY_ONLY_DOCKEY_1></param>
         /// <returns></returns>
         private static string FormatBooleansTrueFalseOrZeroOne(string docXml, string DocTypeName)
         {
@@ -159,7 +159,7 @@ namespace Rudine.Interpreters.Xsn
             Regex.Match(DocData,
                      @"(urn:schemas-microsoft-com:office:infopath:)(?<DocTypeName>\w+)(:-myXSD-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})",
                      RegexOptions.IgnoreCase)
-                 .Groups["DocTypeName"].Value;
+                 .Groups[DocRev.KeyPart1].Value;
 
         public override bool Processable(string DocTypeName, string DocRev)
         {
@@ -348,7 +348,7 @@ namespace Rudine.Interpreters.Xsn
         ///     referenced once.
         /// </summary>
         /// <param name="docXml"></param>
-        /// <param name="DocTypeName"></param>
+        /// <param name=DocRev.MY_ONLY_DOCKEY_1></param>
         /// <returns></returns>
         internal static string RemoveValueTypeElementDefaults(string docXml, string DocTypeName)
         {

@@ -18,10 +18,10 @@ namespace Rudine
         public static string GetTargetDocName(this LightDoc lightdoc)
         {
             Dictionary<string, string> _DocKeys = lightdoc.GetDocKeys();
-            return _DocKeys.ContainsKey("TargetDocTypeName")
-                       ? _DocKeys["TargetDocTypeName"]
-                       : _DocKeys.ContainsKey("DocTypeName")
-                           ? _DocKeys["DocTypeName"]
+            return _DocKeys.ContainsKey(DocRev.KeyPart1)
+                       ? _DocKeys[DocRev.KeyPart1]
+                       : _DocKeys.ContainsKey(DocRev.KeyPart1)
+                           ? _DocKeys[DocRev.KeyPart1]
                            : lightdoc.DocTypeName;
         }
 
@@ -36,10 +36,10 @@ namespace Rudine
         public static string GetTargetDocVer(this LightDoc lightdoc)
         {
             Dictionary<string, string> _DocKeys = lightdoc.GetDocKeys();
-            return _DocKeys.ContainsKey("TargetDocTypeVer")
-                       ? _DocKeys["TargetDocTypeVer"]
-                       : _DocKeys.ContainsKey("DocTypeVer")
-                           ? _DocKeys["DocTypeVer"]
+            return _DocKeys.ContainsKey(DocRev.KeyPart2)
+                       ? _DocKeys[DocRev.KeyPart2]
+                       : _DocKeys.ContainsKey(DocRev.KeyPart2)
+                           ? _DocKeys[DocRev.KeyPart2]
                            : null;
         }
     }

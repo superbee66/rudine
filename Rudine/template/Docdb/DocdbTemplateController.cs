@@ -12,14 +12,16 @@ namespace Rudine.Template.Docdb
         {
             IDocRev o = (IDocRev) DocExchange.LuceneController.Get(
                 DocRev.MY_ONLY_DOC_NAME,
-                new Dictionary<string, string> { { "TargetDocTypeVer", DocTypeVer }, { "TargetDocTypeName", DocTypeName } });
+                new Dictionary<string, string> { { DocRev.KeyPart2, DocTypeVer }, { DocRev.KeyPart1, DocTypeName } });
 
             if (o == null)
                 o = (IDocRev) DocExchange.LuceneController.Get(
                     DocRev.MY_ONLY_DOC_NAME,
-                    new Dictionary<string, string> { { "DocTypeVer", DocTypeVer }, { "DocTypeName", DocTypeName } });
+                    new Dictionary<string, string> { { DocRev.KeyPart2, DocTypeVer }, { DocRev.KeyPart1, DocTypeName } });
 
-            byte[] bytes = o.DocFiles?.FirstOrDefault(f => f.Name.Equals(filename, StringComparison.InvariantCultureIgnoreCase))?.Bytes;
+            byte[] bytes = o.DocFiles == null
+                ? null
+                : o.DocFiles.FirstOrDefault(f => f.Name.Equals(filename, StringComparison.InvariantCultureIgnoreCase))?.Bytes;
 
             return bytes == null
                        ? null
@@ -33,7 +35,7 @@ namespace Rudine.Template.Docdb
                                   new Dictionary<string, List<string>>
                                   {
                                       {
-                                          "TargetDocTypeName", new List<string> { DocTypeName }
+                                          DocRev.KeyPart1, new List<string> { DocTypeName }
                                       }
                                   })
                               .Select(_LightDoc => _LightDoc.GetTargetDocVer())
