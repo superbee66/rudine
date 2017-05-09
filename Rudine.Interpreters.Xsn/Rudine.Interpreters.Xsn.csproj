@@ -43,7 +43,6 @@
     <Compile Include="..\Rudine.Web\Util\CacheMan.cs">
       <Link>CacheMan.cs</Link>
     </Compile>
-    <Compile Include="BaseDocExtensions.cs" />
     <Compile Include="InfoPathAttachmentEncoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XsnXmlInterpreter.cs" />

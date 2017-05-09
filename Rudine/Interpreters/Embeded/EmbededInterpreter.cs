@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Web.Script.Serialization;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
-using Rudine.Util.Zips;
 using Rudine.Web;
 using Rudine.Web.Util;
 
@@ -15,13 +17,22 @@ namespace Rudine.Interpreters.Embeded
     /// </summary>
     public class EmbededInterpreter : DocByteInterpreter
     {
+        private static readonly JavaScriptSerializer _JavaScriptSerializer = new JavaScriptSerializer();
+
+        /// <summary>
+        ///     utilizes actual MY_ONLY_DOC_NAME as the file extension
+        /// </summary>
         public override ContentInfo ContentInfo =>
             new ContentInfo { ContentFileExtension = DocRev.MY_ONLY_DOC_NAME, ContentType = "application/octet-stream" };
 
+        /// <summary>
+        /// </summary>
+        /// <param name= DocRev.MY_ONLY_DOCKEY_1>accepts only DcoRev (MY_ONLY_DOC_NAME)</param>
+        /// <returns></returns>
         public override BaseDoc Create(string DocTypeName)
         {
             if (!DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME, StringComparison.InvariantCultureIgnoreCase))
-                throw new ArgumentException(String.Empty, nameof(DocTypeName));
+                throw new ArgumentException(string.Empty, nameof(DocTypeName));
 
             return Create();
         }
@@ -31,7 +42,9 @@ namespace Rudine.Interpreters.Embeded
             return new DocRev
             {
                 DocFiles = new List<DocRevEntry>(),
-                DocURN = new DocURN()
+                DocURN = new DocURN(),
+                DocTypeName = DocRev.MY_ONLY_DOC_NAME,
+                solutionVersion = DocRev.MY_ONLY_DOC_VERSION
             };
         }
 
@@ -58,23 +71,20 @@ namespace Rudine.Interpreters.Embeded
             using (ZipFile _ZipFile = new ZipFile(_MemoryStream))
             {
                 foreach (ZipEntry _ZipEntry in _ZipFile)
-                    if (_ZipEntry.IsFile)
-                    {
+                    if (_ZipEntry.Name.Equals(DocRev.ManifestFileName, StringComparison.InvariantCultureIgnoreCase))
+                        _DOCREV.DocURN = _JavaScriptSerializer.Deserialize<DocTypeInfo>(Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry).AsBytes()));
+                    else if (_ZipEntry.Name.Equals(DocRev.SchemaFileName, StringComparison.InvariantCultureIgnoreCase))
+                        _DOCREV.DocSchema = Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry).AsBytes());
+                    else if (_ZipEntry.IsFile)
                         _DOCREV.DocFiles.Add(
                             new DocRevEntry
                             {
                                 Bytes = _ZipFile.GetInputStream(_ZipEntry).AsBytes(),
-                                Name = _ZipFile.Name,
+                                Name = _ZipEntry.Name,
                                 ModDate = _ZipEntry.DateTime
                             });
-                    }
             }
 
-            _DOCREV.DocKeys = new Dictionary<string, string>
-            {
-                { "TargetDocTypeName", _DOCREV.DocURN.DocTypeName },
-                { "TargetDocTypeVer", _DOCREV.DocURN.solutionVersion }
-            };
             return _DOCREV;
         }
 
@@ -84,28 +94,37 @@ namespace Rudine.Interpreters.Embeded
 
         public override string ReadDocTypeName(byte[] DocData) => ReadDocPI(DocData).DocTypeName;
 
-        public override List<ContentInfo> TemplateSources() =>
-            new List<ContentInfo> { ContentInfo };
+        public override List<ContentInfo> TemplateSources() => new List<ContentInfo> { ContentInfo };
 
         public override void Validate(byte[] DocData) { }
 
         public override byte[] WriteByte<T>(T source, bool includeProcessingInformation = true)
         {
+            //using (FileStream memoryStream = File.Create("test.zip"))
+            //using (ZipOutputStream _ZipOutputStream = new ZipOutputStream(memoryStream) { IsStreamOwner = false })
             using (MemoryStream memoryStream = new MemoryStream())
             using (ZipOutputStream _ZipOutputStream = new ZipOutputStream(memoryStream) { IsStreamOwner = false })
             {
-                IDocRev _DocRev = (IDocRev)source;
+                IDocRev _DocRev = (IDocRev) source;
                 _ZipOutputStream.SetLevel(9); //0-9, 9 being the highest level of compression
 
-                // processing instructions
-                _ZipOutputStream.PutNextEntry(
-                    new ZipEntry(Parm.DocSrc)
+                List<DocRevEntry> _DocInfoDocRevEntry = new List<DocRevEntry>
+                {
+                    new DocRevEntry
                     {
-                        IsUnicodeText = true,
-                        Comment = BuildHref(_DocRev.DocURN.DocTypeName, _DocRev.DocURN.solutionVersion)
-                    });
+                        Bytes = Encoding.Default.GetBytes(_JavaScriptSerializer.Serialize(_DocRev.DocURN)),
+                        ModDate = _DocRev.DocFiles.Max(DocFile => DocFile.ModDate),
+                        Name = DocRev.ManifestFileName
+                    },
+                    new DocRevEntry
+                    {
+                        Bytes = Encoding.Default.GetBytes(_DocRev.DocSchema),
+                        ModDate = _DocRev.DocFiles.Max(DocFile => DocFile.ModDate),
+                        Name = DocRev.ManifestFileName
+                    }
+                };
 
-                foreach (DocRevEntry docRevEntry in _DocRev.DocFiles)
+                foreach (DocRevEntry docRevEntry in _DocRev.DocFiles.Union(_DocInfoDocRevEntry))
                     if (docRevEntry.Bytes.Length > 0)
                     {
                         // Zip the file in buffered chunks
@@ -115,7 +134,7 @@ namespace Rudine.Interpreters.Embeded
                         using (MemoryStream streamReader = new MemoryStream(docRevEntry.Bytes))
                         {
                             _ZipOutputStream.PutNextEntry(
-                                new ZipEntry(docRevEntry.Name)
+                                new ZipEntry(docRevEntry.Name.TrimStart('/', '\\'))
                                 {
                                     // Note the zip format stores 2 second granularity
                                     DateTime = docRevEntry.ModDate,
@@ -132,7 +151,9 @@ namespace Rudine.Interpreters.Embeded
                     }
 
                 _ZipOutputStream.Close();
-                return memoryStream.ToBytes();
+
+                memoryStream.Position = 0;
+                return memoryStream.ToArray();
             }
         }
 
