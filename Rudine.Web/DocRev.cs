@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Xml.Serialization;
 using Rudine.Web.Util;
@@ -17,48 +18,10 @@ namespace Rudine.Web
     {
         public const string MY_ONLY_DOC_NAME = "DocRev";
         public const string MY_ONLY_DOC_VERSION = "1.0.0.0";
-
-        /// <summary>
-        ///     system reserved value management
-        /// </summary>
-        public override Dictionary<string, string> DocKeys
-        {
-            get { return MakeDocKeys(DocURN); }
-            set
-            {
-                if (value != default(Dictionary<string, string>))
-                    if (value != MakeDocKeys(DocURN))
-                        throw PropertyValueException(nameof(DocKeys));
-                base.DocKeys = value;
-            }
-        }
-
-        public static Dictionary<string, string> MakeDocKeys(DocURN docUrn) =>
-            new Dictionary<string, string>
-            {
-                    { "TargetDocTypeName", docUrn.DocTypeName },
-                    { "TargetDocTypeVer", docUrn.solutionVersion }
-                };
-
-        /// <summary>
-        ///     string literal that is valid XSD  used to compose an IDocModel & finally a BaseDoc from
-        /// </summary>
-        public string DocSchema { get; set; }
-
-        [DefaultValue(MY_ONLY_DOC_NAME)]
-        public override string DocTypeName
-        {
-            get { return base.DocTypeName; }
-
-            set
-            {
-                if (value != DocTypeName)
-                    throw PropertyValueException(nameof(DocTypeName));
-                base.DocTypeName = value;
-            }
-        }
-
-        public DocURN DocURN { get; set; }
+        public const string KeyPart1 = "TargetDocTypeName";
+        public const string KeyPart2 = "TargetDocTypeVer";
+        public static string ManifestFileName = string.Format("{0}.json", nameof(DocURN));
+        public static string SchemaFileName = string.Format("{0}.xsd", nameof(DocSchema));
 
         public List<DocRevEntry> DocFiles { get; set; }
 
@@ -69,12 +32,57 @@ namespace Rudine.Web
                 using (MD5 md5 = MD5.Create())
                 {
                     foreach (DocRevEntry docRevEntry in DocFiles)
-                    {
-                        md5.TransformString(docRevEntry.Name);
-                        md5.TransformBytes(docRevEntry.Bytes);
-                    }
+                        if (
+                            !docRevEntry.Name.Equals(ManifestFileName, StringComparison.InvariantCultureIgnoreCase)
+                            &&
+                            !docRevEntry.Name.Equals(SchemaFileName, StringComparison.InvariantCultureIgnoreCase)
+                            )
+                        {
+                            md5.TransformString(docRevEntry.Name ?? string.Empty);
+                            md5.TransformBytes(docRevEntry.Bytes);
+                        }
+                    md5.TransformFinalBlock(new byte[0], 0, 0);
                     return BitConverter.ToString(md5.Hash);
                 }
+            }
+        }
+
+        public DocURN DocURN { get; set; }
+
+          /// <summary>
+        /// string literal that is valid XSD  used to compose an IDocModel & finally a BaseDoc from
+        /// </summary>
+        public string DocSchema { get; set; }
+
+        /// <summary>
+        ///     system reserved value management
+        /// </summary>
+        [XmlIgnore]
+        public override Dictionary<string, string> DocKeys
+        {
+            get { return base.DocKeys; }
+            set
+            {
+                if (value != default(Dictionary<string, string>))
+                    if (string.Join(",", value.Keys.OrderBy(key => key)) != string.Join(",", MakeDocKeys(DocURN).Keys.OrderBy(key => key)))
+                        throw PropertyValueException(nameof(DocKeys));
+
+                base.DocKeys = value;
+            }
+        }
+
+
+
+        [DefaultValue(MY_ONLY_DOC_NAME)]
+        public override string DocTypeName
+        {
+            get { return base.DocTypeName; }
+
+            set
+            {
+                if (value != MY_ONLY_DOC_NAME)
+                    throw PropertyValueException(nameof(DocTypeName));
+                base.DocTypeName = value;
             }
         }
 
@@ -85,12 +93,19 @@ namespace Rudine.Web
 
             set
             {
-                if (value != solutionVersion)
+                if (value != MY_ONLY_DOC_VERSION)
                     throw PropertyValueException(nameof(solutionVersion));
 
                 base.solutionVersion = value;
             }
         }
+
+        public static Dictionary<string, string> MakeDocKeys(DocURN docUrn) =>
+            new Dictionary<string, string>
+            {
+                { DocRev.KeyPart1, docUrn.DocTypeName },
+                { DocRev.KeyPart2, docUrn.solutionVersion }
+            };
 
         private static Exception PropertyValueException(string propertyName)
         {
