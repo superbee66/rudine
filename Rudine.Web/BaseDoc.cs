@@ -18,10 +18,6 @@ namespace Rudine.Web
     [Serializable]
     public class BaseDoc : DocProcessingInstructions, IBaseDoc
     {
-        private static readonly string[] FormNonFillablePropertyNames =
-        {
-            "DocChecksum", "DocStatus", "DocId", "DocTitleFormat", "DocSrc", "DocDropbox"
-        };
 
         /// <summary>
         ///     User may want to title there own document?
@@ -32,41 +28,6 @@ namespace Rudine.Web
         {
             get { return base.DocTitle ?? DocTypeName.ToUpper(); }
             set { base.DocTitle = value; }
-        }
-
-        #region GetForm*Properties*
-
-        /// <summary>
-        ///     Further filters GetFormObjectNavProperties stripping DocId
-        /// </summary>
-        /// <param name="filled"></param>
-        /// <returns></returns>
-        public PropertyInfo[] GetFormFillableProperties(bool filled = false)
-        {
-            //TODO:Need to detect interface implementation safely
-            return GetFormObjectNavProperties(filled).Where(m => !FormNonFillablePropertyNames.Contains(m.Name)).ToArray();
-        }
-
-        /// <summary>
-        ///     Further filters GetFormObjectMappedProperties stripping IgnoreDataMember,XmlIgnoreAttribute,ScriptIgnoreAttribute &
-        ///     NotMapped properties
-        /// </summary>
-        /// <param name="filled">when true, ensures the properties have been explicitly set</param>
-        /// <returns></returns>
-        public PropertyInfo[] GetFormObjectNavProperties(bool filled = false)
-        {
-            PropertyInfo[] p = CacheMan.Cache(() => GetFormObjectMappedProperties(false)
-                                                  .Where(m =>
-                                                             m.DeclaringType != typeof(BaseDoc) &&
-                                                             m.DeclaringType != typeof(BaseAutoIdent)
-                                                  )
-                                                  .ToArray(),
-                false,
-                "GetFormObjectNavProperties",
-                GetType().FullName,
-                "GetFormObjectNavProperties");
-
-            return p.Where(m => !filled || !this.IsDefaultValue(m)).ToArray();
         }
 
         /// <summary>
@@ -97,8 +58,6 @@ namespace Rudine.Web
             return p.Where(m => !filled || !this.IsDefaultValue(m)).ToArray();
         }
 
-        #endregion GetForm*Properties*
-
         [XmlIgnore]
         [DataMember]
         public sealed override bool? DocStatus
@@ -115,12 +74,6 @@ namespace Rudine.Web
             set { base.DocChecksum = value; }
         }
 
-        /// <summary>
-        ///     gathers up types referenced by this BaseDoc via properties that descend from the
-        ///     DocKey & BaseAutoIdent super-class designed to work with the generic repository implementation
-        /// </summary>
-        /// <returns></returns>
-        public List<Type> ListRelatedEntities() { return ListRelatedEntities(GetType()); }
 
         /// <summary>
         ///     gathers up types referenced by the o via properties that descend from the
