@@ -51,7 +51,7 @@ namespace Rudine
                     ResultPath = "/" + url.Substring(2);
             else
 
-                // Url look like ~something
+            // Url look like ~something
             if (ApplicationPath.Length > 1)
                 ResultPath = ApplicationPath + "/" + url.Substring(1);
             else
@@ -103,54 +103,58 @@ namespace Rudine
         /// </summary>
         /// <param name="BaseDoc"></param>
         /// <param name="RelayUrl"></param>
-        /// <returns></returns>
+        /// <returns>string.empty when no HttpContext or OperationContext is not avaliable </returns>
         public static string ToUrl(BaseDoc BaseDoc, string RelayUrl = null)
         {
-            if (string.IsNullOrWhiteSpace(RelayUrl))
-                RelayUrl = ReverseProxy.GetRelayUrl();
-
-            string DocTypeName = BaseDoc.DocTypeName;
-
-            string _Url = string.IsNullOrWhiteSpace(RelayUrl)
-                              ? string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}",
-                                  RequestPaths.ApplicationPath,
-                                  DocTypeName,
-                                  Parm.DocBin,
-                                  HttpUtility.UrlEncode(Compressor.CompressToBase64String(BaseDoc.ToBytes())))
-                              : string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}&{4}={5}",
-                                  RelayUrl,
-                                  DocTypeName,
-                                  Parm.DocBin,
-                                  HttpUtility.UrlEncode(Compressor.CompressToBase64String(BaseDoc.ToBytes())),
-                                  Parm.RelayUrl,
-                                  HttpUtility.UrlEncode(RelayUrl)
-                              );
-
-            //REF:http://support.microsoft.com/kb/208427
-            if (_Url.Length > 2083)
+            string _Url = string.Empty;
+            if (!string.IsNullOrWhiteSpace(RequestPaths.AbsoluteUri))
             {
-                string _CacheKey = HttpUtility.UrlEncode(string.Format("{0}.{1}", DocTypeName, _Url.GetHashCode()));
+                if (string.IsNullOrWhiteSpace(RelayUrl))
+                    RelayUrl = ReverseProxy.GetRelayUrl();
 
-                if (HttpRuntime.Cache[_CacheKey] == null)
-                    HttpRuntime.Cache.Insert(_CacheKey,
-                        BaseDoc,
-                        null,
-                        Cache.NoAbsoluteExpiration,
-                        TimeSpan.FromMinutes(10));
+                string DocTypeName = BaseDoc.DocTypeName;
 
                 _Url = string.IsNullOrWhiteSpace(RelayUrl)
-                           ? string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}",
-                               RequestPaths.ApplicationPath,
-                               DocTypeName,
-                               Parm.DocCache,
-                               _CacheKey)
-                           : string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}&{4}={5}",
-                               RelayUrl,
-                               DocTypeName,
-                               Parm.DocCache,
-                               _CacheKey,
-                               Parm.RelayUrl,
-                               HttpUtility.UrlEncode(RelayUrl));
+                                 ? string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}",
+                                     RequestPaths.ApplicationPath,
+                                     DocTypeName,
+                                     Parm.DocBin,
+                                     HttpUtility.UrlEncode(Compressor.CompressToBase64String(BaseDoc.ToBytes())))
+                                 : string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}&{4}={5}",
+                                     RelayUrl,
+                                     DocTypeName,
+                                     Parm.DocBin,
+                                     HttpUtility.UrlEncode(Compressor.CompressToBase64String(BaseDoc.ToBytes())),
+                                     Parm.RelayUrl,
+                                     HttpUtility.UrlEncode(RelayUrl)
+                                 );
+
+                //REF:http://support.microsoft.com/kb/208427
+                if (_Url.Length > 2083)
+                {
+                    string _CacheKey = HttpUtility.UrlEncode(string.Format("{0}.{1}", DocTypeName, _Url.GetHashCode()));
+
+                    if (HttpRuntime.Cache[_CacheKey] == null)
+                        HttpRuntime.Cache.Insert(_CacheKey,
+                            BaseDoc,
+                            null,
+                            Cache.NoAbsoluteExpiration,
+                            TimeSpan.FromMinutes(10));
+
+                    _Url = string.IsNullOrWhiteSpace(RelayUrl)
+                               ? string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}",
+                                   RequestPaths.ApplicationPath,
+                                   DocTypeName,
+                                   Parm.DocCache,
+                                   _CacheKey)
+                               : string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}&{4}={5}",
+                                   RelayUrl,
+                                   DocTypeName,
+                                   Parm.DocCache,
+                                   _CacheKey,
+                                   Parm.RelayUrl,
+                                   HttpUtility.UrlEncode(RelayUrl));
+                }
             }
             return _Url;
         }

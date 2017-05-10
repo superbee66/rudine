@@ -10,6 +10,10 @@ namespace Rudine.Web.Util
     /// </summary>
     public static class RequestPaths
     {
+        /// <summary>
+        ///     AbsoluteUri from HttpContext or OperationContext, depending on which is avaliable. An empty string if none are
+        ///     avaliable.
+        /// </summary>
         public static string AbsoluteUri
         {
             get
@@ -20,7 +24,7 @@ namespace Rudine.Web.Util
                         ? (HttpContext.Current.Request.Url.AbsoluteUri == "/" ? "" : HttpContext.Current.Request.Url.AbsoluteUri)
                         : OperationContext.Current != null && OperationContext.Current.RequestContext != null
                             ? OperationContext.Current.RequestContext.RequestMessage.Headers.To.AbsoluteUri
-                            : "http://localhost";
+                            : "";
             }
         }
 
