@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web.Script.Serialization;
 using System.Xml.Serialization;
 
 namespace Rudine.Web
@@ -13,6 +14,9 @@ namespace Rudine.Web
         /// path of file compatible with ZipEntry
         /// </summary>
         public string Name { get; set; }
+
+        [XmlIgnore]
+        [ScriptIgnore]
         public DateTime ModDate { get; set; }
     }
 }
