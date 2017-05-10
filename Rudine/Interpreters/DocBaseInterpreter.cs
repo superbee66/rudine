@@ -63,9 +63,9 @@ namespace Rudine.Interpreters
         ///     TemplateSources() item's file extension
         /// </param>
         /// <param name="docRev">defaults to docFiles newest file modData AsDocRev</param>
-        /// <param name="docProperties"></param>
+        /// <param name="schemaFields"></param>
         /// <returns></returns>
-        public virtual DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null)
+        public virtual DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
         {
             if (string.IsNullOrWhiteSpace(docRev))
                 docRev = docFiles.Max(docFile => docFile.ModDate).AsDocRev();
@@ -78,13 +78,13 @@ namespace Rudine.Interpreters
                     .Select(docFile => StringTransform.SafeIdentifier(new FileInfo(docFile.Name).Name))
                     .FirstOrDefault();
 
-            if (docProperties == null || docProperties.Count == 0)
-                docProperties = new List<CompositeProperty>();
+            if (schemaFields == null || schemaFields.Count == 0)
+                schemaFields = new List<CompositeProperty>();
 
             string temporaryNamespace = RuntimeTypeNamer.CalcCSharpNamespace(docTypeName, docRev, nameof(IDocBaseInterpreter));
 
-            //FileInfo _XsdFileInfo = new FileInfo(String.Format(@"{0}\{1}", _DocDirectoryInfo.FullName, Runtime.MYSCHEMA_XSD_FILE_NAME));
-            Type xsdSchemaClrType = new CompositeType(temporaryNamespace, docTypeName, docProperties.ToArray());
+            //FileInfo _XsdFileInfo = new FileInfo(String.Format(@"{0}\{1}", _DocDirectoryInfo.FullName, Runtime.SchemaFileName));
+            Type xsdSchemaClrType = new CompositeType(temporaryNamespace, docTypeName, schemaFields.ToArray());
 
             // the "lazy-load" CompositeType requires activation in order for the _template_docx_obj.GetType().Assembly to register as having any types defined
             object xsdSchemaClrObject = Activator.CreateInstance(xsdSchemaClrType);
@@ -168,12 +168,15 @@ namespace Rudine.Interpreters
         /// <returns></returns>
         public static BaseDoc SetPI(BaseDoc dstBaseDoc, DocProcessingInstructions pi, string DocTypeName = null, string DocRev = null)
         {
-            dstBaseDoc = (BaseDoc) PropertyOverlay.Overlay(pi, dstBaseDoc);
+            dstBaseDoc = (BaseDoc)PropertyOverlay.Overlay(pi, dstBaseDoc);
             dstBaseDoc.DocTypeName = DocTypeName ?? pi.DocTypeName;
             dstBaseDoc.solutionVersion = DocRev ?? pi.solutionVersion;
             return dstBaseDoc;
         }
 
         public abstract List<ContentInfo> TemplateSources();
+
+
+
     }
 }

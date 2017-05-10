@@ -36,24 +36,24 @@ namespace Rudine.Interpreters.Pdf
         /// <param name="docFiles"></param>
         /// <param name="docTypeName">default will be the original pdf's filename without the extension & only alpha numerics</param>
         /// <param name="docRev"></param>
-        /// <param name="docProperties"></param>
+        /// <param name="schemaFields"></param>
         /// <returns></returns>
-        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null)
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
         {
-            if (docProperties.Count == 0)
+            if (schemaFields.Count == 0)
                 foreach (var docData in docFiles.Where(docFile => docFile.Name.EndsWith(ContentInfo.ContentFileExtension, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(docFile => docFile.ModDate))
                 {
-                    if (docProperties.Count == 0)
+                    if (schemaFields.Count == 0)
                         using (MemoryStream _MemoryStream = new MemoryStream(docData.Bytes))
                         using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.ReadOnly))
                         {
                             PdfAcroForm AcroForm = _PdfDocument.AcroForm;
 
                             for (int i = 0; i < AcroForm.Fields.Elements.Count; i++)
-                                docProperties.Add(AcroForm.Fields[i].AsCompositeProperty());
+                                schemaFields.Add(AcroForm.Fields[i].AsCompositeProperty());
                         }
 
-                    if (docProperties.Count > 0)
+                    if (schemaFields.Count > 0)
                     {
                         docTypeName = string.IsNullOrWhiteSpace(docTypeName)
                             ? new FileInfo(docData.Name).Name
@@ -62,13 +62,14 @@ namespace Rudine.Interpreters.Pdf
                     }
                 }
 
-            return docProperties.Count == 0
+            return schemaFields.Count == 0
                        ? null
                        : base.CreateTemplate(
                            docFiles,
                            docTypeName,
                            docRev,
-                           docProperties);
+                           schemaXml,
+                           schemaFields);
         }
 
         /// <summary>

@@ -123,7 +123,7 @@ namespace Rudine
             //#if !FAST
             Version existingVersion;
             // DOCREVs are only submitted via Text, there is no need to worry about them enter the system in another fusion. 
-            if (_LightDoc.DocTypeName == DocRev.MY_ONLY_DOC_NAME)
+            if (_LightDoc.DocTypeName == DocRev.MyOnlyDocName)
                 // if the DocRev submitted supersedes the current or this is no current..
                 if (!Version.TryParse(TemplateController.Instance.TopDocRev(TargetDocName), out existingVersion) || Version.Parse(TargetDocVer) >= existingVersion)
                     // if there is no representation of this DocRev as a directory in the file system (as this trumps the submitted one no matter what
@@ -242,10 +242,12 @@ namespace Rudine
 
 
 
-        public override DocRev CreateTemplate(List<Rudine.Web.DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null) =>
-            DocInterpreter.Instance.CreateTemplate(docFiles, docTypeName, docRev, docProperties);
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)  =>
+            DocInterpreter.Instance.CreateTemplate(docFiles, docTypeName, docRev, schemaXml,schemaFields);
 
         public override List<ContentInfo> TemplateSources() =>
             DocInterpreter.Instance.TemplateSources();
+
+        
     }
 }

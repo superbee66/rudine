@@ -364,7 +364,17 @@ namespace Rudine.Interpreters.Xsn
         }
 
         public override List<ContentInfo> TemplateSources() =>
-            new List<ContentInfo> { new ContentInfo { ContentFileExtension = "xsn", ContentType = "application/vnd.ms-infopath" } };
+            new List<ContentInfo>
+            {
+                new ContentInfo { ContentFileExtension = "xsn", ContentType = "application/vnd.ms-infopath" },
+                new ContentInfo { ContentFileExtension = "xsf", ContentType = "application/vnd.ms-infopath" }
+            };
+
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
+        {
+
+            return base.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields);
+        }
 
         /// <summary>
         ///     Runs a given form's xml schema against it throwing an exception if it fails to validate

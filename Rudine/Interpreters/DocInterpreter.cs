@@ -91,17 +91,17 @@ namespace Rudine.Interpreters
                     TemplateController.Instance.TopDocRev(DocTypeName))
                 .Create(DocTypeName);
 
-        public DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null)
+        public DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
         {
             DocRev _DocRev = null;
 
-            foreach (string Extension in docFiles.Select(_ => new FileInfo(_.Name).Extension).Distinct())
+            foreach (string Extension in docFiles.Select(_ => new FileInfo(_.Name).Extension.Trim('.')).Distinct())
                 foreach (DocTextInterpreter _IDocDataInterpreter in ContentInterpreterInstances.OfType<DocTextInterpreter>())
-                    if (_IDocDataInterpreter.ContentInfo.ContentFileExtension.Equals(Extension, StringComparison.CurrentCultureIgnoreCase))
+                    if (_IDocDataInterpreter.TemplateSources().Any(templateSource => templateSource.ContentFileExtension.Trim('.').Equals(Extension, StringComparison.CurrentCultureIgnoreCase)))
                         if (_DocRev == null)
                             break;
                         else
-                            _DocRev = _IDocDataInterpreter.CreateTemplate(docFiles, docTypeName, docRev, docProperties);
+                            _DocRev = _IDocDataInterpreter.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields);
 
             return _DocRev;
         }
@@ -181,7 +181,7 @@ namespace Rudine.Interpreters
         public virtual void ProcessRequest(HttpContext context)
         {
             // ensure the latest content has been processed & imported
-            ImporterController.TryDocRevImporting();
+            ImporterController.CreateTemplateItems(DocExchange.Instance);
 
             TemplateFileInfo _TemplateFileInfo = TemplateController.ParseTemplateFileInfo(context);
 

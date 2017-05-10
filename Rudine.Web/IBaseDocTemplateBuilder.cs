@@ -14,7 +14,7 @@ namespace Rudine.Web
         /// <param name="Files"></param>
         /// <returns></returns>
         [OperationContract]
-        DocRev CreateTemplate(List<Rudine.Web.DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null);
+        DocRev CreateTemplate(List<Rudine.Web.DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null);
 
         /// <summary>
         /// file/mime information that are likely canidates for CreateTemplate calls

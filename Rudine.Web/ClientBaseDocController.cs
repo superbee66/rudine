@@ -33,14 +33,11 @@ namespace Rudine.Web
             set { _defaultRelayUrl = value; }
         }
 
-        public TClientBaseT UnderlyingWSClient
-        {
-            get { return _UnderlyingWSClient; }
-        }
+        public TClientBaseT UnderlyingWSClient =>
+            _UnderlyingWSClient;
 
-        public override List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null)
-        {
-            return (List<LightDoc>)GetMethodInfo(DocCmd.Audit)
+        public override List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null) =>
+            (List<LightDoc>) GetMethodInfo(DocCmd.Audit)
                 .Invoke(UnderlyingWSClient,
                     new object[]
                     {
@@ -48,50 +45,40 @@ namespace Rudine.Web
                         DocId,
                         RelayUrl
                     });
-        }
 
-        public override BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null)
-        {
-            RelayUrl = string.IsNullOrWhiteSpace(RelayUrl)
-                           ? DefaultRelayUrl
-                           : RelayUrl;
-
-            Dictionary<string, object> _Parms = new Dictionary<string, object>
-            {
+        public override BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null) =>
+            (BaseDoc) GetMethodInfo(DocCmd.Create)
+                .Invoke(UnderlyingWSClient, new Dictionary<string, object>
                 {
-                    Parm.Doc, Doc
-                },
-                {
-                    Parm.DocKeys, DocKeys
-                },
-                {
-                    Parm.RelayUrl, RelayUrl
-                }
-            };
+                    { Parm.Doc, Doc },
+                    { Parm.DocKeys, DocKeys },
+                    { Parm.RelayUrl, string.IsNullOrWhiteSpace(RelayUrl) ? DefaultRelayUrl : RelayUrl }
+                });
 
-            BaseDoc form = (BaseDoc)GetMethodInfo(DocCmd.Create).Invoke(UnderlyingWSClient, _Parms);
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null) =>
+            (DocRev) _UnderlyingControllerType.GetMethod(nameof(CreateTemplate))
+                                              .Invoke(UnderlyingWSClient,
+                                                  new object[]
+                                                  {
+                                                      docFiles,
+                                                      docTypeName,
+                                                      docRev,
+                                                      schemaXml,
+                                                      schemaFields
+                                                  });
 
-            return form;
-        }
-
-        public override BaseDoc Get(string DocTypeName, Dictionary<string, string> DocKeys = null, string DocId = null, string RelayUrl = null)
-        {
-            RelayUrl = string.IsNullOrWhiteSpace(RelayUrl)
-                           ? DefaultRelayUrl
-                           : RelayUrl;
-
-            Dictionary<string, object> parms = new Dictionary<string, object>
+        public override BaseDoc Get(string DocTypeName, Dictionary<string, string> DocKeys = null, string DocId = null, string RelayUrl = null) =>
+            (BaseDoc) GetMethodInfo(DocCmd.Get).Invoke(UnderlyingWSClient, new Dictionary<string, object>
             {
                 { Parm.DocTypeName, DocTypeName },
                 { Parm.DocKeys, DocKeys },
                 { Parm.DocId, DocId },
-                { Parm.RelayUrl, RelayUrl }
-            };
-
-            BaseDoc form = (BaseDoc)GetMethodInfo(DocCmd.Get).Invoke(UnderlyingWSClient, parms);
-
-            return form;
-        }
+                {
+                    Parm.RelayUrl, string.IsNullOrWhiteSpace(RelayUrl)
+                                       ? DefaultRelayUrl
+                                       : RelayUrl
+                }
+            });
 
         public byte[] GetDocBytes(string DocSrc, out string filename)
         {
@@ -107,8 +94,8 @@ namespace Rudine.Web
         {
             MemoryStream _MemoryStream = new MemoryStream();
             //TODO:Relocate this to a more appropriate class
-            HttpWebRequest _HttpWebRequest = (HttpWebRequest)WebRequest.Create(new Uri(DocSrc));
-            using (HttpWebResponse _HttpWebResponse = (HttpWebResponse)_HttpWebRequest.GetResponse())
+            HttpWebRequest _HttpWebRequest = (HttpWebRequest) WebRequest.Create(new Uri(DocSrc));
+            using (HttpWebResponse _HttpWebResponse = (HttpWebResponse) _HttpWebRequest.GetResponse())
             {
                 filename = Regex.Match(_HttpWebResponse.Headers["content-disposition"], "filename=\"([^\"]+)\"").Groups[1].Value;
                 _HttpWebResponse.GetResponseStream().CopyTo(_MemoryStream);
@@ -142,19 +129,17 @@ namespace Rudine.Web
 
         public override DocTypeInfo Info(string DocTypeName) =>
             CacheMan.Cache(() =>
-                               (DocTypeInfo)GetMethodInfo(DocCmd.Info).Invoke(UnderlyingWSClient, new object[] { DocTypeName }),
+                               (DocTypeInfo) GetMethodInfo(DocCmd.Info)
+                                   .Invoke(UnderlyingWSClient, new object[] { DocTypeName }),
                 false,
                 "DocTypeInfo",
                 DocTypeName,
                 DocCmd.Info);
 
-        public override List<LightDoc> List(List<string> DocTypes, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null)
-        {
-            RelayUrl = string.IsNullOrWhiteSpace(RelayUrl)
-                           ? DefaultRelayUrl
-                           : RelayUrl;
+        public override List<ContentInfo> Interpreters() { return null; }
 
-            object[] parms =
+        public override List<LightDoc> List(List<string> DocTypes, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null) =>
+            (List<LightDoc>) GetMethodInfo(DocCmd.List).Invoke(UnderlyingWSClient, new object[]
             {
                 DocTypes,
                 DocKeys ?? new Dictionary<string, List<string>>(),
@@ -162,28 +147,22 @@ namespace Rudine.Web
                 KeyWord ?? string.Empty,
                 PageSize,
                 PageIndex,
-                RelayUrl
-            };
-            MethodInfo _MethodInfo = GetMethodInfo(DocCmd.List);
+                string.IsNullOrWhiteSpace(RelayUrl)
+                    ? DefaultRelayUrl
+                    : RelayUrl
+            });
 
-            return (List<LightDoc>)_MethodInfo.Invoke(UnderlyingWSClient, parms);
-        }
-
-        private BaseDoc Read(object DocData, string RelayUrl)
-        {
-            RelayUrl = string.IsNullOrWhiteSpace(RelayUrl)
-                           ? DefaultRelayUrl
-                           : RelayUrl;
-
-            Dictionary<string, object> _Parms = new Dictionary<string, object>
-            {
-                { Parm.DocData, DocData },
-                { Parm.RelayUrl, RelayUrl }
-            };
-
-            BaseDoc _Form = (BaseDoc)GetMethodInfo(DocData is byte[] ? DocCmd.ReadBytes : DocCmd.ReadText).Invoke(UnderlyingWSClient, _Parms);
-            return _Form;
-        }
+        private BaseDoc Read(object DocData, string RelayUrl) =>
+            (BaseDoc) GetMethodInfo(DocData is byte[] ? DocCmd.ReadBytes : DocCmd.ReadText)
+                .Invoke(UnderlyingWSClient, new Dictionary<string, object>
+                {
+                    { Parm.DocData, DocData },
+                    {
+                        Parm.RelayUrl, string.IsNullOrWhiteSpace(RelayUrl)
+                                           ? DefaultRelayUrl
+                                           : RelayUrl
+                    }
+                });
 
         public override BaseDoc ReadBytes(byte[] DocData, string RelayUrl = null) =>
             Read(DocData, RelayUrl);
@@ -192,7 +171,7 @@ namespace Rudine.Web
             Read(DocData, RelayUrl);
 
         public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null) =>
-            (LightDoc)GetMethodInfo(DocCmd.Status)
+            (LightDoc) GetMethodInfo(DocCmd.Status)
                 .Invoke(UnderlyingWSClient,
                     new object[]
                     {
@@ -203,25 +182,21 @@ namespace Rudine.Web
                         RelayUrl
                     });
 
-        private LightDoc Submit(object DocData, string DocSubmittedByEmail, string RelayUrl, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle)
-        {
-            RelayUrl = string.IsNullOrWhiteSpace(RelayUrl)
-                           ? DefaultRelayUrl
-                           : RelayUrl;
-
-            return (LightDoc)GetMethodInfo(DocData is byte[] ? DocCmd.SubmitBytes : DocCmd.SubmitText)
+        private LightDoc Submit(object DocData, string DocSubmittedByEmail, string RelayUrl, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle) =>
+            (LightDoc) GetMethodInfo(DocData is byte[] ? DocCmd.SubmitBytes : DocCmd.SubmitText)
                 .Invoke(UnderlyingWSClient,
                     new[]
                     {
                         DocData,
                         DocSubmittedByEmail,
-                        RelayUrl,
+                        string.IsNullOrWhiteSpace(RelayUrl)
+                            ? DefaultRelayUrl
+                            : RelayUrl,
                         DocStatus,
                         SubmittedDate,
                         DocKeys,
                         DocTitle
                     });
-        }
 
         public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
             Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
@@ -229,22 +204,9 @@ namespace Rudine.Web
         public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
             Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
-        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null) =>
-            (DocRev)_UnderlyingControllerType.GetMethod(nameof(CreateTemplate))
-                                              .Invoke(UnderlyingWSClient,
-                                                  new object[]
-                                                  {
-                                                      docFiles,
-                                                      docTypeName,
-                                                      docRev,
-                                                      docProperties
-                                                  });
-
         public override List<ContentInfo> TemplateSources() =>
-               (List<ContentInfo>)_UnderlyingControllerType.GetMethod(nameof(TemplateSources))
-                                              .Invoke(UnderlyingWSClient,
-                                                  new object[] { });
-
-        public override List<ContentInfo> Interpreters() { return null; }
+            (List<ContentInfo>) _UnderlyingControllerType.GetMethod(nameof(TemplateSources))
+                                                         .Invoke(UnderlyingWSClient,
+                                                             new object[] { });
     }
 }

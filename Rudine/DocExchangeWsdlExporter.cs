@@ -8,6 +8,7 @@ using System.Xml.Schema;
 using Rudine.Template;
 using Rudine.Template.Filesystem;
 using Rudine.Util;
+using Rudine.Web;
 using Rudine.Web.Util;
 
 namespace Rudine
@@ -25,8 +26,6 @@ namespace Rudine
         /// <returns></returns>
         public override MetadataSet GetGeneratedMetadata()
         {
-            ImporterController.TryDocRevImporting();
-
             int i = 0;
             // let the base build up metadata for the service contracts as these are static
             MetadataSet _MetadataSet = base.GetGeneratedMetadata();
@@ -41,7 +40,7 @@ namespace Rudine
                                        RequestPaths.GetPhysicalApplicationPath(
                                            "doc",
                                            _DirectoryInfo.Name,
-                                           Runtime.MYSCHEMA_XSD_FILE_NAME)).GetHashCode()
+                                           DocRev.SchemaFileName)).GetHashCode()
                                    ^ WindowsIdentity.GetCurrent().User.Value.GetHashCode()); // just incase the user changes due to an apppool change
 
                 string tempDataContractXsdPath = string.Format("{0}\\{1}.xsd", Path.GetTempPath(), Base36.Encode(key));

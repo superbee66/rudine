@@ -13,6 +13,7 @@ namespace Rudine.Web
     {
         public abstract List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null);
         public abstract BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null);
+        public abstract DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null);
         public abstract BaseDoc Get(string DocTypeName, Dictionary<string, string> DocKeys = null, string DocId = null, string RelayUrl = null);
         public abstract DocTypeInfo Info(string DocTypeName);
         public abstract List<ContentInfo> Interpreters();
@@ -56,7 +57,6 @@ namespace Rudine.Web
                 streamAsValue => SubmitText(streamAsValue, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle));
         }
         public abstract LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
-        public abstract DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, List<CompositeProperty> docProperties = null);
         public abstract List<ContentInfo> TemplateSources();
     }
 }
