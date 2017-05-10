@@ -31,8 +31,8 @@ namespace Rudine.Interpreters.Embeded.Tests
             EmbededInterpreter _EmbededInterpreter = new EmbededInterpreter();
             DocRev docRev_A = (DocRev)_EmbededInterpreter.Create("DocRev");
 
-            
-            File.WriteAllText(file.FullName,"Hello World!");
+
+            File.WriteAllText(file.FullName, "Hello World!");
 
             docRev_A.DocURN.DocTypeName = "Booger";
             docRev_A.DocURN.solutionVersion = new Version(1, 3).ToString();
@@ -46,17 +46,10 @@ namespace Rudine.Interpreters.Embeded.Tests
 
             docRev_A = (DocRev)DocExchange.Instance.Create(docRev_A);
 
-            Assert.NotNull(docRev_A.DocFilesMD5);
+            // round-trip the object to make sure serialization is working everywhere
+            DocRev docRev_B = (DocRev)DocExchange.Instance.ReadBytes(_EmbededInterpreter.WriteByte(docRev_A));
 
-            
-            File.WriteAllBytes("test.zip", _EmbededInterpreter.WriteByte(docRev_A));
-
-            FileInfo _FileInfo = new FileInfo("test.zip");
-
-            DocRev docRev_B = (DocRev)_EmbededInterpreter.Read(File.ReadAllBytes("test.zip"));
-
-            File.WriteAllText("a.json", _JavaScriptSerializer.Serialize(docRev_A));
-            File.WriteAllText("b.json", _JavaScriptSerializer.Serialize(docRev_B));
+            Assert.AreEqual(_JavaScriptSerializer.Serialize(docRev_A), _JavaScriptSerializer.Serialize(docRev_B));
 
         }
     }
