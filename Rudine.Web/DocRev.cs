@@ -22,6 +22,7 @@ namespace Rudine.Web
         public const string KeyPart2 = "TargetDocTypeVer";
         public static string ManifestFileName = string.Format("{0}.json", nameof(DocURN));
         public static string SchemaFileName = string.Format("{0}.xsd", nameof(DocSchema));
+        public static string PIFileName = string.Format("{0}.json", nameof(DocProcessingInstructions));
 
         public List<DocRevEntry> DocFiles { get; set; }
 
@@ -49,7 +50,7 @@ namespace Rudine.Web
 
         public DocURN DocURN { get; set; }
 
-          /// <summary>
+        /// <summary>
         /// string literal that is valid XSD  used to compose an IDocModel & finally a BaseDoc from
         /// </summary>
         public string DocSchema { get; set; }
@@ -93,18 +94,21 @@ namespace Rudine.Web
 
             set
             {
-                if (value != MY_ONLY_DOC_VERSION)
-                    throw PropertyValueException(nameof(solutionVersion));
+                if (value != default(string)) // serializers often set this to "" when they are spinning up
+                {
+                    if (value != MY_ONLY_DOC_VERSION)
+                        throw PropertyValueException(nameof(solutionVersion));
 
-                base.solutionVersion = value;
+                    base.solutionVersion = value;
+                }
             }
         }
 
         public static Dictionary<string, string> MakeDocKeys(DocURN docUrn) =>
             new Dictionary<string, string>
             {
-                { DocRev.KeyPart1, docUrn.DocTypeName },
-                { DocRev.KeyPart2, docUrn.solutionVersion }
+                { KeyPart1, docUrn.DocTypeName },
+                { KeyPart2, docUrn.solutionVersion }
             };
 
         private static Exception PropertyValueException(string propertyName)
