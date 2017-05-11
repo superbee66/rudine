@@ -71,6 +71,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Rudine.Interpeter.pdf\Rudine.Interpreters.Pdf.csproj">
+      <Project>{25dfa9b7-ce29-4772-9e02-49e60192369f}</Project>
+      <Name>Rudine.Interpreters.Pdf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rudine.Interpreters.Xsn\Rudine.Interpreters.Xsn.csproj">
       <Project>{89527749-556d-4e8d-8213-d2b0d869506b}</Project>
       <Name>Rudine.Interpreters.Xsn</Name>
