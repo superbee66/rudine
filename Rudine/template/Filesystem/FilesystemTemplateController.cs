@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using Rudine.Interpreters;
+using Rudine.Interpreters.Embeded;
+using Rudine.Web;
 using Rudine.Web.Util;
 
 namespace Rudine.Template.Filesystem
@@ -74,7 +76,7 @@ namespace Rudine.Template.Filesystem
             string TargetDocTypeName = string.Empty;
 
             // run through all the text files at the root of the target directory and try to resolve there revision number/string
-            foreach (FileInfo filepath in _DirectoryInfo.EnumerateFiles().Where(fileinfo => !fileinfo.Name.Equals(Runtime.MYSCHEMA_XSD_FILE_NAME, StringComparison.InvariantCultureIgnoreCase)))
+            foreach (FileInfo filepath in _DirectoryInfo.EnumerateFiles().Where(fileinfo => !fileinfo.Name.Equals(DocRev.SchemaFileName, StringComparison.InvariantCultureIgnoreCase)))
             {
                 bool isBinary = FileSystem.isBinary(filepath.FullName);
 

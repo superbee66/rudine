@@ -148,8 +148,8 @@ namespace Rudine.Template
         /// <returns>string.Empty if nothing is found</returns>
         public string TopDocRev(string DocTypeName, bool forceRefresh) =>
             CacheMan.Cache(() =>
-                               DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase)
-                                   ? DocRev.MY_ONLY_DOC_VERSION.ToString()
+                               DocTypeName.Equals(DocRev.MyOnlyDocName, StringComparison.CurrentCultureIgnoreCase)
+                                   ? DocRev.MyOnlyDocVersion.ToString()
                                    : _DefaultTopDocFilesystemTemplateController.TopDocRev(DocTypeName)
                                      ?? _OtherIDocResourceControllers
                                          //DOCREVs should always come from the embedded controller

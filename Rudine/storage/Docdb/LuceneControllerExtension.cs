@@ -34,7 +34,7 @@ namespace Rudine.Storage.Docdb
                         false,
                         IndexWriter.MaxFieldLength.UNLIMITED))
                     {
-                        foreach (string DocTypeName in o.List(new List<string> { DocRev.MY_ONLY_DOC_NAME }).Select(_LightDoc => _LightDoc.GetTargetDocName()).Distinct())
+                        foreach (string DocTypeName in o.List(new List<string> { DocRev.MyOnlyDocName }).Select(_LightDoc => _LightDoc.GetTargetDocName()).Distinct())
                         {
                             int PageIndex = 0, hashcode = 0;
                             List<Document> _ListDocument = new List<Document>();

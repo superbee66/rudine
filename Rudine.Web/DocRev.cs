@@ -16,13 +16,13 @@ namespace Rudine.Web
     [Serializable]
     public class DocRev : BaseDoc, IDocRev
     {
-        public const string MY_ONLY_DOC_NAME = "DocRev";
-        public const string MY_ONLY_DOC_VERSION = "1.0.0.0";
+        public const string MyOnlyDocName = "DocRev";
+        public const string MyOnlyDocVersion = "1.0.0.0";
         public const string KeyPart1 = "TargetDocTypeName";
         public const string KeyPart2 = "TargetDocTypeVer";
-        public static string ManifestFileName = string.Format("{0}.json", nameof(DocURN));
-        public static string SchemaFileName = string.Format("{0}.xsd", nameof(DocSchema));
-        public static string PIFileName = string.Format("{0}.json", nameof(DocProcessingInstructions));
+        public static readonly string ManifestFileName = String.Format("{0}.json", nameof(DocURN));
+        public static readonly string SchemaFileName = String.Format("{0}.xsd", nameof(DocSchema));
+        public static readonly string PIFileName = String.Format("{0}.json", nameof(DocProcessingInstructions));
 
         public List<DocRevEntry> DocFiles { get; set; }
 
@@ -37,9 +37,9 @@ namespace Rudine.Web
                             !docRevEntry.Name.Equals(ManifestFileName, StringComparison.InvariantCultureIgnoreCase)
                             &&
                             !docRevEntry.Name.Equals(SchemaFileName, StringComparison.InvariantCultureIgnoreCase)
-                            )
+                        )
                         {
-                            md5.TransformString(docRevEntry.Name ?? string.Empty);
+                            md5.TransformString(docRevEntry.Name ?? String.Empty);
                             md5.TransformBytes(docRevEntry.Bytes);
                         }
                     md5.TransformFinalBlock(new byte[0], 0, 0);
@@ -47,13 +47,6 @@ namespace Rudine.Web
                 }
             }
         }
-
-        public DocURN DocURN { get; set; }
-
-        /// <summary>
-        /// string literal that is valid XSD  used to compose an IDocModel & finally a BaseDoc from
-        /// </summary>
-        public string DocSchema { get; set; }
 
         /// <summary>
         ///     system reserved value management
@@ -65,29 +58,34 @@ namespace Rudine.Web
             set
             {
                 if (value != default(Dictionary<string, string>))
-                    if (string.Join(",", value.Keys.OrderBy(key => key)) != string.Join(",", MakeDocKeys(DocURN).Keys.OrderBy(key => key)))
+                    if (String.Join(",", value.Keys.OrderBy(key => key)) != String.Join(",", MakeDocKeys(DocURN).Keys.OrderBy(key => key)))
                         throw PropertyValueException(nameof(DocKeys));
 
                 base.DocKeys = value;
             }
         }
 
+        /// <summary>
+        ///     string literal that is valid XSD  used to compose an IDocModel & finally a BaseDoc from
+        /// </summary>
+        public string DocSchema { get; set; }
 
-
-        [DefaultValue(MY_ONLY_DOC_NAME)]
+        [DefaultValue(MyOnlyDocName)]
         public override string DocTypeName
         {
             get { return base.DocTypeName; }
 
             set
             {
-                if (value != MY_ONLY_DOC_NAME)
+                if (value != MyOnlyDocName)
                     throw PropertyValueException(nameof(DocTypeName));
                 base.DocTypeName = value;
             }
         }
 
-        [DefaultValue(MY_ONLY_DOC_VERSION)]
+        public DocURN DocURN { get; set; }
+
+        [DefaultValue(MyOnlyDocVersion)]
         public override string solutionVersion
         {
             get { return base.solutionVersion; }
@@ -96,7 +94,7 @@ namespace Rudine.Web
             {
                 if (value != default(string)) // serializers often set this to "" when they are spinning up
                 {
-                    if (value != MY_ONLY_DOC_VERSION)
+                    if (value != MyOnlyDocVersion)
                         throw PropertyValueException(nameof(solutionVersion));
 
                     base.solutionVersion = value;

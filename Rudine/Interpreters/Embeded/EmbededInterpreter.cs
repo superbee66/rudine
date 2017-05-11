@@ -23,7 +23,7 @@ namespace Rudine.Interpreters.Embeded
         ///     utilizes actual MY_ONLY_DOC_NAME as the file extension
         /// </summary>
         public override ContentInfo ContentInfo =>
-            new ContentInfo { ContentFileExtension = DocRev.MY_ONLY_DOC_NAME, ContentType = "application/octet-stream" };
+            new ContentInfo { ContentFileExtension = DocRev.MyOnlyDocName, ContentType = "application/octet-stream" };
 
         /// <summary>
         /// </summary>
@@ -31,8 +31,8 @@ namespace Rudine.Interpreters.Embeded
         /// <returns></returns>
         public override BaseDoc Create(string DocTypeName)
         {
-            if (!DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME, StringComparison.InvariantCultureIgnoreCase))
-                throw new ArgumentException(string.Empty, nameof(DocTypeName));
+            if (!DocTypeName.Equals(DocRev.MyOnlyDocName, StringComparison.InvariantCultureIgnoreCase))
+                throw new ArgumentException(String.Empty, nameof(DocTypeName));
 
             return Create();
         }
@@ -43,8 +43,8 @@ namespace Rudine.Interpreters.Embeded
             {
                 DocFiles = new List<DocRevEntry>(),
                 DocURN = new DocURN(),
-                DocTypeName = DocRev.MY_ONLY_DOC_NAME,
-                solutionVersion = DocRev.MY_ONLY_DOC_VERSION
+                DocTypeName = DocRev.MyOnlyDocName,
+                solutionVersion = DocRev.MyOnlyDocVersion
             };
         }
 
@@ -53,9 +53,9 @@ namespace Rudine.Interpreters.Embeded
         public override string HrefVirtualFilename(string DocTypeName, string DocRev) => null;
 
         public override bool Processable(string DocTypeName, string docRev) =>
-            DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME)
+            DocTypeName.Equals(DocRev.MyOnlyDocName)
             &&
-            docRev.Equals(DocRev.MY_ONLY_DOC_VERSION);
+            docRev.Equals(DocRev.MyOnlyDocVersion);
 
         /// <summary>
         ///     extracts contents of the zip file into a DocRev object
@@ -94,6 +94,7 @@ namespace Rudine.Interpreters.Embeded
             return _DOCREV;
         }
 
+        
         public override DocProcessingInstructions ReadDocPI(byte[] DocData) => Read(DocData);
 
         public override string ReadDocRev(byte[] DocData) => ReadDocPI(DocData).solutionVersion;
@@ -123,7 +124,7 @@ namespace Rudine.Interpreters.Embeded
                     },
                     new DocRevEntry
                     {
-                        Bytes = Encoding.Default.GetBytes(_DocRev.DocSchema ?? string.Empty),
+                        Bytes = Encoding.Default.GetBytes(_DocRev.DocSchema ?? String.Empty),
                         ModDate = DefaultModDate,
                         Name = DocRev.ManifestFileName
                     } };

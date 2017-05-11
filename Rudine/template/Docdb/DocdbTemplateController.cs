@@ -11,12 +11,12 @@ namespace Rudine.Template.Docdb
         public MemoryStream OpenRead(string DocTypeName, string DocTypeVer, string filename)
         {
             IDocRev o = (IDocRev) DocExchange.LuceneController.Get(
-                DocRev.MY_ONLY_DOC_NAME,
+                DocRev.MyOnlyDocName,
                 new Dictionary<string, string> { { DocRev.KeyPart2, DocTypeVer }, { DocRev.KeyPart1, DocTypeName } });
 
             if (o == null)
                 o = (IDocRev) DocExchange.LuceneController.Get(
-                    DocRev.MY_ONLY_DOC_NAME,
+                    DocRev.MyOnlyDocName,
                     new Dictionary<string, string> { { DocRev.KeyPart2, DocTypeVer }, { DocRev.KeyPart1, DocTypeName } });
 
             byte[] bytes = o.DocFiles == null
@@ -31,7 +31,7 @@ namespace Rudine.Template.Docdb
         public string TopDocRev(string DocTypeName)
         {
             return DocExchange.LuceneController.List(
-                                  new List<string> { DocRev.MY_ONLY_DOC_NAME },
+                                  new List<string> { DocRev.MyOnlyDocName },
                                   new Dictionary<string, List<string>>
                                   {
                                       {
