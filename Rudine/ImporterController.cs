@@ -1,57 +1,129 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Xml.Serialization;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
-using Microsoft.Deployment.Compression;
-using Microsoft.Deployment.Compression.Cab;
-using Newtonsoft.Json;
-using Rudine.Exceptions;
-using Rudine.Interpreters;
-using Rudine.Interpreters.Embeded;
-
 using Rudine.Template.Filesystem;
 using Rudine.Util;
-using Rudine.Util.Cabs;
 using Rudine.Util.Xsds;
 using Rudine.Web;
 using Rudine.Web.Util;
 
 namespace Rudine
 {
+    /// <summary>
+    /// creates doc/* directories based on IDocModel(s) in memory or any loose files in the doc/* directory that are valid. APP_CODE/*.cs based on the docSchema XSD are created if they don't exist.
+    /// </summary>
     public static class ImporterController
     {
-        public static string DirectoryFullName
-        {
-            get { return RequestPaths.GetPhysicalApplicationPath("import"); }
-        }
+        static readonly string AppCode = RequestPaths.GetPhysicalApplicationPath("App_Code");
+        static readonly DirectoryInfo APP_DOCS = new DirectoryInfo(RequestPaths.GetPhysicalApplicationPath("doc"));
+        private static readonly ConcurrentStack<DirectoryInfo> DOCS = new ConcurrentStack<DirectoryInfo>();
 
         static ImporterController() { Reflection.LoadBinDlls(); }
 
-        private static List<ImporterLightDoc> GetImporterLightDocList(string FullPathOfFile)
+        /// <summary>
+        ///     Intended time of use it that of a "post cache reset" time. If cache has been cleared, all the logic behind this
+        ///     method will run.
+        /// </summary>
+        public static void CreateTemplateItems(BaseDocController baseDocController)
         {
-            FileInfo _FileInfoLog = new FileInfo(GetLogFilePath(FullPathOfFile));
+            DocsFromIDocModels();
 
-            return _FileInfoLog.Exists
-                       ? JsonConvert.DeserializeObject<List<ImporterLightDoc>>(File.ReadAllText(_FileInfoLog.FullName))
-                       : new List<ImporterLightDoc>();
+            DocsFromFiles(baseDocController);
+
+            DOCS.PushRange(Directory
+                .EnumerateDirectories(FilesystemTemplateController.DirectoryPath)
+                .Select(dirpath => new DirectoryInfo(dirpath))
+                .Where(dirpath => !DOCS.Contains(dirpath))
+                .OrderByDescending(dirpath =>
+                                       new[] { dirpath.LastWriteTime.Ticks }
+                                           .Union(
+                                               GetRelativeFilePathsInDirectoryTree(dirpath.FullName, true)
+                                                   .Select(filepath => File.GetLastWriteTimeUtc(filepath).Ticks))
+                                           .Max())
+                .ToArray());
+
+            // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
+            DirectoryInfo dir;
+            while (DOCS.TryPop(out dir) && ImportContentFolder(baseDocController, dir) != null) {}
+
+            // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
+            if (!DOCS.IsEmpty)
+                Tasker.StartNewTask(() =>
+                                    {
+                                        while (DOCS.TryPop(out dir))
+                                            ImportContentFolder(baseDocController, dir);
+                                        return true;
+                                    });
         }
 
         /// <summary>
+        ///     move any loose files taht qualify as TemplateSources items under the doc/* folder, creating there own folder in the
+        ///     process
         /// </summary>
-        /// <param name="TargetImportFile"></param>
-        /// <returns></returns>
-        private static string GetLogFilePath(string TargetImportFile)
+        /// <param name="baseDocController"></param>
+        private static void DocsFromFiles(BaseDocController baseDocController)
         {
-            return string.Format(@"{0}\{1}.import.json", new FileInfo(TargetImportFile).Directory.FullName,
-                Environment.GetEnvironmentVariable("computername"));
+            string[] extensions = baseDocController.TemplateSources().Select(templateSource => "." + templateSource.ContentFileExtension).Distinct().ToArray();
+
+            foreach (FileInfo fileinfo in Directory.EnumerateFiles(APP_DOCS.FullName, "*", SearchOption.TopDirectoryOnly).Select(filepath => new FileInfo(filepath)))
+                if (extensions.Any(extension => extension.Equals(fileinfo.Extension, StringComparison.InvariantCultureIgnoreCase)))
+                    fileinfo.MoveTo(
+                        new DirectoryInfo(RequestPaths.GetPhysicalApplicationPath("doc", StringTransform.PrettyCSharpIdent(Path.GetFileNameWithoutExtension(fileinfo.FullName))))
+                            .mkdir() + "\\" + StringTransform.PrettyCSharpIdent(Path.GetFileNameWithoutExtension(fileinfo.FullName)) + fileinfo.Extension);
+        }
+
+        /// <summary>
+        ///     Scans AppDomain for classes implementing the IDocModel & performs all transformations needed to represent them as
+        ///     BaseDoc to be served.
+        /// </summary>
+        private static void DocsFromIDocModels()
+        {
+            //TODO:Validate POCO utilizes correct title-case underscore separated labeling practices
+            //TODO:add a placeholder file describing what goes in the given DocTypeName's form root directory
+            var docModelItems = AppDomain
+                .CurrentDomain
+                .GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Distinct()
+                .Where(typ => (typ.GetInterfaces().Any(i => i == typeof(IDocModel))))
+                .Select(type => new
+                {
+                    type,
+                    DirectoryInfo = new DirectoryInfo(FilesystemTemplateController.GetDocDirectoryPath(type.Name)).mkdir(),
+                    myschemaXsd = XsdExporter.ExportSchemas(
+                        type.Assembly,
+                        new List<string> { type.Name },
+                        RuntimeTypeNamer.CalcSchemaUri(type.Name)).First()
+                });
+
+            foreach (var docTypeDirectoryInfo in docModelItems)
+            {
+                string filepath = string.Format(@"{0}{1}", docTypeDirectoryInfo.DirectoryInfo.FullName, DocRev.SchemaFileName);
+
+                // always (over)write the xsd as this will always be generated by and for Rudine.Core regardless of the IDocInterpreter that is handling
+                // compare the existing xsd on disk with the one generated here (excluding the "rolling" namespace) to see if anything has changed
+                if (
+                    !File.Exists(filepath)
+                    ||
+                    RuntimeTypeNamer.VALID_CSHARP_NAMESPACE_PART_MATCH.Replace(docTypeDirectoryInfo.myschemaXsd, string.Empty) != RuntimeTypeNamer.VALID_CSHARP_NAMESPACE_PART_MATCH.Replace(File.ReadAllText(filepath), string.Empty)
+                )
+                {
+                    File.WriteAllText(string.Format(@"{0}{1}", docTypeDirectoryInfo.DirectoryInfo.FullName, DocRev.SchemaFileName), docTypeDirectoryInfo.myschemaXsd);
+                }
+
+                // create placeholder App_Code\DocTypeName.c_ files for developer to get started with myschema.xsd generation via cSharp file editing & thus auto translating
+                Tasker.StartNewTask(() =>
+                                    {
+                                        foreach (string docTypeName in DocExchange.DocTypeDirectories())
+                                            if (!docModelItems.Any(m => m.DirectoryInfo.Name.Equals(docTypeName, StringComparison.CurrentCultureIgnoreCase)))
+                                                WriteCSharpAPP_CODE(docTypeName);
+                                        return true;
+                                    });
+            }
         }
 
         /// <summary>
@@ -64,6 +136,44 @@ namespace Rudine
             IList<string> list = new List<string>();
             RecursiveGetRelativeFilePathsInDirectoryTree(dir, string.Empty, includeSubdirectories, list);
             return list;
+        }
+
+        /// <summary>
+        ///     Expects the directory to contain an infopath manifest.xsf & template.xml files. The contents are then persisted &
+        ///     indexed by DocTypeName & DocTypeRev (aka solutionVersion) for OpenStream & OpenText operations. As of this writing,
+        ///     this application must have write access to the parent folder of the given directory for cab compression operations.
+        /// </summary>
+        /// <param name="importFolderPath"></param>
+        /// <param name="workingFolderPath">default is parent of importFolderPath</param>
+        public static DocRev ImportContentFolder(BaseDocController baseDocController, DirectoryInfo sourceFolderPath, string workingFolderPath = null)
+        {
+            DocRev docRev = new DocRev
+            {
+                DocURN = new DocURN
+                {
+                    DocTypeName = Path.GetFileNameWithoutExtension(sourceFolderPath.Name)
+                },
+                DocFiles = new List<DocRevEntry>()
+            };
+
+            foreach (FileInfo filepath in sourceFolderPath.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                docRev.DocFiles.Add(
+                    new DocRevEntry
+                    {
+                        Bytes = File.ReadAllBytes(filepath.FullName),
+                        ModDate = filepath.LastWriteTimeUtc,
+                        Name = filepath.FullName.Substring(sourceFolderPath.FullName.Length + 1)
+                    });
+
+            docRev = baseDocController.List(
+                         new List<string> { nameof(DocRev) },
+                         null,
+                         null,
+                         docRev.DocFilesMD5).Count == 0
+                         ? baseDocController.CreateTemplate(docRev.DocFiles, docRev.DocTypeName)
+                         : null;
+
+            return docRev;
         }
 
         private static void RecursiveGetRelativeFilePathsInDirectoryTree(string dir, string relativeDir, bool includeSubdirectories, IList<string> fileList)
@@ -87,288 +197,30 @@ namespace Rudine
             }
         }
 
-        private static IDictionary<string, string> CreateStringDictionary(IList<string> keys, IList<string> values)
+        /// <summary>
+        ///     converts the DocSchema XSD to a csharp POCO and writes it out to the APP_CODE directory
+        /// </summary>
+        /// <param name="docTypeName"></param>
+        private static void WriteCSharpAPP_CODE(string docTypeName)
         {
-            IDictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            checked
+            string cSharpCodeFileName = string.Format(@"{0}\{1}.c_", AppCode, docTypeName);
+
+            string xsd = File.ReadAllText(
+                RequestPaths.GetPhysicalApplicationPath(
+                    "doc",
+                    docTypeName, DocRev.SchemaFileName));
+
+            string myclassesCs = new Xsd().ImportSchemasAsClasses(
+                new[] { xsd },
+                null,
+                CodeGenerationOptions.GenerateOrder | CodeGenerationOptions.GenerateProperties,
+                new StringCollection());
+
+            if (!File.Exists(cSharpCodeFileName) || File.ReadAllText(cSharpCodeFileName) != myclassesCs)
             {
-                for (int i = 0; i < keys.Count; i++)
-                    dictionary.Add(keys[i], values[i]);
-                return dictionary;
+                File.WriteAllText(cSharpCodeFileName, myclassesCs);
+                File.SetAttributes(cSharpCodeFileName, FileAttributes.Hidden);
             }
-        }
-
-        /// <summary>
-        ///     Expects the directory to contain an infopath manifest.xsf & template.xml files. The contents are then persisted &
-        ///     indexed by DocTypeName & DocTypeRev (aka solutionVersion) for OpenStream & OpenText operations. As of this writing,
-        ///     this application must have write access to the parent folder of the given directory for cab compression operations.
-        /// </summary>
-        /// <param name="importFolderPath"></param>
-        /// <param name="workingFolderPath">default is parent of importFolderPath</param>
-        public static List<ImporterLightDoc> ImportContentFolder(string sourceFolderPath, string workingFolderPath = null)
-        {
-            List<ImporterLightDoc> List_ImporterLightDoc = new List<ImporterLightDoc>();
-
-            //DirectoryInfo _DirectoryInfo = new DirectoryInfo(sourceFolderPath);
-
-            //if (workingFolderPath == null)
-            //    workingFolderPath = RequestPaths.GetPhysicalApplicationPath("import");
-
-            ////// ensure the import folder actually exists
-            //new DirectoryInfo(workingFolderPath)
-            //    .mkdir()
-            //    .Attributes = FileAttributes.NotContentIndexed | FileAttributes.Hidden;
-
-            //string DocMD5, DocTypeVer;
-            //string DocTypeName = FilesystemTemplateController.ScanContentFolder(_DirectoryInfo, out DocTypeVer, out DocMD5);
-            //if (!DocExchange.LuceneController.List(new List<string> { DocRev.MY_ONLY_DOC_NAME }, null, null, DocMD5).Any())
-            //{
-            //    IList<string> relativeFilePathsInDirectoryTree = GetRelativeFilePathsInDirectoryTree(_DirectoryInfo.FullName, true);
-            //    IDictionary<string, string> files = CreateStringDictionary(relativeFilePathsInDirectoryTree, relativeFilePathsInDirectoryTree);
-            //    IDocRev DocRevBaseDoc = (IDocRev)DocInterpreter.Instance.Create(DocRev.MY_ONLY_DOC_NAME);
-
-            //    DocRevBaseDoc.DocURN.DocTypeName = DocTypeName;
-            //    DocRevBaseDoc.DocURN.solutionVersion = DocTypeVer;
-            //    DocRevBaseDoc.DocChecksum = int.MinValue;
-            //    DocRevBaseDoc.DocStatus = true;
-            //    DocRevBaseDoc.DocTitle = String.Format("{0} {1}", DocTypeName, DocTypeVer);
-            //    DocRevBaseDoc.DocTypeName = DocRev.MY_ONLY_DOC_NAME;
-            //    DocRevBaseDoc.DocKeys = new Dictionary<string, string>
-            //        {
-            //            { "TargetDocTypeName", DocTypeName },
-            //            { "TargetDocTypeVer", DocTypeVer }
-            //        };
-
-            //    foreach (KeyValuePair<string, string> file in files)
-            //    {
-
-            //        FileInfo AddFileInfo = new FileInfo(_DirectoryInfo.FullName + "\\" + file.Value);
-            //        DocRevBaseDoc.FileList.Add(
-            //            new DocRevEntry()
-            //            {
-            //                Bytes = AddFileInfo.OpenRead().AsBytes(),
-            //                Name = file.Key
-            //            });
-            //    }
-
-            //    List_ImporterLightDoc.Add(
-            //         new ImporterLightDoc
-            //         {
-            //             LightDoc = DocExchange.Instance.Import(
-            //                 DocInterpreter.Instance.WriteStream((BaseDoc)DocRevBaseDoc))
-            //         });
-            //}
-            return List_ImporterLightDoc;
-        }
-
-        /// <summary>
-        ///     Scans AppDomain for classes implementing the IDocModel & performs all transformations needed to represent them as
-        ///     BaseDoc to be served.
-        /// </summary>
-        /// <param name="DocTypeName">
-        ///     Processes only the given DocTypeName the IDocModel represents. If a IDocModel can not be
-        ///     located through out the AppDomain nothing will be processed & no IDocRev will be imported. If no DocTypeName is
-        ///     specified all IDocModel located will be processed.
-        /// </param>
-        public static List<ImporterLightDoc> ReadIDocModelCSharpCode()
-        {
-            List<ImporterLightDoc> List_ImporterLightDoc = new List<ImporterLightDoc>();
-
-            //TODO:Validate POCO utilizes correct title-case underscore separated labeling practices
-            //TODO:add a placeholder file describing what goes in the given DocTypeName's form root directory
-            var IDocModelItems = AppDomain
-                .CurrentDomain
-                .GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Distinct()
-                .Where(typ => (typ.GetInterfaces().Any(i => i == typeof(IDocModel))))
-                .Select(type => new
-                {
-                    type,
-                    DirectoryInfo = new DirectoryInfo(FilesystemTemplateController.GetDocDirectoryPath(type.Name)).mkdir(),
-                    myschemaXsd = XsdExporter.ExportSchemas(
-                        type.Assembly,
-                        new List<string> { type.Name },
-                        RuntimeTypeNamer.CalcSchemaUri(type.Name)).First()
-                });
-
-            foreach (var docTypeDirectoryInfo in IDocModelItems)
-            {
-                string filepath = string.Format(@"{0}{1}", docTypeDirectoryInfo.DirectoryInfo.FullName, Runtime.MYSCHEMA_XSD_FILE_NAME);
-
-                // always (over)write the xsd as this will always be generated by and for Rudine.Core regardless of the IDocInterpreter that is handling
-                // compare the existing xsd on disk with the one generated here (excluding the "rolling" namespace) to see if anything has changed
-                if (
-                    !File.Exists(filepath)
-                    ||
-                    RuntimeTypeNamer.VALID_CSHARP_NAMESPACE_PART_MATCH.Replace(docTypeDirectoryInfo.myschemaXsd, string.Empty) != RuntimeTypeNamer.VALID_CSHARP_NAMESPACE_PART_MATCH.Replace(File.ReadAllText(filepath), string.Empty)
-                )
-                {
-                    File.WriteAllText(string.Format(@"{0}{1}", docTypeDirectoryInfo.DirectoryInfo.FullName, Runtime.MYSCHEMA_XSD_FILE_NAME), docTypeDirectoryInfo.myschemaXsd);
-                }
-
-                // create placeholder App_Code\DocTypeName.c_ files for developer to get started with myschema.xsd generation via cSharp file editing & thus auto translating
-                string App_Code_Directory_Fullname = RequestPaths.GetPhysicalApplicationPath("App_Code");
-                if (Directory.Exists(App_Code_Directory_Fullname))
-                    Tasker.StartNewTask(() =>
-                                        {
-                                            foreach (string DocTypeName in DocExchange.DocTypeDirectories())
-                                                if (!IDocModelItems.Any(m => m.DirectoryInfo.Name.Equals(DocTypeName, StringComparison.CurrentCultureIgnoreCase)))
-                                                {
-                                                    string cSharpCodeFileName = string.Format(@"{0}\{1}.c_", App_Code_Directory_Fullname, DocTypeName);
-                                                    string xsdFileName = RequestPaths.GetPhysicalApplicationPath("doc", DocTypeName, Runtime.MYSCHEMA_XSD_FILE_NAME);
-                                                    string xsd = File.ReadAllText(xsdFileName);
-                                                    string myclasses_cs = new Xsd().ImportSchemasAsClasses(
-                                                        new[] { xsd },
-                                                        null,
-                                                        CodeGenerationOptions.GenerateOrder | CodeGenerationOptions.GenerateProperties,
-                                                        new StringCollection());
-
-                                                    if (!File.Exists(cSharpCodeFileName) || File.ReadAllText(cSharpCodeFileName) != myclasses_cs)
-                                                    {
-                                                        File.WriteAllText(cSharpCodeFileName, myclasses_cs);
-                                                        File.SetAttributes(cSharpCodeFileName, FileAttributes.Hidden);
-                                                    }
-                                                }
-                                            return true;
-                                        });
-            }
-            return List_ImporterLightDoc;
-        }
-
-        private static readonly ConcurrentStack<string> dirs = new ConcurrentStack<string>();
-
-        /// <summary>
-        ///     Intended time of use it that of a "post cache reset" time. If cache has been cleared, all the logic behind this
-        ///     method will run.
-        /// </summary>
-        public static void TryDocRevImporting() =>
-            CacheMan.Cache(() =>
-                           {
-                               ReadIDocModelCSharpCode();
-
-                               dirs.PushRange(Directory
-                                   .EnumerateDirectories(FilesystemTemplateController.DirectoryPath)
-                                   .Select(dirpath => new DirectoryInfo(dirpath).FullName)
-                                   .Where(dirpath => !dirs.Contains(dirpath))
-                                   .OrderByDescending(dirpath =>
-                                                          new[]
-                                                              {
-                                                                  Directory.GetLastWriteTime(dirpath).Ticks
-                                                              }
-                                                              .Union(
-                                                                  GetRelativeFilePathsInDirectoryTree(dirpath, true)
-                                                                      .Select(filepath => File.GetLastWriteTimeUtc(filepath).Ticks))
-                                                              .Max())
-                                   .ToArray());
-
-                               // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
-                               string dir;
-                               while (dirs.TryPop(out dir) && ImportContentFolder(dir).Any())
-                               { }
-
-                               // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
-                               if (!dirs.IsEmpty)
-                                   Tasker.StartNewTask(() =>
-                                                       {
-                                                           while (dirs.TryPop(out dir))
-                                                               ImportContentFolder(dir);
-                                                           return true;
-                                                       });
-
-                               return new object();
-                           },
-                false,
-                "ImportDocModelsRunOnce"
-            );
-
-        /// <summary>
-        ///     Enumerates infopath format files (*.xml) in the /import folder. At this time only Infopath formats are processed.
-        ///     Ordered for processing; docrevs first by solutionversion then other doctypenames also by solution version
-        /// </summary>
-        /// <returns></returns>
-        public static List<ImporterLightDoc> ProcessImportDirectory()
-        {
-            if (!string.IsNullOrWhiteSpace(DirectoryFullName))
-                lock (DirectoryFullName)
-                {
-                    if (!Directory.Exists(DirectoryFullName))
-                        return new List<ImporterLightDoc>();
-
-                    //TODO:Use yet to be made "Capabilities()" methods to see what extensions & interprester will be used
-                    return Directory
-                        .EnumerateFiles(DirectoryFullName, "*.xml")
-                        .Select(path => new
-                        {
-                            path,
-                            PI = DocExchange.Instance.ReadStream(File.OpenRead(path))
-                        })
-                        .Where(file => !string.IsNullOrWhiteSpace(file.PI.DocTypeName))
-                        .OrderBy(file => !file.PI.DocTypeName.Equals(DocRev.MY_ONLY_DOC_NAME, StringComparison.CurrentCultureIgnoreCase))
-                        .ThenBy(file => file.PI.DocTypeName)
-                        .ThenBy(file => Version.Parse(file.PI.solutionVersion))
-                        .ToArray()
-                        .Select(file =>
-                                {
-                                    List<ImporterLightDoc> List_LightDoc = GetImporterLightDocList(file.path);
-                                    ImporterLightDoc _LightDoc = List_LightDoc.FirstOrDefault(m => m.ImportDocSrc == file.path);
-
-                                    if (_LightDoc == null || (!string.IsNullOrWhiteSpace(_LightDoc.ExceptionMessage) && string.Format("{0}", _LightDoc.ExceptionMessage).IndexOf("skipped") == -1))
-                                        try
-                                        {
-                                            List_LightDoc.Remove(_LightDoc);
-                                            using (Stream _Stream = File.OpenRead(file.path))
-                                                _LightDoc = new ImporterLightDoc
-                                                {
-                                                    LightDoc = DocExchange.Instance.Import(_Stream)
-                                                };
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            _LightDoc = new ImporterLightDoc
-                                            {
-                                                LightDoc = new LightDoc
-                                                {
-                                                    DocSubmitDate = DateTime.Now
-                                                },
-                                                ExceptionMessage = ex.Message + "\n" + file.path + "\n"
-                                            };
-                                            if (ex.InnerException != null)
-                                                _LightDoc.ExceptionMessage = string.Format("{0} {1} {3}", _LightDoc.ExceptionMessage, ex.InnerException.Message, ex.StackTrace);
-                                        }
-                                        finally
-                                        {
-                                            _LightDoc.ImportDocSrc = file.path;
-
-                                            List_LightDoc.Add(_LightDoc);
-                                            SaveImporterLightDocList(List_LightDoc);
-                                        }
-
-                                    return _LightDoc;
-                                })
-                        .Where(o => o != null)
-                        .ToList();
-                }
-
-            return new List<ImporterLightDoc>();
-        }
-
-        /// <summary>
-        ///     Persists a log file(s) to the directories ImportLightDoc.ImportDocSrc originated from
-        /// </summary>
-        /// <param name="List_ImporterLightDoc"></param>
-        public static void SaveImporterLightDocList(List<ImporterLightDoc> List_ImporterLightDoc)
-        {
-            foreach (string FilePath in List_ImporterLightDoc.Select(m => GetLogFilePath(m.ImportDocSrc)).Distinct())
-                File.WriteAllText(
-                    FilePath,
-                    JsonConvert.SerializeObject(
-                        List_ImporterLightDoc.Where(m => GetLogFilePath(m.ImportDocSrc) == FilePath).ToList(),
-                        Formatting.Indented,
-                        new JsonSerializerSettings
-                        {
-                            DefaultValueHandling = DefaultValueHandling.Ignore
-                        }));
         }
     }
 }

@@ -49,7 +49,7 @@ namespace Rudine
             typeof(DesignerCategoryAttribute)
         }.ToDictionary(m => m.Namespace, n => Path.GetFileName(n.Assembly.Location));
 
-        public const string MYSCHEMA_XSD_FILE_NAME = "myschema.xsd";
+       
 
         public static BaseDoc ActivateBaseDoc(string DocTypeName, string DocRev, IBaseDocController baseDocController, params string[] AdditionalRootNames) =>
             (BaseDoc)Activator.CreateInstance(ActivateBaseDocType(DocTypeName, DocRev, baseDocController, AdditionalRootNames));
