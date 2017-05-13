@@ -98,7 +98,7 @@ namespace Rudine.Interpreters
             foreach (string Extension in docFiles.Select(_ => new FileInfo(_.Name).Extension.Trim('.')).Distinct())
                 foreach (DocTextInterpreter _IDocDataInterpreter in ContentInterpreterInstances.OfType<DocTextInterpreter>())
                     if (_IDocDataInterpreter.TemplateSources().Any(templateSource => templateSource.ContentFileExtension.Trim('.').Equals(Extension, StringComparison.CurrentCultureIgnoreCase)))
-                        if (_DocRev == null)
+                        if (_DocRev != null)
                             break;
                         else
                             _DocRev = _IDocDataInterpreter.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields);
