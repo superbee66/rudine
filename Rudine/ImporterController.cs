@@ -48,7 +48,7 @@ namespace Rudine
 
             // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
             DirectoryInfo dir;
-            while (DOCS.TryPop(out dir) && ImportContentFolder(baseDocController, dir) != null) {}
+            while (DOCS.TryPop(out dir) && ImportContentFolder(baseDocController, dir) != null) { }
 
             // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
             if (!DOCS.IsEmpty)
@@ -71,9 +71,12 @@ namespace Rudine
 
             foreach (FileInfo fileinfo in Directory.EnumerateFiles(APP_DOCS.FullName, "*", SearchOption.TopDirectoryOnly).Select(filepath => new FileInfo(filepath)))
                 if (extensions.Any(extension => extension.Equals(fileinfo.Extension, StringComparison.InvariantCultureIgnoreCase)))
-                    fileinfo.MoveTo(
-                        new DirectoryInfo(RequestPaths.GetPhysicalApplicationPath("doc", StringTransform.PrettyCSharpIdent(Path.GetFileNameWithoutExtension(fileinfo.FullName))))
-                            .mkdir() + "\\" + StringTransform.PrettyCSharpIdent(Path.GetFileNameWithoutExtension(fileinfo.FullName)) + fileinfo.Extension);
+                    ImportContentFiles(
+                        baseDocController,
+                        fileinfo.Directory,
+                        StringTransform.PrettyCSharpIdent(Path.GetFileNameWithoutExtension(fileinfo.FullName)),
+                        new List<FileInfo> { fileinfo });
+
         }
 
         /// <summary>
@@ -145,18 +148,27 @@ namespace Rudine
         /// </summary>
         /// <param name="importFolderPath"></param>
         /// <param name="workingFolderPath">default is parent of importFolderPath</param>
-        public static DocRev ImportContentFolder(BaseDocController baseDocController, DirectoryInfo sourceFolderPath, string workingFolderPath = null)
+        public static DocRev ImportContentFolder(BaseDocController baseDocController, DirectoryInfo sourceFolderPath) =>
+            ImportContentFiles(
+                baseDocController,
+                sourceFolderPath,
+                Path.GetFileNameWithoutExtension(sourceFolderPath.Name),
+                sourceFolderPath.EnumerateFiles("*.*", SearchOption.AllDirectories).ToList());
+
+
+        public static DocRev ImportContentFiles(BaseDocController baseDocController, DirectoryInfo sourceFolderPath, string DocTypeName, List<FileInfo> sourceFiles)
         {
+
             DocRev docRev = new DocRev
             {
                 DocURN = new DocURN
                 {
-                    DocTypeName = Path.GetFileNameWithoutExtension(sourceFolderPath.Name)
+                    DocTypeName = DocTypeName
                 },
                 DocFiles = new List<DocRevEntry>()
             };
 
-            foreach (FileInfo filepath in sourceFolderPath.EnumerateFiles("*.*", SearchOption.AllDirectories))
+            foreach (FileInfo filepath in sourceFiles)
                 docRev.DocFiles.Add(
                     new DocRevEntry
                     {
@@ -175,6 +187,8 @@ namespace Rudine
 
             return docRev;
         }
+
+
 
         private static void RecursiveGetRelativeFilePathsInDirectoryTree(string dir, string relativeDir, bool includeSubdirectories, IList<string> fileList)
         {
