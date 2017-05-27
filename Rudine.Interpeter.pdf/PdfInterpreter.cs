@@ -40,6 +40,9 @@ namespace Rudine.Interpreters.Pdf
         /// <returns></returns>
         public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
         {
+            if (schemaFields == null)
+                schemaFields = new List<CompositeProperty>();
+
             if (schemaFields.Count == 0)
                 foreach (var docData in docFiles.Where(docFile => docFile.Name.EndsWith(ContentInfo.ContentFileExtension, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(docFile => docFile.ModDate))
                 {
