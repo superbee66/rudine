@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using Rudine.Template;
 using Rudine.Template.Filesystem;
@@ -75,15 +76,14 @@ namespace Rudine.Interpreters
                     .SelectMany(templateSource =>
                                     docFiles.Where(docFile => docFile.Name.EndsWith(templateSource.ContentFileExtension, StringComparison.InvariantCultureIgnoreCase)))
                     .OrderByDescending(docFile => docFile.ModDate)
-                    .Select(docFile => StringTransform.SafeIdentifier(new FileInfo(docFile.Name).Name))
+                    .Select(docFile => GetFilenameDocTypeName(docFile))
                     .FirstOrDefault();
 
-            if (schemaFields == null || schemaFields.Count == 0)
+            if (schemaFields == null)
                 schemaFields = new List<CompositeProperty>();
 
             string temporaryNamespace = RuntimeTypeNamer.CalcCSharpNamespace(docTypeName, docRev, nameof(IDocBaseInterpreter));
 
-            //FileInfo _XsdFileInfo = new FileInfo(String.Format(@"{0}\{1}", _DocDirectoryInfo.FullName, Runtime.SchemaFileName));
             Type xsdSchemaClrType = new CompositeType(temporaryNamespace, docTypeName, schemaFields.ToArray());
 
             // the "lazy-load" CompositeType requires activation in order for the _template_docx_obj.GetType().Assembly to register as having any types defined
@@ -100,7 +100,10 @@ namespace Rudine.Interpreters
                 {
                     DocTypeName = docTypeName,
                     solutionVersion = docRev
-                }
+                },
+                //TODO:move this to correct place
+                solutionVersion = DocRev.MyOnlyDocVersion,
+                DocTypeName = DocRev.MyOnlyDocName
             };
         }
 
@@ -117,9 +120,21 @@ namespace Rudine.Interpreters
                 FileSystem.CleanFileName(_DocProcessingInstructions.DocTitle)
                           .Trim(),
                 string.IsNullOrWhiteSpace(ContentFileExtension)
-                    ? DocInterpreter.InstanceLocatorByName<DocBaseInterpreter>(_DocProcessingInstructions.DocTypeName, _DocProcessingInstructions.solutionVersion)
-                                    .ContentInfo.ContentFileExtension
+                    ? DocInterpreter
+                        .InstanceLocatorByName<DocBaseInterpreter>(_DocProcessingInstructions.DocTypeName, _DocProcessingInstructions.solutionVersion)
+                        .ContentInfo.ContentFileExtension
                     : ContentFileExtension);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="docFile"></param>
+        /// <returns>filename stripped of non-alpha-numerics uppercase</returns>
+        protected static string GetFilenameDocTypeName(DocRevEntry docFile) =>
+            Regex.Replace(
+                StringTransform.SafeIdentifier(Path.GetFileNameWithoutExtension(docFile.Name)),
+                "^[0-9A-Z]",
+                string.Empty,
+                RegexOptions.IgnoreCase).ToUpper();
 
         /// <summary>
         ///     Should be backed by a httphandler. For InfoPath there is a manifest.xsf the InfoPath Desktop Application will be
@@ -175,8 +190,5 @@ namespace Rudine.Interpreters
         }
 
         public abstract List<ContentInfo> TemplateSources();
-
-
-
     }
 }
