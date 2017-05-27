@@ -126,7 +126,7 @@ namespace Rudine.Interpreters.Embeded
                     {
                         Bytes = Encoding.Default.GetBytes(_DocRev.DocSchema ?? String.Empty),
                         ModDate = DefaultModDate,
-                        Name = DocRev.ManifestFileName
+                        Name = DocRev.SchemaFileName
                     } };
 
                 if (includeProcessingInformation)
