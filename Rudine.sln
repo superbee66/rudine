@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudine.Interpreters.Pdf", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudineTests", "RudineTests\RudineTests.csproj", "{229376AE-F476-43BF-8A6F-F4EE57F87AC7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rudine.Interpreters.PdfTests", "Rudine.Interpreters.PdfTests\Rudine.Interpreters.PdfTests.csproj", "{9ABDEB76-2D97-4809-9390-F4690F003667}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{229376AE-F476-43BF-8A6F-F4EE57F87AC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{229376AE-F476-43BF-8A6F-F4EE57F87AC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{229376AE-F476-43BF-8A6F-F4EE57F87AC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ABDEB76-2D97-4809-9390-F4690F003667}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ABDEB76-2D97-4809-9390-F4690F003667}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ABDEB76-2D97-4809-9390-F4690F003667}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ABDEB76-2D97-4809-9390-F4690F003667}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
