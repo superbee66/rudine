@@ -24,11 +24,6 @@ namespace Rudine.Interpreters.Pdf
 
         public override BaseDoc Create(string DocTypeName) { throw new NotImplementedException(); }
 
-        public override string GetDescription(string DocTypeName) { throw new NotImplementedException(); }
-
-        public override string HrefVirtualFilename(string DocTypeName, string DocRev) { throw new NotImplementedException(); }
-        public override bool Processable(string DocTypeName, string DocRev) { throw new NotImplementedException(); }
-
         /// <summary>
         ///     enumerate each PdfAcroField, convert it's value to clr type, use reflection to set that value to the clr object
         ///     BaseDoc.
@@ -45,7 +40,6 @@ namespace Rudine.Interpreters.Pdf
 
             if (schemaFields.Count == 0)
                 foreach (var docData in docFiles.Where(docFile => docFile.Name.EndsWith(ContentInfo.ContentFileExtension, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(docFile => docFile.ModDate))
-                {
                     if (schemaFields.Count == 0)
                         using (MemoryStream _MemoryStream = new MemoryStream(docData.Bytes))
                         using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.ReadOnly))
@@ -54,16 +48,19 @@ namespace Rudine.Interpreters.Pdf
 
                             for (int i = 0; i < AcroForm.Fields.Elements.Count; i++)
                                 schemaFields.Add(AcroForm.Fields[i].AsCompositeProperty());
-                        }
 
-                    if (schemaFields.Count > 0)
-                    {
-                        docTypeName = string.IsNullOrWhiteSpace(docTypeName)
-                            ? new FileInfo(docData.Name).Name
-                            : docTypeName;
-                        break;
-                    }
-                }
+                            if (schemaFields.Count > 0)
+                            {
+                                DocProcessingInstructions pi = ReadDocPI(_PdfDocument);
+
+                                docTypeName = !string.IsNullOrWhiteSpace(docTypeName)
+                                                  ? docTypeName
+                                                  : !string.IsNullOrWhiteSpace(pi.DocTypeName)
+                                                      ? pi.DocTypeName
+                                                      : GetFilenameDocTypeName(docData);
+                                break;
+                            }
+                        }
 
             return schemaFields.Count == 0
                        ? null
@@ -74,6 +71,23 @@ namespace Rudine.Interpreters.Pdf
                            schemaXml,
                            schemaFields);
         }
+
+        public override string GetDescription(string DocTypeName) { throw new NotImplementedException(); }
+
+        private static string GetSetDocPIProperty(PdfDocument _PdfDocument, string propertyName, object propertyValue = null)
+        {
+            string propertyValueAsString = string.Format("{0}", propertyValue);
+
+            if (!string.IsNullOrWhiteSpace(propertyValueAsString))
+                _PdfDocument.Info.Elements.SetString("/" + propertyName, propertyValueAsString);
+
+            return _PdfDocument.Info.Elements.ContainsKey("/" + propertyName)
+                       ? string.Format("{0}", _PdfDocument.Info.Elements["/" + propertyName])
+                       : null;
+        }
+
+        public override string HrefVirtualFilename(string DocTypeName, string DocRev) { throw new NotImplementedException(); }
+        public override bool Processable(string DocTypeName, string DocRev) { throw new NotImplementedException(); }
 
         /// <summary>
         ///     enumerate each PdfAcroField, convert it's value to clr type, use reflection to set that value to the clr object
@@ -123,75 +137,78 @@ namespace Rudine.Interpreters.Pdf
 
         private static DocProcessingInstructions ReadDocPI(PdfDocument _PdfDocument)
         {
-            DocProcessingInstructions _DocProcessingInstructions = new DocProcessingInstructions
+            DocProcessingInstructions pi = new DocProcessingInstructions
             {
-                DocTypeName = _PdfDocument.Internals.FirstDocumentID,
-                DocStatus = _PdfDocument.Info.Elements.ContainsKey("/" + Parm.DocStatus) && _PdfDocument.Info.Elements.GetBoolean("/" + Parm.DocStatus),
-                DocTitle = _PdfDocument.Info.Title,
-                solutionVersion = _PdfDocument.Info.Elements["/" + Parm.DocRev].ToString()
+                DocTitle = _PdfDocument.Info.Title
             };
 
-            _DocProcessingInstructions.SetDocId(_PdfDocument.Internals.SecondDocumentID);
+            pi.DocTypeName = GetSetDocPIProperty(_PdfDocument, nameof(pi.DocTypeName));
+            pi.DocStatus = bool.Parse(GetSetDocPIProperty(_PdfDocument, nameof(pi.solutionVersion)) ?? bool.FalseString);
+            pi.solutionVersion = GetSetDocPIProperty(_PdfDocument, nameof(pi.solutionVersion));
+            pi.SetDocId(GetSetDocPIProperty(_PdfDocument, Parm.DocId));
 
-            return _DocProcessingInstructions;
+            return pi;
         }
 
         public override string ReadDocRev(byte[] DocData) => ReadDocPI(DocData).solutionVersion;
-
         public override string ReadDocTypeName(byte[] DocData) => ReadDocPI(DocData).DocTypeName;
-
-        public override List<ContentInfo> TemplateSources() =>
-            new List<ContentInfo> { ContentInfo };
-
+        public override List<ContentInfo> TemplateSources() => new List<ContentInfo> { ContentInfo };
         public override void Validate(byte[] DocData) { throw new NotImplementedException(); }
 
         public override byte[] WriteByte<T>(T source, bool includeProcessingInformation = true)
         {
-            using (MemoryStream _MemoryStream = TemplateController.Instance.OpenRead(
-                source.DocTypeName,
-                source.solutionVersion,
-                TEMPLATE_PDF))
-
-            using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.Modify))
+            using (MemoryStream _MemoryStreamTemplate = TemplateController.Instance.OpenRead(source.DocTypeName, source.solutionVersion, TEMPLATE_PDF))
+            using (MemoryStream _MemoryStream = new MemoryStream())
             {
-                Type baseDocType = source.GetType();
+                _MemoryStreamTemplate.CopyTo(_MemoryStream);
+                _MemoryStream.Position = 0;
 
-                for (int i = 0; i < _PdfDocument.AcroForm.Fields.Elements.Count; i++)
+                using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.Modify))
                 {
-                    PdfAcroField _Field = _PdfDocument.AcroForm.Fields[i];
-                    _Field.Value = new PdfString(string.Format("{0}", baseDocType.GetProperty(_Field.Name).GetValue(source, null)));
+                    Type baseDocType = source.GetType();
+
+                    for (int i = 0; i < _PdfDocument.AcroForm.Fields.Elements.Count; i++)
+                    {
+                        PdfAcroField _Field = _PdfDocument.AcroForm.Fields[i];
+                        _Field.Value = new PdfString(string.Format("{0}", baseDocType.GetProperty(_Field.Name).GetValue(source, null)));
+                    }
+
+                    if (includeProcessingInformation)
+                        WritePI(source, _PdfDocument);
+
+                    _PdfDocument.Save(_MemoryStream, false);
+
+                    return _MemoryStream.ToArray();
                 }
-
-                if (includeProcessingInformation)
-                    WritePI(source, _PdfDocument);
-
-                _PdfDocument.Save(_MemoryStream);
-
-                return _MemoryStream.ToArray();
             }
         }
 
         public override byte[] WritePI(byte[] DocData, DocProcessingInstructions pi)
         {
-            using (MemoryStream _MemoryStream = new MemoryStream(DocData))
-            using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.Modify))
+            using (MemoryStream _MemoryStream = new MemoryStream())
             {
-                WritePI(pi, _PdfDocument);
-                _PdfDocument.Save(_MemoryStream);
-                return _MemoryStream.ToArray();
+                _MemoryStream.Write(DocData, 0, DocData.Length);
+                _MemoryStream.Position = 0;
+
+                using (PdfDocument _PdfDocument = PdfReader.Open(_MemoryStream, PdfDocumentOpenMode.Modify))
+                {
+                    WritePI(pi, _PdfDocument);
+                    _PdfDocument.Save(_MemoryStream, false);
+                    _MemoryStream.Position = 0;
+                    return _MemoryStream.ToArray();
+                }
             }
         }
 
         private static void WritePI(DocProcessingInstructions pi, PdfDocument _PdfDocument)
         {
-            //  _PdfDocument.Info.Creator = string.Join(", ", new string[] { _PdfDocument.Info.Creator, typeof(DocByteInterpreter).Assembly.GetName().Name }.Distinct());
             _PdfDocument.Info.ModificationDate = _PdfDocument.Info.ModificationDate == DateTime.MinValue ? DateTime.Now : _PdfDocument.Info.ModificationDate;
-            _PdfDocument.Internals.FirstDocumentID = pi.DocTypeName;
-            _PdfDocument.Internals.SecondDocumentID = pi.GetDocId();
             _PdfDocument.Info.Title = pi.DocTitle;
-            if (pi.DocStatus != null)
-                _PdfDocument.Info.Elements.SetBoolean("/" + Parm.DocStatus, pi.DocStatus ?? false);
-            _PdfDocument.Info.Elements.SetString("/" + Parm.DocRev, pi.solutionVersion);
+
+            GetSetDocPIProperty(_PdfDocument, nameof(pi.DocKeys), pi.GetDocId());
+            GetSetDocPIProperty(_PdfDocument, nameof(pi.DocStatus), pi.DocStatus);
+            GetSetDocPIProperty(_PdfDocument, nameof(pi.DocTypeName), pi.DocTypeName);
+            GetSetDocPIProperty(_PdfDocument, nameof(pi.solutionVersion), pi.solutionVersion);
         }
     }
 }
