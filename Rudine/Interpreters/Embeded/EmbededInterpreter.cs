@@ -12,7 +12,7 @@ using Rudine.Web.Util;
 namespace Rudine.Interpreters.Embeded
 {
     /// <summary>
-    ///     a glorified set of zipping routines that convert to and from a BaseDoc holding bytes that represent supporting
+    ///     a glorified set of zipping routine that convert to and from a BaseDoc holding bytes that represent supporting
     ///     content for that BaseDoc/DocRev definition
     /// </summary>
     public class EmbededInterpreter : DocByteInterpreter

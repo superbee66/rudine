@@ -145,7 +145,11 @@ namespace Rudine.Interpreters.Pdf
             pi.DocTypeName = GetSetDocPIProperty(_PdfDocument, nameof(pi.DocTypeName));
             pi.DocStatus = bool.Parse(GetSetDocPIProperty(_PdfDocument, nameof(pi.solutionVersion)) ?? bool.FalseString);
             pi.solutionVersion = GetSetDocPIProperty(_PdfDocument, nameof(pi.solutionVersion));
-            pi.SetDocId(GetSetDocPIProperty(_PdfDocument, Parm.DocId));
+
+            // PDF never seen/served by this app will not have a DocId defined to decrypt
+            string DocId = GetSetDocPIProperty(_PdfDocument, Parm.DocId);
+            if (!string.IsNullOrWhiteSpace(DocId))
+                pi.SetDocId(DocId);
 
             return pi;
         }
