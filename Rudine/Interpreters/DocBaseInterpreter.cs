@@ -89,6 +89,13 @@ namespace Rudine.Interpreters
             // the "lazy-load" CompositeType requires activation in order for the _template_docx_obj.GetType().Assembly to register as having any types defined
             object xsdSchemaClrObject = Activator.CreateInstance(xsdSchemaClrType);
 
+            DocURN _DocURN = new DocURN
+            {
+                DocTypeName = docTypeName,
+                solutionVersion = docRev
+            };
+
+            //TODO:Relationship between EmbeddedInterpr.. DocInter.. & BaseDocInter needs to be rethought
             return new DocRev
             {
                 DocFiles = docFiles,
@@ -96,12 +103,8 @@ namespace Rudine.Interpreters
                     xsdSchemaClrObject.GetType().Assembly,
                     new List<string> { docTypeName },
                     RuntimeTypeNamer.CalcSchemaUri(docTypeName, docRev)).First(),
-                DocURN = new DocURN
-                {
-                    DocTypeName = docTypeName,
-                    solutionVersion = docRev
-                },
-                //TODO:move this to correct place
+                DocURN = _DocURN,
+                DocKeys = DocRev.MakeDocKeys(_DocURN),
                 solutionVersion = DocRev.MyOnlyDocVersion,
                 DocTypeName = DocRev.MyOnlyDocName
             };

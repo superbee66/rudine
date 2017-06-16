@@ -37,7 +37,7 @@ namespace Rudine.Interpreters.Embeded
             return Create();
         }
 
-        private static DocRev Create()
+        internal static DocRev Create()
         {
             return new DocRev
             {
