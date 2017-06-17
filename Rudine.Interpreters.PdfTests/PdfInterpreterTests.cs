@@ -9,32 +9,7 @@ namespace Rudine.Interpreters.Pdf.Tests
     [TestFixture]
     public class PdfInterpreterTests
     {
-        [Test]
-        public void CreateTest() { Assert.Fail(); }
 
-        [Test]
-        public void GetDescriptionTest() { Assert.Fail(); }
-
-        [Test]
-        public void HrefVirtualFilenameTest() { Assert.Fail(); }
-
-        [Test]
-        public void ProcessableTest() { Assert.Fail(); }
-
-        [Test]
-        public void CreateTemplateTest() { Assert.Fail(); }
-
-        [Test]
-        public void ReadTest() { Assert.Fail(); }
-
-        [Test]
-        public void ReadDocPITest() { Assert.Fail(); }
-
-        [Test]
-        public void ReadDocRevTest() { Assert.Fail(); }
-
-        [Test]
-        public void ReadDocTypeNameTest() { Assert.Fail(); }
 
         [Test]
         public void TemplateSourcesTest()
@@ -66,13 +41,5 @@ namespace Rudine.Interpreters.Pdf.Tests
 
         }
 
-        [Test]
-        public void ValidateTest() { Assert.Fail(); }
-
-        [Test]
-        public void WriteByteTest() { Assert.Fail(); }
-
-        [Test]
-        public void WritePITest() { Assert.Fail(); }
     }
 }

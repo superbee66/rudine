@@ -105,7 +105,7 @@ namespace Rudine.Interpreters.Xsn
         }
 
         public override BaseDoc Create(string DocTypeName) =>
-            Read(TemplateController.Instance.OpenText(DocTypeName, "template.xml"));
+            Read(TemplateController.Instance.OpenText(DocTypeName, templateFileName));
 
         /// <summary>
         ///     XmlSerializer writes Booleans as the words "true" & "false". InfoPath can
@@ -116,7 +116,7 @@ namespace Rudine.Interpreters.Xsn
         /// <returns></returns>
         private static string FormatBooleansTrueFalseOrZeroOne(string docXml, string DocTypeName)
         {
-            string templateDocXml = TemplateController.Instance.OpenText(DocTypeName, "template.xml");
+            string templateDocXml = TemplateController.Instance.OpenText(DocTypeName, templateFileName);
 
             return Regex.Replace(
                 docXml,
@@ -163,7 +163,7 @@ namespace Rudine.Interpreters.Xsn
 
         public override bool Processable(string DocTypeName, string DocRev)
         {
-            string template_xml = TemplateController.Instance.OpenText(DocTypeName, DocRev, "template.xml");
+            string template_xml = TemplateController.Instance.OpenText(DocTypeName, DocRev, templateFileName);
             return
                 !string.IsNullOrWhiteSpace(template_xml)
                 &&
@@ -352,7 +352,7 @@ namespace Rudine.Interpreters.Xsn
         /// <returns></returns>
         internal static string RemoveValueTypeElementDefaults(string docXml, string DocTypeName)
         {
-            string templateDocXml = TemplateController.Instance.OpenText(DocTypeName, "template.xml");
+            string templateDocXml = TemplateController.Instance.OpenText(DocTypeName, templateFileName);
 
             return Regex.Replace(
                 docXml,
@@ -363,6 +363,7 @@ namespace Rudine.Interpreters.Xsn
                 RegexOptions.Singleline | RegexOptions.Multiline);
         }
 
+        private const string templateFileName = "template.xml";
         public override List<ContentInfo> TemplateSources() =>
             new List<ContentInfo>
             {
@@ -372,6 +373,15 @@ namespace Rudine.Interpreters.Xsn
 
         public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
         {
+            byte[] template_Bytes = docFiles.FirstOrDefault(f => f.Name.Equals(templateFileName, StringComparison.CurrentCultureIgnoreCase))?.Bytes;
+            byte[] schema_Bytes = docFiles.FirstOrDefault(f => f.Name.Equals("myschema.xsd", StringComparison.CurrentCultureIgnoreCase))?.Bytes;
+
+            if (template_Bytes != null && schema_Bytes != null)
+            {
+                DocProcessingInstructions pi = ReadDocPI(Encoding.Default.GetString(template_Bytes));
+                docTypeName = pi.DocTypeName;
+                docRev = pi.solutionVersion;
+            }
 
             return base.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields);
         }
@@ -383,7 +393,6 @@ namespace Rudine.Interpreters.Xsn
         /// <param name="xml"></param>
         public override void Validate(string DocData) =>
             new SchemaValidator().Validate(DocData, Read(DocData, true));
-
         private XmlWriter WriteInfoPathProcessingInstructions(DocProcessingInstructions pi, XmlWriter _XmlTextWriter)
         {
             _XmlTextWriter.WriteProcessingInstruction("mso-infoPathSolution",
@@ -396,7 +405,7 @@ namespace Rudine.Interpreters.Xsn
             _XmlTextWriter.WriteProcessingInstruction("mso-application", mso_application);
 
             // there is special instructions for attachments
-            if ((TemplateController.Instance.OpenText(pi.DocTypeName, pi.solutionVersion, "template.xml") ?? string.Empty).IndexOf("mso-infoPath-file-attachment-present") > 0)
+            if ((TemplateController.Instance.OpenText(pi.DocTypeName, pi.solutionVersion, templateFileName) ?? string.Empty).IndexOf("mso-infoPath-file-attachment-present") > 0)
                 _XmlTextWriter.WriteProcessingInstruction("mso-infoPath-file-attachment-present", string.Empty);
 
             _XmlTextWriter.WriteProcessingInstruction("ipb-application",
@@ -439,7 +448,7 @@ namespace Rudine.Interpreters.Xsn
             {
                 //TODO:Cache _XmlSerializerNamespaces
                 XmlSerializerNamespaces _XmlSerializerNamespaces = new XmlSerializerNamespaces();
-                foreach (Match xmlnsMatch in Regex.Matches(TemplateController.Instance.OpenText(source.DocTypeName, source.solutionVersion, "template.xml") ?? string.Empty, XmlRootAttributeNamespaces))
+                foreach (Match xmlnsMatch in Regex.Matches(TemplateController.Instance.OpenText(source.DocTypeName, source.solutionVersion, templateFileName) ?? string.Empty, XmlRootAttributeNamespaces))
                     _XmlSerializerNamespaces.Add(xmlnsMatch.Groups[1].Value, xmlnsMatch.Groups[2].Value);
 
                 if (source is BaseDoc)
