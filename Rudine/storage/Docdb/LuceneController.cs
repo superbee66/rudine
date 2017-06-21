@@ -14,7 +14,7 @@ using Rudine.Interpreters;
 using Rudine.Util.Zips;
 using Rudine.Web;
 using Rudine.Web.Util;
-using Directory = System.IO.Directory;
+using Directory = Lucene.Net.Store.Directory;
 using Version = Lucene.Net.Util.Version;
 
 namespace Rudine.Storage.Docdb
@@ -107,23 +107,8 @@ namespace Rudine.Storage.Docdb
             return _Audit;
         }
 
-        public List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = PAGE_SIZE_DEFAULT, int PageIndex = 0, string RelayUrl = null)
-        {
-            return ListDocuments(
-                DocTypeNames,
-                DocKeys,
-                DocProperties,
-                KeyWord,
-                PageSize,
-                PageIndex,
-                RelayUrl,
-                DirectoryPath).Select(m => m.GetBinaryValue(Parm.LightDoc).FromBytes<LightDoc>()).ToList();
-        }
-
         /// <summary>
         /// </summary>
-        /// <param name="DocSrc"></param>
-        /// <param name="DocKeysFromDocId"></param>
         /// <param name="DocTypeName"></param>
         /// <param name="DocKeys">have precedence over DocId when is not null</param>
         /// <param name="DocId"></param>
@@ -139,7 +124,7 @@ namespace Rudine.Storage.Docdb
                 _RequiredDocKeys[_Item.Key] = new List<string> { _Item.Value };
 
             //BUG:DocStatus is not persisted by in the DocData; this band-aid gets it from the LightDoc in order to return it to the calling DataContract method
-            foreach (Document _Document in ListDocuments(new List<string> { DocTypeName }, _RequiredDocKeys, null, null, 1, 0, RelayUrl, DirectoryPath))
+            foreach (Document _Document in ListDocuments(new List<string> { DocTypeName }, _RequiredDocKeys, null, null, 1, 0))
             {
                 _BaseDoc = _Document.AsDocSubmissions().Last().Key.DocIsBinary
                                ? DocInterpreter.Instance.Read((byte[])_Document.AsDocSubmissions().Last().Value, true)
@@ -167,17 +152,34 @@ namespace Rudine.Storage.Docdb
                                   .Value;
         }
 
-        public string GetDocDataText(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (string)GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
         public byte[] GetDocDataBytes(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (byte[])GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
 
-        #region private
+        public string GetDocDataText(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (string)GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
+
+        public List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = PAGE_SIZE_DEFAULT, int PageIndex = 0, string RelayUrl = null)
+        {
+            return ListDocuments(
+                DocTypeNames,
+                DocKeys,
+                DocProperties,
+                KeyWord,
+                PageSize,
+                PageIndex).Select(m => m.GetBinaryValue(Parm.LightDoc).FromBytes<LightDoc>()).ToList();
+        }
+
+        private Directory Open() =>
+#if DEBUG
+            new RAMDirectory();
+#else
+            FSDirectory.Open(DirectoryPath);
+#endif
 
         /// <summary>
         ///     ListDocuments always returns results in reverse-chronological order
         /// </summary>
         private static readonly Sort _ListDocumentsSort = new Sort(new SortField(Parm.LogSequenceNumber, SortField.LONG, true));
 
-        internal List<Document> ListDocuments(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null, string IndexDirectory = null)
+        internal List<Document> ListDocuments(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0)
         {
             if (CreateNeeded())
                 return new List<Document>();
@@ -216,28 +218,30 @@ namespace Rudine.Storage.Docdb
 
             using (KeywordAnalyzer _KeywordAnalyzer = new KeywordAnalyzer())
             using (PerFieldAnalyzerWrapper _PerFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(_KeywordAnalyzer))
-            using (IndexSearcher _Searcher = new IndexSearcher(FSDirectory.Open(DirectoryPath), true))
             {
-                ScoreDoc[] _ScoreDoc = _Searcher.Search(new MultiFieldQueryParser(LUCENE_VERSION,
-                        _Fields.ToArray(),
-                        _PerFieldAnalyzerWrapper)
+                using (IndexSearcher _Searcher = new IndexSearcher(Open(), true))
                 {
-                    AllowLeadingWildcard = false
-                }.Parse(_QueryString),
-                    null,
-                    PageIndex * PageSize + PageSize,
-                    _ListDocumentsSort).ScoreDocs;
+                    ScoreDoc[] _ScoreDoc = _Searcher.Search(new MultiFieldQueryParser(LUCENE_VERSION,
+                            _Fields.ToArray(),
+                            _PerFieldAnalyzerWrapper)
+                    {
+                        AllowLeadingWildcard = false
+                    }.Parse(_QueryString),
+                        null,
+                        PageIndex * PageSize + PageSize,
+                        _ListDocumentsSort).ScoreDocs;
 
-                return PageIndex * PageSize < _ScoreDoc.Length
-                           ? _ScoreDoc.Skip(PageIndex * PageSize).Select(m => _Searcher.Doc(
-                                                                             m.Doc,
-                                                                             //BANDAID:for some reason binary fields don't seem to lazy load; they throw an IO exception
-                                                                             // until this is resolved it will be assumed the full document (all byte[] fields) will be
-                                                                             // needed thus avoiding any lazy loading here
-                                                                             PageSize == 1
-                                                                                 ? null
-                                                                                 : LazyLoadFieldSelector.Instance)).ToList()
-                           : new List<Document>();
+                    return PageIndex * PageSize < _ScoreDoc.Length
+                               ? _ScoreDoc.Skip(PageIndex * PageSize).Select(m => _Searcher.Doc(
+                                                                                 m.Doc,
+                                                                                 //BANDAID:for some reason binary fields don't seem to lazy load; they throw an IO exception
+                                                                                 // until this is resolved it will be assumed the full document (all byte[] fields) will be
+                                                                                 // needed thus avoiding any lazy loading here
+                                                                                 PageSize == 1
+                                                                                     ? null
+                                                                                     : LazyLoadFieldSelector.Instance)).ToList()
+                               : new List<Document>();
+                }
             }
         }
 
@@ -283,9 +287,7 @@ namespace Rudine.Storage.Docdb
                 null,
                 null,
                 1,
-                0,
-                RelayUrl,
-                IndexDirectory).FirstOrDefault();
+                0).FirstOrDefault();
 
             return _Document;
         }
@@ -294,10 +296,13 @@ namespace Rudine.Storage.Docdb
 
         private bool CreateNeeded()
         {
+#if DEBUG
+            return Open().isOpen_ForNUnit;
+#else
             DirectoryPath = RequestPaths.GetPhysicalApplicationPath("doc_db");
 
             // ensure the import folder actually exists
-            if (!Directory.Exists(DirectoryPath))
+            if (!System.IO.Directory.Exists(DirectoryPath))
             {
                 new DirectoryInfo(DirectoryPath)
                     .mkdir()
@@ -305,7 +310,9 @@ namespace Rudine.Storage.Docdb
                 return true;
             }
 
-            return !Directory.EnumerateFiles(DirectoryPath).Any();
+            return !System.IO.Directory.EnumerateFiles(DirectoryPath).Any();
+#endif
+
         }
 
         private static string KeysToPredicate(string FieldName, List<string> DocTypes)
@@ -364,7 +371,7 @@ namespace Rudine.Storage.Docdb
             _DocSubmissions.Add(_LightDoc, DocData);
 
             using (StandardAnalyzer _StandardAnalyzer = new StandardAnalyzer(LUCENE_VERSION))
-            using (IndexWriter _CurrentIndexWriter = new IndexWriter(FSDirectory.Open(DirectoryPath), _StandardAnalyzer, CreateNeeded(), IndexWriter.MaxFieldLength.UNLIMITED))
+            using (IndexWriter _CurrentIndexWriter = new IndexWriter(Open(), _StandardAnalyzer, CreateNeeded(), IndexWriter.MaxFieldLength.UNLIMITED))
             {
                 if (_DocSubmissions.Count > 1)
                     _CurrentIndexWriter.UpdateDocument(_BaseDoc.docTermFromBaseDoc(), _DocSubmissions.AsDocument());
@@ -409,7 +416,7 @@ namespace Rudine.Storage.Docdb
             _DocSubmissions.Add(_LightDoc, DocData);
 
             using (StandardAnalyzer _StandardAnalyzer = new StandardAnalyzer(LUCENE_VERSION))
-            using (IndexWriter _CurrentIndexWriter = new IndexWriter(FSDirectory.Open(DirectoryPath), _StandardAnalyzer, CreateNeeded(), IndexWriter.MaxFieldLength.UNLIMITED))
+            using (IndexWriter _CurrentIndexWriter = new IndexWriter(Open(), _StandardAnalyzer, CreateNeeded(), IndexWriter.MaxFieldLength.UNLIMITED))
             {
                 if (_DocSubmissions.Count > 1)
                     _CurrentIndexWriter.UpdateDocument(_BaseDoc.docTermFromBaseDoc(), _DocSubmissions.AsDocument());
@@ -421,7 +428,5 @@ namespace Rudine.Storage.Docdb
 
             return _LightDoc;
         }
-
-        #endregion
     }
 }
