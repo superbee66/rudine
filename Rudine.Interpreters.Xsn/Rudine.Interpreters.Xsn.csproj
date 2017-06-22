@@ -51,6 +51,12 @@
     <Compile Include="..\Rudine.Web\Util\CacheMan.cs">
       <Link>CacheMan.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
+      <Link>util\FileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\StreamExtensions.cs">
+      <Link>util\StreamExtensions.cs</Link>
+    </Compile>
     <Compile Include="InfoPathAttachmentEncoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="util\Cabs\ArchiveMemoryStreamContext.cs" />
