@@ -167,12 +167,7 @@ namespace Rudine.Storage.Docdb
                 PageIndex).Select(m => m.GetBinaryValue(Parm.LightDoc).FromBytes<LightDoc>()).ToList();
         }
 
-        private Directory Open() =>
-#if DEBUG
-            new RAMDirectory();
-#else
-            FSDirectory.Open(DirectoryPath);
-#endif
+        private Directory Open() => FSDirectory.Open(DirectoryPath);
 
         /// <summary>
         ///     ListDocuments always returns results in reverse-chronological order
@@ -296,9 +291,6 @@ namespace Rudine.Storage.Docdb
 
         private bool CreateNeeded()
         {
-#if DEBUG
-            return Open().isOpen_ForNUnit;
-#else
             DirectoryPath = RequestPaths.GetPhysicalApplicationPath("doc_db");
 
             // ensure the import folder actually exists
@@ -311,8 +303,6 @@ namespace Rudine.Storage.Docdb
             }
 
             return !System.IO.Directory.EnumerateFiles(DirectoryPath).Any();
-#endif
-
         }
 
         private static string KeysToPredicate(string FieldName, List<string> DocTypes)
