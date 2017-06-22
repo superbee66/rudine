@@ -61,8 +61,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\RudineTests\doc\OpenOffice4.pdf">
-      <Link>OpenOffice4.pdf</Link>
+    <None Include="..\RudineTests\doc\BaseLineOpenOffice4.pdf">
+      <Link>BaseLineOpenOffice4.pdf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
@@ -71,6 +71,10 @@
     <ProjectReference Include="..\Rudine.Interpeter.pdf\Rudine.Interpreters.Pdf.csproj">
       <Project>{25DFA9B7-CE29-4772-9E02-49E60192369F}</Project>
       <Name>Rudine.Interpreters.Pdf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Rudine.Interpreters.Xsn\Rudine.Interpreters.Xsn.csproj">
+      <Project>{89527749-556D-4E8D-8213-D2B0D869506B}</Project>
+      <Name>Rudine.Interpreters.Xsn</Name>
     </ProjectReference>
     <ProjectReference Include="..\Rudine\Rudine.csproj">
       <Project>{C9065636-B397-4FB3-B9DE-8FE5A754210A}</Project>
@@ -81,6 +85,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Choose>

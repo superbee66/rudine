@@ -204,10 +204,7 @@
     <Compile Include="Template\ITemplateController.cs" />
     <Compile Include="Exceptions\DocDataException.cs" />
     <Compile Include="Template\TemplateFileInfo.cs" />
-    <Compile Include="Util\Cabs\ArchiveMemoryStreamContext.cs" />
-    <Compile Include="Util\Cabs\CabInfoExtensions.cs" />
     <Compile Include="Util\Base36.cs" />
-    <Compile Include="Util\Cabs\CabExtract.cs" />
     <Compile Include="Util\ExceptionExtrensions.cs" />
     <Compile Include="Util\Reflection.cs" />
     <Compile Include="Util\SelfMarshalByRefObject.cs" />
@@ -223,7 +220,6 @@
     <Compile Include="Util\Xsds\XsdParameters.cs" />
     <Compile Include="Util\Zips\Compressor.cs" />
     <Compile Include="Util\Zips\RuntimeBinaryFormatter.cs" />
-    <Compile Include="Util\Cabs\CabinetInfo.cs" />
     <Compile Include="Util\PropertyOverlay.cs" />
     <Compile Include="Util\DictionaryExtensions.cs">
       <SubType>Code</SubType>

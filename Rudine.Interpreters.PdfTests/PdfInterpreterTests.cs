@@ -26,9 +26,9 @@ namespace Rudine.Interpreters.Pdf.Tests
                 {
                     new DocRevEntry
                     {
-                        Bytes = _PdfInterpreter.WritePI( Resources.OpenOffice4, pi  ),
+                        Bytes = _PdfInterpreter.WritePI( Resources.BaseLineOpenOffice4, pi  ),
                         ModDate = DateTime.Now,
-                        Name = string.Format("{0}.pdf", nameof(Resources.OpenOffice4))
+                        Name = string.Format("{0}.pdf", nameof(Resources.BaseLineOpenOffice4))
                     }
                 });
 
