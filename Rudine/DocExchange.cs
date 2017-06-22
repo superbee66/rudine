@@ -242,12 +242,12 @@ namespace Rudine
 
 
 
-        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)  =>
-            DocInterpreter.Instance.CreateTemplate(docFiles, docTypeName, docRev, schemaXml,schemaFields);
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null) => 
+            (DocRev)Create(DocInterpreter.Instance.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields), null, false);
 
         public override List<ContentInfo> TemplateSources() =>
             DocInterpreter.Instance.TemplateSources();
 
-        
+
     }
 }
