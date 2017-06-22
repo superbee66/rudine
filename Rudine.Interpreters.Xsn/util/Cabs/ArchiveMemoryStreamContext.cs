@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Deployment.Compression;
 
-namespace Rudine.Util.Cabs
+namespace Rudine.Interpreters.Xsn.util.Cabs
 {
     internal class ArchiveMemoryStreamContext : ArchiveFileStreamContext, IDisposable
     {

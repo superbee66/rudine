@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Rudine.Util.Cabs
+namespace Rudine.Interpreters.Xsn.util.Cabs
 {
     internal class CabExtract : IDisposable
     {

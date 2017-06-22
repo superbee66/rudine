@@ -4,7 +4,7 @@ using System.IO;
 using Microsoft.Deployment.Compression;
 using Microsoft.Deployment.Compression.Cab;
 
-namespace Rudine.Util.Cabs
+namespace Rudine.Interpreters.Xsn.util.Cabs
 {
     internal static class CabInfoExtensions
     {

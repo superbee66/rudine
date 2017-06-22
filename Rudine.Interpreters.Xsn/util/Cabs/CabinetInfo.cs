@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Rudine.Util.Cabs
+namespace Rudine.Interpreters.Xsn.util.Cabs
 {
     [StructLayout(LayoutKind.Sequential)]
     internal class CabinetInfo //Cabinet API: "FDCABINETINFO"
