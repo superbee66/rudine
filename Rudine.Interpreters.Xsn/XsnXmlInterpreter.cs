@@ -10,6 +10,9 @@ using System.Web;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Microsoft.Deployment.Compression;
+using Microsoft.Deployment.Compression.Cab;
+using Rudine.Interpreters.Xsn.util.Cabs;
 using Rudine.Template;
 using Rudine.Web;
 using Rudine.Web.Util;
@@ -39,6 +42,12 @@ namespace Rudine.Interpreters.Xsn
         ///     The value from the key specified by {0} parsed from the XML processing instructions
         /// </summary>
         private const string parseRegex = @"(?<=(^|[^\w]+){0}="")([^""""]+)(?="".*)";
+
+        const string manifestFileName = "manifest.xsf";
+
+        private const string InfoPathDesignerPackageFileExtension = "xsn";
+        private const string templateFileName = "template.xml";
+        private const string schemaFileName = "myschema.xsd";
 
         /// <summary>
         ///     matches 0001-01-01T00:00:00, 0 & false; things considered default values in this solution
@@ -107,12 +116,51 @@ namespace Rudine.Interpreters.Xsn
         public override BaseDoc Create(string DocTypeName) =>
             Read(TemplateController.Instance.OpenText(DocTypeName, templateFileName));
 
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
+        {
+            DocRevEntry xsnFile = docFiles.FirstOrDefault(f => Path.GetExtension(f.Name).Trim('.').Equals(InfoPathDesignerPackageFileExtension, StringComparison.CurrentCultureIgnoreCase));
+
+            using (CompressionEngine compressionEngine = new CabEngine { CompressionLevel = CompressionLevel.Max })
+            using (MemoryStream xsnFileInMemoryStream = new MemoryStream(xsnFile.Bytes))
+            using (MemoryStream xsnFileOutMemoryStream = new MemoryStream())
+            {
+                xsnFileInMemoryStream.CopyTo(xsnFileOutMemoryStream);
+
+                byte[] templateBytes = xsnFile == null
+                                           ? docFiles.FirstOrDefault(f => f.Name.Equals(templateFileName, StringComparison.CurrentCultureIgnoreCase))?.Bytes
+                                           : compressionEngine.Unpack(xsnFileInMemoryStream, templateFileName).AsBytes();
+
+                byte[] schemaBytes = xsnFile == null
+                                         ? docFiles.FirstOrDefault(f => f.Name.Equals(schemaFileName, StringComparison.CurrentCultureIgnoreCase))?.Bytes
+                                         : compressionEngine.Unpack(xsnFileInMemoryStream, schemaFileName).AsBytes();
+
+                DocProcessingInstructions pi = ReadDocPI(Encoding.Default.GetString(templateBytes));
+
+                docTypeName = pi.DocTypeName;
+                docRev = pi.solutionVersion;
+
+                if (schemaBytes != null)
+                    schemaXml = Encoding.Default.GetString(schemaBytes);
+
+                for (int i = 0; i < docFiles.Count; i++)
+                    if (docFiles[i].Name == xsnFile.Name)
+                    {
+                        xsnFile.Name = string.Format("{0}.{1}", GetFilenameDocTypeName(xsnFile), InfoPathDesignerPackageFileExtension);
+                        docFiles[i] = xsnFile;
+                        break;
+                    }
+            }
+
+
+            return base.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields);
+        }
+
         /// <summary>
         ///     XmlSerializer writes Booleans as the words "true" & "false". InfoPath can
         ///     potentially write them as "1" & "0".
         /// </summary>
         /// <param name="docXml"></param>
-        /// <param name=DocRev.MY_ONLY_DOCKEY_1></param>
+        /// <param name= DocRev.MY_ONLY_DOCKEY_1></param>
         /// <returns></returns>
         private static string FormatBooleansTrueFalseOrZeroOne(string docXml, string DocTypeName)
         {
@@ -136,7 +184,7 @@ namespace Rudine.Interpreters.Xsn
         /// <param name= NavKey.DocTypeName></param>
         /// <returns></returns>
         public override string GetDescription(string DocTypeName) =>
-            ParseAttributeValue(TemplateController.Instance.OpenText(DocTypeName, "manifest.xsf"), "description");
+            ParseAttributeValue(TemplateController.Instance.OpenText(DocTypeName, manifestFileName), "description");
 
         /// <summary>
         ///     Parses the given form's "solutionVersion" number from the manifest.xsf. Note,
@@ -148,7 +196,7 @@ namespace Rudine.Interpreters.Xsn
             ReadDocRev(DocData);
 
         public override string HrefVirtualFilename(string DocTypeName, string DocRev) =>
-            "manifest.xsf";
+            manifestFileName;
 
         private static string ParseAttributeValue(string DocData, string attributeName) =>
             Regex.Match(DocData, string.Format("(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline)
@@ -157,9 +205,9 @@ namespace Rudine.Interpreters.Xsn
         //BUG:<DocTypeName> may have hyphens & will not change when InfoPath designer changes the root node in the editor
         private static string parseReadDocTypeName(string DocData) =>
             Regex.Match(DocData,
-                     @"(urn:schemas-microsoft-com:office:infopath:)(?<DocTypeName>\w+)(:-myXSD-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})",
+                     @"(urn:schemas-microsoft-com:office:infopath:)(?<DocTypeNameGroup>\w+)(:-myXSD-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})",
                      RegexOptions.IgnoreCase)
-                 .Groups[DocRev.KeyPart1].Value;
+                 .Groups["DocTypeNameGroup"].Value;
 
         public override bool Processable(string DocTypeName, string DocRev)
         {
@@ -167,7 +215,7 @@ namespace Rudine.Interpreters.Xsn
             return
                 !string.IsNullOrWhiteSpace(template_xml)
                 &&
-                !string.IsNullOrWhiteSpace(TemplateController.Instance.OpenText(DocTypeName, DocRev, "manifest.xsf"))
+                !string.IsNullOrWhiteSpace(TemplateController.Instance.OpenText(DocTypeName, DocRev, manifestFileName))
                 &&
                 ReadDocTypeName(template_xml) == DocTypeName
                 &&
@@ -309,6 +357,7 @@ namespace Rudine.Interpreters.Xsn
             }
 
             _DocProcessingInstructions.solutionVersion = GetDocRev(SrcDocXml);
+            _DocProcessingInstructions.DocTypeName = parseReadDocTypeName(SrcDocXml);
 
             return _DocProcessingInstructions;
         }
@@ -348,7 +397,7 @@ namespace Rudine.Interpreters.Xsn
         ///     referenced once.
         /// </summary>
         /// <param name="docXml"></param>
-        /// <param name=DocRev.MY_ONLY_DOCKEY_1></param>
+        /// <param name= DocRev.MY_ONLY_DOCKEY_1></param>
         /// <returns></returns>
         internal static string RemoveValueTypeElementDefaults(string docXml, string DocTypeName)
         {
@@ -363,28 +412,12 @@ namespace Rudine.Interpreters.Xsn
                 RegexOptions.Singleline | RegexOptions.Multiline);
         }
 
-        private const string templateFileName = "template.xml";
         public override List<ContentInfo> TemplateSources() =>
             new List<ContentInfo>
             {
-                new ContentInfo { ContentFileExtension = "xsn", ContentType = "application/vnd.ms-infopath" },
+                new ContentInfo { ContentFileExtension = InfoPathDesignerPackageFileExtension, ContentType = "application/vnd.ms-infopath" },
                 new ContentInfo { ContentFileExtension = "xsf", ContentType = "application/vnd.ms-infopath" }
             };
-
-        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
-        {
-            byte[] template_Bytes = docFiles.FirstOrDefault(f => f.Name.Equals(templateFileName, StringComparison.CurrentCultureIgnoreCase))?.Bytes;
-            byte[] schema_Bytes = docFiles.FirstOrDefault(f => f.Name.Equals("myschema.xsd", StringComparison.CurrentCultureIgnoreCase))?.Bytes;
-
-            if (template_Bytes != null && schema_Bytes != null)
-            {
-                DocProcessingInstructions pi = ReadDocPI(Encoding.Default.GetString(template_Bytes));
-                docTypeName = pi.DocTypeName;
-                docRev = pi.solutionVersion;
-            }
-
-            return base.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields);
-        }
 
         /// <summary>
         ///     Runs a given form's xml schema against it throwing an exception if it fails to validate
@@ -393,6 +426,7 @@ namespace Rudine.Interpreters.Xsn
         /// <param name="xml"></param>
         public override void Validate(string DocData) =>
             new SchemaValidator().Validate(DocData, Read(DocData, true));
+
         private XmlWriter WriteInfoPathProcessingInstructions(DocProcessingInstructions pi, XmlWriter _XmlTextWriter)
         {
             _XmlTextWriter.WriteProcessingInstruction("mso-infoPathSolution",
@@ -506,7 +540,7 @@ namespace Rudine.Interpreters.Xsn
                         .FirstOrDefault()
                         .Namespace;
 
-                    using (StringReader _StringReaderXsd = new StringReader(TemplateController.Instance.OpenText(_BaseDoc.DocTypeName, _BaseDoc.solutionVersion, "myschema.xsd")))
+                    using (StringReader _StringReaderXsd = new StringReader(TemplateController.Instance.OpenText(_BaseDoc.DocTypeName, _BaseDoc.solutionVersion, schemaFileName)))
                     using (XmlTextReader _XmlTextReaderXsd = new XmlTextReader(_StringReaderXsd))
                     {
                         // Add that class into .Net XML XSD schema validation
