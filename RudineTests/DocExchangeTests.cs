@@ -13,18 +13,11 @@ namespace Rudine.Tests
         [Test]
         [Sequential]
         public void CreateTemplateTest(
-            [
-                Values(
-                    nameof(Resources.BaseLineInfoPath2013),
-                    nameof(Resources.BaseLineOpenOffice4)
-                )] string docTypeName,
-            [
-                Values(
-                    "xsn",
-                    "pdf")] string fileExtension
+            [Values(nameof(Resources.BaseLineInfoPath2013), nameof(Resources.BaseLineOpenOffice4))] string docTypeName,
+            [Values("xsn", "pdf")] string fileExtension
         )
         {
-            byte[] docBytes = (byte[]) Resources.ResourceManager.GetObject(docTypeName);
+            byte[] docBytes = (byte[])Resources.ResourceManager.GetObject(docTypeName);
 
             DocProcessingInstructions pi = new DocProcessingInstructions
             {
