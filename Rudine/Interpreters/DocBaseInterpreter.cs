@@ -135,7 +135,7 @@ namespace Rudine.Interpreters
         protected static string GetFilenameDocTypeName(DocRevEntry docFile) =>
             Regex.Replace(
                 StringTransform.SafeIdentifier(Path.GetFileNameWithoutExtension(docFile.Name)),
-                "^[0-9A-Z]",
+                "[^0-9A-Za-z_]",
                 string.Empty,
                 RegexOptions.IgnoreCase).ToUpper();
 
