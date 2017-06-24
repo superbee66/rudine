@@ -26,36 +26,8 @@ namespace Rudine.Web
         [DataMember]
         public override string DocTitle
         {
-            get { return base.DocTitle ?? DocTypeName.ToUpper(); }
+            get { return base.DocTitle ?? DocTypeName; }
             set { base.DocTitle = value; }
-        }
-
-        /// <summary>
-        ///     serialize-able, settable properties
-        /// </summary>
-        /// <param name="filled">when true, ensures the properties have been explicitly set</param>
-        /// <returns></returns>
-        public PropertyInfo[] GetFormObjectMappedProperties(bool filled = false)
-        {
-            PropertyInfo[] p = CacheMan.Cache(() =>
-                                              {
-                                                  return GetType().GetProperties(
-                                                      BindingFlags.IgnoreCase
-                                                      | BindingFlags.Public
-                                                      | BindingFlags.Instance
-                                                      | BindingFlags.SetProperty).Where(m =>
-                                                                                            m.CanWrite
-                                                                                            && m.PropertyType.IsPublic
-                                                                                            && m.PropertyType.IsSerializable
-                                                                                            && !m.PropertyType.IsArray
-                                                                                            && !ExpressionParser.GetNonNullableType(m.PropertyType).IsAbstract
-                                                                                            && !ExpressionParser.GetNonNullableType(m.PropertyType).IsGenericType).ToArray();
-                                              },
-                false,
-                GetType().FullName,
-                "GetFormObjectMappedProperties");
-
-            return p.Where(m => !filled || !this.IsDefaultValue(m)).ToArray();
         }
 
         [XmlIgnore]

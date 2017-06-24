@@ -80,13 +80,10 @@ namespace Rudine.Storage.Docdb
                     Field.Index.NOT_ANALYZED));
 
             //TODO:Be selective about the column store like Raven does. Record if there is a query filter against it, only then should it be broken out as a field
-            foreach (PropertyInfo p in _BaseDoc
-                .GetFormObjectMappedProperties(true)
+            foreach (PropertyInfo p in _BaseDoc.GetType().GetProperties()
                 .Where(m =>
                            _Document.GetFieldable(m.Name) == null
-                           && m.DeclaringType != typeof(DocProcessingInstructions)
-                           && m.DeclaringType != typeof(DocTerm)
-                           && m.PropertyType != typeof(Byte[])))
+                           && m.PropertyType != typeof(byte[])))
 
                 _Document.Add(
                     new Field(
