@@ -49,7 +49,7 @@ namespace Rudine
             typeof(DesignerCategoryAttribute)
         }.ToDictionary(m => m.Namespace, n => Path.GetFileName(n.Assembly.Location));
 
-       
+
 
         public static BaseDoc ActivateBaseDoc(string DocTypeName, string DocRev, IBaseDocController baseDocController, params string[] AdditionalRootNames) =>
             (BaseDoc)Activator.CreateInstance(ActivateBaseDocType(DocTypeName, DocRev, baseDocController, AdditionalRootNames));
@@ -68,13 +68,13 @@ namespace Rudine
         internal static string GetDocSchema(string docTypeName, string docRev, IBaseDocController baseDocController)
         {
             return ((IDocRev)baseDocController.Get(
-                            docTypeName,
-                            DocRev.MakeDocKeys(
-                                new DocURN
-                                {
-                                    DocTypeName = docTypeName,
-                                    solutionVersion = docRev
-                                }))).DocSchema;
+                DocRev.MyOnlyDocName,
+                DocRev.MakeDocKeys(
+                           new DocURN
+                           {
+                               DocTypeName = docTypeName,
+                               solutionVersion = docRev
+                           }))).DocSchema;
         }
 
         /// <summary>
