@@ -41,6 +41,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
@@ -53,6 +54,12 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="..\Rudine.Web\Util\CacheMan.cs">
+      <Link>CacheMan.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
+      <Link>FileSystem.cs</Link>
+    </Compile>
     <Compile Include="DocExchangeTests.cs" />
     <Compile Include="ImporterControllerTests.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreterTests.cs" />
