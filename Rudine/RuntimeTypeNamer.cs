@@ -62,7 +62,7 @@ namespace Rudine
         {
             Validate(DocTypeName, DocRev, AdditionalRootNames);
 
-            string[] DocTypeNameParts = DocTypeName.Split('.').Select(s => String.Format("{0}{1}", DOCTYPENAME_NS_PREFIX, s.ToUpper())).ToArray();
+            string[] DocTypeNameParts = DocTypeName.Split('.').Select(s => String.Format("{0}{1}", DOCTYPENAME_NS_PREFIX, s)).ToArray();
             string[] RevParts = DocRev.Split('.').Select(s => String.Format("{0}{1}", DOCREV_NS_PREFIX, s)).ToArray();
             string[] OtherParts = AdditionalRootNames == null
                                       ? new string[]
