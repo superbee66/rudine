@@ -193,7 +193,7 @@ namespace Rudine.Interpreters
             // ensure the latest content has been processed & imported
             ImporterController.CreateTemplateItems(DocExchange.Instance);
 
-            TemplateFileInfo _TemplateFileInfo = TemplateController.ParseTemplateFileInfo(context);
+            TemplateFileInfo _TemplateFileInfo = TemplateController.Instance.ParseTemplateFileInfo(context);
 
             if (!string.IsNullOrWhiteSpace(_TemplateFileInfo.DocTypeName)
                 &&
