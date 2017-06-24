@@ -134,7 +134,7 @@ namespace Rudine.Storage.Docdb
                 {
                     _BaseDoc.DocSrc = Nav.ToUrl(DocTypeName, DocId, RelayUrl);
                     // there is a chance the DocStatus may not be set when it comes to items like DocRev BaseDocType(s)
-                    _BaseDoc.DocStatus = bool.Parse(_Document.Get(Parm.DocStatus) ?? Boolean.FalseString);
+                    bool DocStatus = false;
                     break;
                 }
             }
