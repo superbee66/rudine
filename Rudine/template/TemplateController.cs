@@ -89,7 +89,7 @@ namespace Rudine.Template
         public string TopDocRev(string DocTypeName) =>
             TopDocRev(DocTypeName, false);
 
-        private static string GetHttpContextFileName(HttpContext context) =>
+        public static string GetHttpContextFileName(HttpContext context) =>
             context.Request.Url.Segments[context.Request.Url.Segments.Length - 1].Trim('/');
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Rudine.Template
             return OpenRead(templatefileinfo.DocTypeName, templatefileinfo.solutionVersion, templatefileinfo.FileName);
         }
 
-        public static TemplateFileInfo ParseTemplateFileInfo(HttpContext context) =>
+        public TemplateFileInfo ParseTemplateFileInfo(HttpContext context) =>
             new TemplateFileInfo
             {
                 FileName = GetHttpContextFileName(context),
