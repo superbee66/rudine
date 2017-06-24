@@ -12,7 +12,6 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using Microsoft.Deployment.Compression;
 using Microsoft.Deployment.Compression.Cab;
-using Rudine.Interpreters.Xsn.util.Cabs;
 using Rudine.Template;
 using Rudine.Web;
 using Rudine.Web.Util;
@@ -114,7 +113,7 @@ namespace Rudine.Interpreters.Xsn
         }
 
         public override BaseDoc Create(string DocTypeName) =>
-            Read(TemplateController.Instance.OpenText(DocTypeName, templateFileName));
+            Read(OpenText(DocTypeName, templateFileName));
 
         public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
         {
@@ -142,15 +141,8 @@ namespace Rudine.Interpreters.Xsn
                 if (schemaBytes != null)
                     schemaXml = Encoding.Default.GetString(schemaBytes);
 
-                for (int i = 0; i < docFiles.Count; i++)
-                    if (docFiles[i].Name == xsnFile.Name)
-                    {
-                        xsnFile.Name = string.Format("{0}.{1}", GetFilenameDocTypeName(xsnFile), InfoPathDesignerPackageFileExtension);
-                        docFiles[i] = xsnFile;
-                        break;
-                    }
+                AutoFileNameApply(pi.DocTypeName, docFiles, InfoPathDesignerPackageFileExtension);
             }
-
 
             return base.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields);
         }
@@ -164,7 +156,7 @@ namespace Rudine.Interpreters.Xsn
         /// <returns></returns>
         private static string FormatBooleansTrueFalseOrZeroOne(string docXml, string DocTypeName)
         {
-            string templateDocXml = TemplateController.Instance.OpenText(DocTypeName, templateFileName);
+            string templateDocXml = OpenText(DocTypeName, templateFileName);
 
             return Regex.Replace(
                 docXml,
@@ -184,7 +176,7 @@ namespace Rudine.Interpreters.Xsn
         /// <param name= NavKey.DocTypeName></param>
         /// <returns></returns>
         public override string GetDescription(string DocTypeName) =>
-            ParseAttributeValue(TemplateController.Instance.OpenText(DocTypeName, manifestFileName), "description");
+            ParseAttributeValue(OpenText(DocTypeName, manifestFileName), "description");
 
         /// <summary>
         ///     Parses the given form's "solutionVersion" number from the manifest.xsf. Note,
@@ -197,6 +189,50 @@ namespace Rudine.Interpreters.Xsn
 
         public override string HrefVirtualFilename(string DocTypeName, string DocRev) =>
             manifestFileName;
+
+        /// <summary>
+        ///     extracts request file from InfoPath xsn file stored in DocRev for given docTypeName & docTypeVer
+        /// </summary>
+        /// <param name="docTypeName"></param>
+        /// <param name="docTypeVer"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        private static MemoryStream OpenRead(string docTypeName, string docTypeVer, string filename)
+        {
+            MemoryStream fileMemoryStream = new MemoryStream();
+
+            using (CompressionEngine compressionEngine = new CabEngine { CompressionLevel = CompressionLevel.Max })
+            using (MemoryStream xsnFileInMemoryStream = TemplateController.Instance.OpenRead(docTypeName, docTypeVer, AutoFileName(docTypeName, InfoPathDesignerPackageFileExtension)))
+                compressionEngine.Unpack(xsnFileInMemoryStream, filename).CopyTo(fileMemoryStream);
+
+            return fileMemoryStream;
+        }
+
+        private static MemoryStream OpenRead(HttpContext context, out TemplateFileInfo templatefileinfo)
+        {
+            templatefileinfo = TemplateController.Instance.ParseTemplateFileInfo(context);
+            return OpenRead(templatefileinfo.DocTypeName, templatefileinfo.solutionVersion, templatefileinfo.FileName);
+        }
+
+        private static string OpenText(string docTypeName, string filename) =>
+            OpenText(docTypeName, TemplateController.Instance.TopDocRev(docTypeName), filename);
+
+        private static string OpenText(string docTypeName, string docTypeVer, string filename)
+        {
+            using (Stream _Stream = OpenRead(docTypeName, docTypeVer, filename))
+                return _Stream.AsString();
+        }
+
+        private string OpenText(HttpContext context, out string filename)
+        {
+            filename = TemplateController.GetHttpContextFileName(context);
+            return CacheMan.Cache(() =>
+                                  {
+                                      TemplateFileInfo r;
+                                      using (MemoryStream _MemoryStream = OpenRead(context, out r))
+                                          return _MemoryStream.AsString();
+                                  }, false, "OpenText", context.Request.Url.ToString());
+        }
 
         private static string ParseAttributeValue(string DocData, string attributeName) =>
             Regex.Match(DocData, string.Format("(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline)
@@ -211,11 +247,11 @@ namespace Rudine.Interpreters.Xsn
 
         public override bool Processable(string DocTypeName, string DocRev)
         {
-            string template_xml = TemplateController.Instance.OpenText(DocTypeName, DocRev, templateFileName);
+            string template_xml = OpenText(DocTypeName, DocRev, templateFileName);
             return
                 !string.IsNullOrWhiteSpace(template_xml)
                 &&
-                !string.IsNullOrWhiteSpace(TemplateController.Instance.OpenText(DocTypeName, DocRev, manifestFileName))
+                !string.IsNullOrWhiteSpace(OpenText(DocTypeName, DocRev, manifestFileName))
                 &&
                 ReadDocTypeName(template_xml) == DocTypeName
                 &&
@@ -230,9 +266,9 @@ namespace Rudine.Interpreters.Xsn
         /// <param name="context"></param>
         public override void ProcessRequest(HttpContext context)
         {
-            TemplateFileInfo _TemplateFileInfo = TemplateController.ParseTemplateFileInfo(context);
+            TemplateFileInfo templateFileInfo = TemplateController.Instance.ParseTemplateFileInfo(context);
 
-            if (!_TemplateFileInfo.FileName.Equals(HrefVirtualFilename(_TemplateFileInfo.DocTypeName, _TemplateFileInfo.solutionVersion), StringComparison.InvariantCultureIgnoreCase))
+            if (!templateFileInfo.FileName.Equals(HrefVirtualFilename(templateFileInfo.DocTypeName, templateFileInfo.solutionVersion), StringComparison.InvariantCultureIgnoreCase))
             {
                 base.ProcessRequest(context);
             }
@@ -250,8 +286,8 @@ namespace Rudine.Interpreters.Xsn
                 string UrlReferrer_AbsoluteUri = context.Request.UrlReferrer == null ? "" : context.Request.UrlReferrer.AbsoluteUri;
 
                 string filename;
-                string[] lines = TemplateController.Instance.OpenText(context, out filename)
-                                                   .Split('\n', '\r');
+                string[] lines = OpenText(context, out filename)
+                    .Split('\n', '\r');
 
                 // render the publishUrl as the calling request or that of a registered listener
                 string publishUrl = UrlReferrer_AbsoluteUri.Contains("/" + ReverseProxy.DirectoryName)
@@ -401,7 +437,7 @@ namespace Rudine.Interpreters.Xsn
         /// <returns></returns>
         internal static string RemoveValueTypeElementDefaults(string docXml, string DocTypeName)
         {
-            string templateDocXml = TemplateController.Instance.OpenText(DocTypeName, templateFileName);
+            string templateDocXml = OpenText(DocTypeName, templateFileName);
 
             return Regex.Replace(
                 docXml,
@@ -439,7 +475,7 @@ namespace Rudine.Interpreters.Xsn
             _XmlTextWriter.WriteProcessingInstruction("mso-application", mso_application);
 
             // there is special instructions for attachments
-            if ((TemplateController.Instance.OpenText(pi.DocTypeName, pi.solutionVersion, templateFileName) ?? string.Empty).IndexOf("mso-infoPath-file-attachment-present") > 0)
+            if ((OpenText(pi.DocTypeName, pi.solutionVersion, templateFileName) ?? string.Empty).IndexOf("mso-infoPath-file-attachment-present") > 0)
                 _XmlTextWriter.WriteProcessingInstruction("mso-infoPath-file-attachment-present", string.Empty);
 
             _XmlTextWriter.WriteProcessingInstruction("ipb-application",
@@ -465,6 +501,7 @@ namespace Rudine.Interpreters.Xsn
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
+        /// <param name="includeProcessingInformation"></param>
         /// <returns>Initial document InfoPath Form Filler will open</returns>
         public override string WriteText<T>(T source, bool includeProcessingInformation = true)
         {
@@ -482,7 +519,7 @@ namespace Rudine.Interpreters.Xsn
             {
                 //TODO:Cache _XmlSerializerNamespaces
                 XmlSerializerNamespaces _XmlSerializerNamespaces = new XmlSerializerNamespaces();
-                foreach (Match xmlnsMatch in Regex.Matches(TemplateController.Instance.OpenText(source.DocTypeName, source.solutionVersion, templateFileName) ?? string.Empty, XmlRootAttributeNamespaces))
+                foreach (Match xmlnsMatch in Regex.Matches(OpenText(source.DocTypeName, source.solutionVersion, templateFileName) ?? string.Empty, XmlRootAttributeNamespaces))
                     _XmlSerializerNamespaces.Add(xmlnsMatch.Groups[1].Value, xmlnsMatch.Groups[2].Value);
 
                 if (source is BaseDoc)
@@ -540,7 +577,7 @@ namespace Rudine.Interpreters.Xsn
                         .FirstOrDefault()
                         .Namespace;
 
-                    using (StringReader _StringReaderXsd = new StringReader(TemplateController.Instance.OpenText(_BaseDoc.DocTypeName, _BaseDoc.solutionVersion, schemaFileName)))
+                    using (StringReader _StringReaderXsd = new StringReader(OpenText(_BaseDoc.DocTypeName, _BaseDoc.solutionVersion, schemaFileName)))
                     using (XmlTextReader _XmlTextReaderXsd = new XmlTextReader(_StringReaderXsd))
                     {
                         // Add that class into .Net XML XSD schema validation
