@@ -20,31 +20,34 @@ namespace Rudine.Web
         public const string MyOnlyDocVersion = "1.0.0.0";
         public const string KeyPart1 = "TargetDocTypeName";
         public const string KeyPart2 = "TargetDocTypeVer";
+
         public static readonly string ManifestFileName = String.Format("{0}.json", nameof(DocURN));
         public static readonly string SchemaFileName = String.Format("{0}.xsd", nameof(DocSchema));
         public static readonly string PIFileName = String.Format("{0}.json", nameof(DocProcessingInstructions));
 
+        /// <summary>
+        /// these files are not a factor when calculating DocFilesMD5 as they are system generated
+        /// </summary>
+        private static readonly string[] DocFileMD5Exclutions = { ManifestFileName, SchemaFileName, PIFileName };
+
+
         public List<DocRevEntry> DocFiles { get; set; }
 
-        public string DocFilesMD5
+        public string DocFilesMD5 => DocFilesMD5Calc(DocFiles);
+
+        public static string DocFilesMD5Calc(List<DocRevEntry> docFiles)
         {
-            get
+            using (MD5 md5 = MD5.Create())
             {
-                using (MD5 md5 = MD5.Create())
+                foreach (DocRevEntry docRevEntry in docFiles
+                    .Where(fileA => !DocFileMD5Exclutions.Any(fileB => fileA.Name.Equals(fileB, StringComparison.InvariantCultureIgnoreCase)))
+                    .OrderBy(entry => entry.Name))
                 {
-                    foreach (DocRevEntry docRevEntry in DocFiles)
-                        if (
-                            !docRevEntry.Name.Equals(ManifestFileName, StringComparison.InvariantCultureIgnoreCase)
-                            &&
-                            !docRevEntry.Name.Equals(SchemaFileName, StringComparison.InvariantCultureIgnoreCase)
-                        )
-                        {
-                            md5.TransformString(docRevEntry.Name ?? String.Empty);
-                            md5.TransformBytes(docRevEntry.Bytes);
-                        }
-                    md5.TransformFinalBlock(new byte[0], 0, 0);
-                    return BitConverter.ToString(md5.Hash);
+                    md5.TransformString(docRevEntry.Name ?? String.Empty);
+                    md5.TransformBytes(docRevEntry.Bytes);
                 }
+                md5.TransformFinalBlock(new byte[0], 0, 0);
+                return BitConverter.ToString(md5.Hash);
             }
         }
 
