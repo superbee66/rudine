@@ -45,11 +45,9 @@ namespace Rudine
         /// <returns></returns>
         public virtual BaseDoc Create(BaseDoc Doc, string RelayUrl = null, bool ProcessTemplate = true)
         {
-            string DocTypeName = Doc.DocTypeName;
-
             // apply ~/form/{DocTypeName}/template.xml values to document passed into us
             if (ProcessTemplate)
-                Doc = PropertyOverlay.Overlay(Doc, DocInterpreter.Instance.Create(DocTypeName));
+                Doc = PropertyOverlay.Overlay(Doc, DocInterpreter.Instance.Create(Doc.DocTypeName));
 
             //TODO:need to type-safe all the "object Doc" parameter methods
             Doc.DocChecksum = DocInterpreter.Instance.CalcDocChecksum(Doc);
