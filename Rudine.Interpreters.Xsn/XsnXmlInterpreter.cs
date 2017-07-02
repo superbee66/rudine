@@ -449,11 +449,7 @@ namespace Rudine.Interpreters.Xsn
         }
 
         public override List<ContentInfo> TemplateSources() =>
-            new List<ContentInfo>
-            {
-                new ContentInfo { ContentFileExtension = InfoPathDesignerPackageFileExtension, ContentType = "application/vnd.ms-infopath" },
-                new ContentInfo { ContentFileExtension = "xsf", ContentType = "application/vnd.ms-infopath" }
-            };
+            new List<ContentInfo> { new ContentInfo { ContentFileExtension = InfoPathDesignerPackageFileExtension, ContentType = "application/vnd.ms-infopath" } };
 
         /// <summary>
         ///     Runs a given form's xml schema against it throwing an exception if it fails to validate
