@@ -15,6 +15,8 @@ namespace Rudine.Web
     {
         public bool IsDocRev() { return DocTypeName.Equals(Parm.DocRev, StringComparison.CurrentCultureIgnoreCase); }
 
+        
+        [XmlIgnore]
         [DataMember]
         public string DocSrc { get; set; }
 
