@@ -22,7 +22,8 @@ namespace Rudine.Interpreters.Pdf
 
         public override ContentInfo ContentInfo => new ContentInfo { ContentFileExtension = "pdf", ContentType = "application/pdf" };
 
-        public override BaseDoc Create(string docTypeName) { throw new NotImplementedException(); }
+        public override BaseDoc Create(string docTypeName) =>
+            Create(docTypeName, TemplateController.Instance.TopDocRev(docTypeName));
 
         /// <summary>
         ///     enumerate each PdfAcroField, convert it's value to clr type, use reflection to set that value to the clr object
@@ -107,6 +108,9 @@ namespace Rudine.Interpreters.Pdf
 
         private static PdfDocument OpenRead(byte[] docData, PdfDocumentOpenMode openmode = PdfDocumentOpenMode.ReadOnly) => PdfReader.Open(new MemoryStream(docData), openmode);
 
+        private static BaseDoc Create(string DocTypeName, string DocRev) =>
+            Runtime.ActivateBaseDoc(DocTypeName, DocRev, DocExchange.Instance);
+
         /// <summary>
         ///     enumerate each PdfAcroField, convert it's value to clr type, use reflection to set that value to the clr object
         ///     BaseDoc
@@ -120,12 +124,11 @@ namespace Rudine.Interpreters.Pdf
             {
                 DocProcessingInstructions docProcessingInstructions = ReadDocPI(pdfDocument);
 
-                BaseDoc baseDoc = Runtime.ActivateBaseDoc(
+                BaseDoc baseDoc = Create(
                     docProcessingInstructions.DocTypeName,
                     docRevStrict
                         ? docProcessingInstructions.solutionVersion
-                        : TemplateController.Instance.TopDocRev(docProcessingInstructions.DocTypeName),
-                    DocExchange.Instance);
+                        : TemplateController.Instance.TopDocRev(docProcessingInstructions.DocTypeName));
 
                 Type baseDocType = baseDoc.GetType();
 
