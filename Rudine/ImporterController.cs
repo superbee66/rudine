@@ -14,7 +14,8 @@ using Rudine.Web.Util;
 namespace Rudine
 {
     /// <summary>
-    /// creates doc/* directories based on IDocModel(s) in memory or any loose files in the doc/* directory that are valid. APP_CODE/*.cs based on the docSchema XSD are created if they don't exist.
+    ///     creates doc/* directories based on IDocModel(s) in memory or any loose files in the doc/* directory that are valid.
+    ///     APP_CODE/*.cs based on the docSchema XSD are created if they don't exist.
     /// </summary>
     public static class ImporterController
     {
@@ -34,21 +35,34 @@ namespace Rudine
 
             DocsFromFiles(baseDocController);
 
-            DOCS.PushRange(Directory
+            // scan directories to get ones that have potential files in them to import
+            DirectoryInfo[] range = Directory
                 .EnumerateDirectories(FilesystemTemplateController.DirectoryPath)
                 .Select(dirpath => new DirectoryInfo(dirpath))
-                .Where(dirpath => !DOCS.Contains(dirpath))
+                .Where(dirpath =>
+                           !DOCS.Contains(dirpath)
+                           &&
+                           dirpath
+                               .EnumerateFiles()
+                               .Any(fileinfo =>
+                                        AllTemplateExtensions(baseDocController)
+                                            .Any(extension =>
+                                                     extension.Equals(fileinfo.Extension.Trim('.'), StringComparison.InvariantCultureIgnoreCase))))
                 .OrderByDescending(dirpath =>
                                        new[] { dirpath.LastWriteTime.Ticks }
                                            .Union(
                                                GetRelativeFilePathsInDirectoryTree(dirpath.FullName, true)
                                                    .Select(filepath => File.GetLastWriteTimeUtc(filepath).Ticks))
                                            .Max())
-                .ToArray());
+                .ToArray();
+
+            if (range.Length > 0)
+                DOCS.PushRange(range);
 
             // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
             DirectoryInfo dir;
-            while (DOCS.TryPop(out dir) && ImportContentFolder(baseDocController, dir) != null) { }
+            while (DOCS.TryPop(out dir) && ImportContentFolder(baseDocController, dir) != null)
+            { }
 
             // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
             if (!DOCS.IsEmpty)
@@ -67,17 +81,23 @@ namespace Rudine
         /// <param name="baseDocController"></param>
         private static void DocsFromFiles(BaseDocController baseDocController)
         {
-            string[] extensions = baseDocController.TemplateSources().Select(templateSource => "." + templateSource.ContentFileExtension).Distinct().ToArray();
-
             foreach (FileInfo fileinfo in Directory.EnumerateFiles(APP_DOCS.FullName, "*", SearchOption.TopDirectoryOnly).Select(filepath => new FileInfo(filepath)))
-                if (extensions.Any(extension => extension.Equals(fileinfo.Extension, StringComparison.InvariantCultureIgnoreCase)))
+                if (AllTemplateExtensions(baseDocController).Any(extension => extension.Equals(fileinfo.Extension, StringComparison.InvariantCultureIgnoreCase)))
                     ImportContentFiles(
                         baseDocController,
                         fileinfo.Directory,
                         StringTransform.PrettyCSharpIdent(Path.GetFileNameWithoutExtension(fileinfo.FullName)),
                         new List<FileInfo> { fileinfo });
-
         }
+
+        private static string[] AllTemplateExtensions(BaseDocController baseDocController) =>
+            CacheMan.Cache(() => baseDocController
+                               .TemplateSources()
+                               .Select(templateSource => "." + templateSource.ContentFileExtension)
+                               .Distinct()
+                               .ToArray(),
+                false,
+                nameof(AllTemplateExtensions));
 
         /// <summary>
         ///     Scans AppDomain for classes implementing the IDocModel & performs all transformations needed to represent them as
