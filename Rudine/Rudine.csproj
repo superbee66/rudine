@@ -218,6 +218,7 @@
     <Compile Include="Util\Xsds\Xsd.cs" />
     <Compile Include="Util\Xsds\XsdExporter.cs" />
     <Compile Include="Util\Xsds\XsdParameters.cs" />
+    <Compile Include="Util\Zips\BaseDocExtensions.cs" />
     <Compile Include="Util\Zips\Compressor.cs" />
     <Compile Include="Util\Zips\RuntimeBinaryFormatter.cs" />
     <Compile Include="Util\PropertyOverlay.cs" />
