@@ -96,18 +96,21 @@ namespace Rudine.Interpreters
 
             if (schemaFields != null)
                 if (string.IsNullOrWhiteSpace(schemaXml))
-                    // the "lazy-load" CompositeType requires activation in order for the _template_docx_obj.GetType().Assembly to register as having any types defined
+                // the "lazy-load" CompositeType requires activation in order for the _template_docx_obj.GetType().Assembly to register as having any types defined
+                {
+                    Type type = Activator.CreateInstance(
+                                             new CompositeType(
+                                                 RuntimeTypeNamer.CalcCSharpNamespace(
+                                                     docTypeName,
+                                                     docRev,
+                                                     nameof(IDocBaseInterpreter)),
+                                                 docTypeName,
+                                                 schemaFields.ToArray())).GetType();
                     schemaXml = XsdExporter.ExportSchemas(
-                        Activator.CreateInstance(
-                            new CompositeType(
-                                RuntimeTypeNamer.CalcCSharpNamespace(
-                                    docTypeName,
-                                    docRev,
-                                    nameof(IDocBaseInterpreter)),
-                                docTypeName,
-                                schemaFields.ToArray())).GetType().Assembly,
-                        new List<string> { docTypeName },
-                        RuntimeTypeNamer.CalcSchemaUri(docTypeName, docRev)).First();
+                                               type.Assembly,
+                                               new List<string> { type.FullName },
+                                               RuntimeTypeNamer.CalcSchemaUri(docTypeName, docRev)).First();
+                }
 
             DocURN _DocURN = new DocURN
             {
@@ -208,7 +211,7 @@ namespace Rudine.Interpreters
         /// <returns></returns>
         public static BaseDoc SetPI(BaseDoc dstBaseDoc, DocProcessingInstructions pi, string DocTypeName = null, string DocRev = null)
         {
-            dstBaseDoc = (BaseDoc) PropertyOverlay.Overlay(pi, dstBaseDoc);
+            dstBaseDoc = (BaseDoc)PropertyOverlay.Overlay(pi, dstBaseDoc);
             dstBaseDoc.DocTypeName = DocTypeName ?? pi.DocTypeName;
             dstBaseDoc.solutionVersion = DocRev ?? pi.solutionVersion;
             return dstBaseDoc;
