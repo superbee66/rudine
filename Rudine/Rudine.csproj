@@ -209,15 +209,12 @@
     <Compile Include="Util\Reflection.cs" />
     <Compile Include="Util\SelfMarshalByRefObject.cs" />
     <Compile Include="Util\StringExtensions.cs" />
-    <Compile Include="Util\Xsds\Res.cs" />
     <Compile Include="Util\MimeExtensionHelper.cs" />
     <Compile Include="Storage\Docdb\LuceneController.cs" />
     <Compile Include="Nav.cs" />
     <Compile Include="FormsMigrationsCode\*.cs" />
     <Compile Include="IDocFormatting.cs" />
     <Compile Include="Util\Xsds\Xsd.cs" />
-    <Compile Include="Util\Xsds\XsdExporter.cs" />
-    <Compile Include="Util\Xsds\XsdParameters.cs" />
     <Compile Include="Util\Zips\BaseDocExtensions.cs" />
     <Compile Include="Util\Zips\Compressor.cs" />
     <Compile Include="Util\Zips\RuntimeBinaryFormatter.cs" />
