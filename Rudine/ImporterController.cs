@@ -20,7 +20,7 @@ namespace Rudine
     public static class ImporterController
     {
         static readonly string AppCode = RequestPaths.GetPhysicalApplicationPath("App_Code");
-        static readonly DirectoryInfo APP_DOCS = new DirectoryInfo(RequestPaths.GetPhysicalApplicationPath("doc"));
+        static readonly DirectoryInfo APP_DOCS = new DirectoryInfo(FilesystemTemplateController.DirectoryPath);
         private static readonly ConcurrentStack<DirectoryInfo> DOCS = new ConcurrentStack<DirectoryInfo>();
 
         static ImporterController() { Reflection.LoadBinDlls(); }
@@ -33,45 +33,48 @@ namespace Rudine
         {
             DocsFromIDocModels();
 
-            DocsFromFiles(baseDocController);
+            if (APP_DOCS.Exists)
+            {
+                DocsFromFiles(baseDocController);
 
-            // scan directories to get ones that have potential files in them to import
-            DirectoryInfo[] range = Directory
-                .EnumerateDirectories(FilesystemTemplateController.DirectoryPath)
-                .Select(dirpath => new DirectoryInfo(dirpath))
-                .Where(dirpath =>
-                           !DOCS.Contains(dirpath)
-                           &&
-                           dirpath
-                               .EnumerateFiles()
-                               .Any(fileinfo =>
-                                        AllTemplateExtensions(baseDocController)
-                                            .Any(extension =>
-                                                     extension.Equals(fileinfo.Extension.Trim('.'), StringComparison.InvariantCultureIgnoreCase))))
-                .OrderByDescending(dirpath =>
-                                       new[] { dirpath.LastWriteTime.Ticks }
-                                           .Union(
-                                               GetRelativeFilePathsInDirectoryTree(dirpath.FullName, true)
-                                                   .Select(filepath => File.GetLastWriteTimeUtc(filepath).Ticks))
-                                           .Max())
-                .ToArray();
+                // scan directories to get ones that have potential files in them to import
+                DirectoryInfo[] range = Directory
+                    .EnumerateDirectories(FilesystemTemplateController.DirectoryPath)
+                    .Select(dirpath => new DirectoryInfo(dirpath))
+                    .Where(dirpath =>
+                               !DOCS.Contains(dirpath)
+                               &&
+                               dirpath
+                                   .EnumerateFiles()
+                                   .Any(fileinfo =>
+                                            AllTemplateExtensions(baseDocController)
+                                                .Any(extension =>
+                                                         extension.Equals(fileinfo.Extension.Trim('.'), StringComparison.InvariantCultureIgnoreCase))))
+                    .OrderByDescending(dirpath =>
+                                           new[] { dirpath.LastWriteTime.Ticks }
+                                               .Union(
+                                                   GetRelativeFilePathsInDirectoryTree(dirpath.FullName, true)
+                                                       .Select(filepath => File.GetLastWriteTimeUtc(filepath).Ticks))
+                                               .Max())
+                    .ToArray();
 
-            if (range.Length > 0)
-                DOCS.PushRange(range);
+                if (range.Length > 0)
+                    DOCS.PushRange(range);
 
-            // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
-            DirectoryInfo dir;
-            while (DOCS.TryPop(out dir) && ImportContentFolder(baseDocController, dir) != null)
-            { }
+                // starting with the newest directory, synchronously process each & abend when its found that nothing is imported
+                DirectoryInfo dir;
+                while (DOCS.TryPop(out dir) && ImportContentFolder(baseDocController, dir) != null)
+                { }
 
-            // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
-            if (!DOCS.IsEmpty)
-                Tasker.StartNewTask(() =>
-                                    {
-                                        while (DOCS.TryPop(out dir))
-                                            ImportContentFolder(baseDocController, dir);
-                                        return true;
-                                    });
+                // process the remaining directories queued asynchronously (as this is a resource intensive) on the chance that the "GetLastWriteTimeUtc" lied to us
+                if (!DOCS.IsEmpty)
+                    Tasker.StartNewTask(() =>
+                                        {
+                                            while (DOCS.TryPop(out dir))
+                                                ImportContentFolder(baseDocController, dir);
+                                            return true;
+                                        });
+            }
         }
 
         /// <summary>
