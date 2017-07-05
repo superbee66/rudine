@@ -120,21 +120,6 @@ namespace Rudine
             }
         }
 
-        private static T NormalizeDateTimePropertyValues<T>(T o)
-        {
-            // normalize the datetime properties since they are mangled in the XmlSerialization/DataContractSerilaization process(s)
-            foreach (PropertyInfo p in o.GetType()
-                                        .GetProperties())
-                p.SetValue(
-                    o,
-                    (Nullable.GetUnderlyingType(p.PropertyType) ?? p.PropertyType) == typeof(DateTime)
-                        ? ((DateTime)(p.GetValue(o, null) ?? DateTime.MinValue)).ToLocalTime()
-                        : NormalizeDateTimePropertyValues(p.GetValue(o, null)),
-                    null);
-
-            return o;
-        }
-
         private static byte[] ProcessPI(byte[] DocData, string DocSubmittedByEmail, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle)
         {
             DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
