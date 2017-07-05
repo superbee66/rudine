@@ -16,10 +16,11 @@ namespace Rudine.Tests
     [TestFixture]
     public class DocExchangeTests
     {
-        [OneTimeSetUp]
+        [SetUp]
         public void TestFixtureSetup()
         {
-            string[] DirectoriesToDelete = Directory.EnumerateDirectories(RequestPaths.GetPhysicalApplicationPath("")).ToArray();
+            string[] DirectoriesToDelete = Directory.EnumerateDirectories(RequestPaths.GetPhysicalApplicationPath(""))
+                                                    .ToArray();
 
             // remove directories that can be created at runtime
             foreach (string path in DirectoriesToDelete)
@@ -27,7 +28,8 @@ namespace Rudine.Tests
                     try
                     {
                         new DirectoryInfo(path).rmdir();
-                    } catch (Exception)
+                    }
+                    catch (Exception)
                     {
                         Thread.Sleep(i * 100);
                     }
@@ -37,18 +39,19 @@ namespace Rudine.Tests
                     throw new Exception(string.Format("{0} can't be deleted, TestInitialize ResetPersistedItems method can't finished", path));
 
             //ensure everything is cleared from memory based cache
-            foreach (string cacheKey in MemoryCache.Default.Select(kvp => kvp.Key).ToList())
+            foreach (string cacheKey in MemoryCache.Default.Select(kvp => kvp.Key)
+                                                   .ToList())
                 MemoryCache.Default.Remove(cacheKey);
         }
 
         [Test]
         [Sequential]
         public void CreateTemplateTest(
-            [Values(nameof(Resources.BaseLineInfoPath2013), nameof(Resources.BaseLineOpenOffice4))] string docTypeName,
-            [Values("xsn", "pdf")] string fileExtension
+            [DocTypeNameValues] string docTypeName,
+            [FileExtensionValues] string fileExtension
         )
         {
-            byte[] docBytes = (byte[]) Resources.ResourceManager.GetObject(docTypeName);
+            byte[] docBytes = (byte[])Resources.ResourceManager.GetObject(docTypeName);
 
             DocProcessingInstructions pi = new DocProcessingInstructions
             {
@@ -56,21 +59,19 @@ namespace Rudine.Tests
             };
 
             DocRev docRev = DocExchange.Instance.CreateTemplate(
-                new List<DocRevEntry>
-                {
-                    new DocRevEntry
-                    {
-                        Bytes = docBytes,
-                        ModDate = DateTime.Now,
-                        Name = string.Format("{0}.{1}", docTypeName, fileExtension)
-                    }
-                });
+                                           new List<DocRevEntry> {
+                                               new DocRevEntry {
+                                                   Bytes = docBytes,
+                                                   ModDate = DateTime.Now,
+                                                   Name = string.Format("{0}.{1}", docTypeName, fileExtension)
+                                               }
+                                           });
 
             Assert.IsTrue(docRev.DocURN.DocTypeName.Equals(pi.DocTypeName, StringComparison.CurrentCultureIgnoreCase));
             Assert.NotNull(docRev.solutionVersion);
             Assert.IsTrue(docRev.DocChecksum != default(int));
 
-            LightDoc lightDoc = DocExchange.Instance.SubmitBytes(new EmbededInterpreter().WriteByte(docRev), "removeThisDocSubmittedByEmail@ok.com");
+            LightDoc lightDoc = DocExchange.Instance.SubmitDoc(docRev, "removeThisDocSubmittedByEmail@ok.com");
 
             Assert.NotNull(lightDoc);
         }
@@ -78,16 +79,15 @@ namespace Rudine.Tests
         [Test]
         [Sequential]
         public void CreateTest(
-            [Values(nameof(Resources.BaseLineInfoPath2013), nameof(Resources.BaseLineOpenOffice4))] string docTypeName,
-            [Values("xsn", "pdf")] string fileExtension
+            [DocTypeNameValues] string docTypeName,
+            [FileExtensionValues] string fileExtension
         )
         {
             CreateTemplateTest(docTypeName, fileExtension);
 
             string TopDocRev = TemplateController.Instance.TopDocRev(docTypeName);
 
-            Dictionary<string, string> DocKeys = new Dictionary<string, string>
-            {
+            Dictionary<string, string> DocKeys = new Dictionary<string, string> {
                 { "RightNow", DateTime.Now.ToString() },
                 { "CreateTestDocTypeName", docTypeName }
             };
@@ -101,6 +101,26 @@ namespace Rudine.Tests
             BaseDoc createdBaseDoc = DocExchange.Instance.Create(baseDoc);
 
             Assert.AreEqual(baseDoc.DocKeys, createdBaseDoc.DocKeys);
+        }
+
+        [Test]
+        [Sequential]
+        public void DocTypeNamesTest(
+            [DocTypeNameValues] string docTypeName,
+            [FileExtensionValues] string fileExtension)
+        {
+            // there should be no listing until the docrev has presence in the ~/doc/*
+            Assert.IsFalse(DocExchange.Instance.DocTypeNames()
+                                      .Contains(docTypeName));
+
+            CreateTemplateTest(docTypeName, fileExtension);
+
+            DocRev docrev = (DocRev)DocExchange.Instance.Get(DocRev.MyOnlyDocName, new Dictionary<string, string> { { DocRev.KeyPart1, docTypeName } });
+
+            Assert.IsNotNull(docrev);
+
+            Assert.IsTrue(DocExchange.Instance.DocTypeNames()
+                                     .Contains(docTypeName));
         }
     }
 }

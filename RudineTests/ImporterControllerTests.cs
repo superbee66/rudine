@@ -13,7 +13,7 @@ namespace Rudine.Tests
         [Test()]
         public void TryDocRevImportingTest()
         {
-            ImporterController.CreateTemplateItems(DocExchange.Instance);
+            ImporterController.SyncTemplates(DocExchange.Instance);
         }
     }
 }
