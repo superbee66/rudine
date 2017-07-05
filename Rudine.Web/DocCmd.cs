@@ -12,6 +12,7 @@
         Get,
         SubmitBytes,
         SubmitText,
+        SubmitDoc,
         Info,
         Interpreters
     }

@@ -7,8 +7,10 @@ using Rudine.Web.Util;
 
 #endregion
 
-namespace Rudine.Web {
-    public abstract class BaseDocController : IBaseDocController, IBaseDocTemplateBuilder {
+namespace Rudine.Web
+{
+    public abstract class BaseDocController : IBaseDocController, IBaseDocTemplateBuilder
+    {
         public abstract List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null);
         public abstract BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null);
         public abstract DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null);
@@ -26,6 +28,7 @@ namespace Rudine.Web {
         public abstract BaseDoc ReadText(string DocData, string RelayUrl = null);
         public abstract LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null);
         public abstract LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        public abstract LightDoc SubmitDoc(BaseDoc DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
 
         /// <summary>
         /// </summary>

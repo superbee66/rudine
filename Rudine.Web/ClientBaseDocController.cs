@@ -201,6 +201,22 @@ namespace Rudine.Web
         public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
             Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
+        public override LightDoc SubmitDoc(BaseDoc DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)  =>
+            (LightDoc) GetMethodInfo(DocCmd.SubmitDoc)
+                .Invoke(UnderlyingWSClient,
+                    new object[]
+                    {
+                        DocData,
+                        DocSubmittedByEmail,
+                        string.IsNullOrWhiteSpace(RelayUrl)
+                            ? DefaultRelayUrl
+                            : RelayUrl,
+                        DocStatus,
+                        SubmittedDate,
+                        DocKeys,
+                        DocTitle
+                    });
+
         public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
             Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 

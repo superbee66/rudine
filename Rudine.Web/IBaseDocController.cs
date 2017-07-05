@@ -53,6 +53,9 @@ namespace Rudine.Web
         [OperationContract]
         LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
 
+        [OperationContract]
+        LightDoc SubmitDoc(BaseDoc DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+
         /// <summary>
         ///     not represented as an OperationContract as WCF requires there to be only one Stream parameter in the method. If the
         ///     Rudine.Web lib is reference on the client, it will take care of this limitation by immediately translating the
