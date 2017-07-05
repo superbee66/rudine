@@ -19,7 +19,7 @@ namespace Rudine.Util.Zips
             Formatter = new BinaryFormatter { Binder = new BinaryDeserializationBinder() },
             CloneFormatter = new BinaryFormatter(null, new StreamingContext(StreamingContextStates.Clone)) { Binder = new BinaryDeserializationBinder() };
 
-        public static T Clone<T>(this T o)
+        internal static T Clone<T>(this T o)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -29,13 +29,13 @@ namespace Rudine.Util.Zips
             }
         }
 
-        public static T FromBytes<T>(this byte[] b)
+        internal static T FromBytes<T>(this byte[] b)
         {
             using (MemoryStream memoryStream = new MemoryStream(b))
                 return (T)Formatter.Deserialize(memoryStream);
         }
 
-        public static byte[] ToBytes(this object o)
+        internal static byte[] ToBytes(this object o)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
