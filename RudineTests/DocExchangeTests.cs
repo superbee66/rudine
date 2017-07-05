@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rudine;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -121,6 +122,20 @@ namespace Rudine.Tests
 
             Assert.IsTrue(DocExchange.Instance.DocTypeNames()
                                      .Contains(docTypeName));
+        }
+
+        [Test()]
+        [Sequential]
+        public void TemplateSourcesTest()
+        {
+            var TemplateSources = DocExchange.Instance.TemplateSources();
+            Assert.IsTrue(TemplateSources.Count() == 3);
+        }
+
+        [Test()]
+        public void InterpretersTest()
+        {
+            Assert.IsTrue(DocExchange.Instance.Interpreters().Count() == 3);
         }
     }
 }
