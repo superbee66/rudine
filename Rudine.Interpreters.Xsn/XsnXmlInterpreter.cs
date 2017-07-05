@@ -56,8 +56,6 @@ namespace Rudine.Interpreters.Xsn
             DocXmlDefaultValueRegEx = new Regex("(?<=>)(0001-01-01T00:00:00[^<]*)(?=<)", RegexOptions.IgnoreCase),
             XmlEmptyTagWithoutNullableElementsRegEx = new Regex(@"<(([_:A-Za-z][-._:A-Za-z0-9]*))\s*(/>|>\s*</\2>)", RegexOptions.Singleline | RegexOptions.Multiline);
 
-        private static readonly List<Type> XsdIntEgerFixDstBaseDocKnownTypes = new List<Type>();
-
         /// <summary>
         ///     Default value upon class construction is xml processing instructions specific to Microsoft Office InfoPath & an
         ///     additional instruction set named mso-infoPathSolution specific to this application

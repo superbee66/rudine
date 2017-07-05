@@ -99,9 +99,6 @@
     <Compile Include="..\Rudine.Web\IDocLogistics.cs">
       <Link>Web\IDocLogistics.cs</Link>
     </Compile>
-    <Compile Include="..\Rudine.Web\IDocModel.cs">
-      <Link>Web\IDocModel.cs</Link>
-    </Compile>
     <Compile Include="..\Rudine.Web\IDocRev.cs">
       <Link>Web\IDocRev.cs</Link>
     </Compile>
@@ -171,7 +168,6 @@
     <Compile Include="DocKeyEncrypter.cs" />
     <Compile Include="DocProcessingInstructionsExtensions.cs" />
     <Compile Include="ImporterController.cs" />
-    <Compile Include="ImporterLightDoc.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreter.cs" />
     <Compile Include="Interpreters\IDocBaseInterpreter.cs" />
     <Compile Include="Interpreters\IDocByteInterpreter.cs" />

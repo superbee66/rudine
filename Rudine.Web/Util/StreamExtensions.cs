@@ -31,15 +31,6 @@ namespace Rudine.Web.Util
             return s;
         }
 
-        public static bool isBinary(this Stream stream)
-        {
-            int ch;
-            using (StreamReader _StreamReaderream = new StreamReader(stream))
-                if (FileSystem.isBinary(_StreamReaderream))
-                    return true;
-            return false;
-        }
-
         /// <summary>
         ///     stream fork = spork = taco bell table wear. Given a stream with unknown content, we try to detect that content and
         ///     delegate to the appropriate method for processing. A memory stream rewound to position zero will be passed to the

@@ -137,5 +137,11 @@ namespace Rudine.Tests
         {
             Assert.IsTrue(DocExchange.Instance.Interpreters().Count() == 3);
         }
+
+        [Test()]
+        public void AuditTest()
+        {
+            Assert.Fail();
+        }
     }
 }

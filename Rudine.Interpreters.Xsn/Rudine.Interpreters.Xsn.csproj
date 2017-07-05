@@ -60,9 +60,7 @@
     <Compile Include="InfoPathAttachmentEncoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="util\Cabs\ArchiveMemoryStreamContext.cs" />
-    <Compile Include="util\Cabs\CabExtract.cs" />
     <Compile Include="util\Cabs\CabinetInfo.cs" />
-    <Compile Include="util\Cabs\CabInfoExtensions.cs" />
     <Compile Include="XsnXmlInterpreter.cs" />
   </ItemGroup>
   <ItemGroup>
