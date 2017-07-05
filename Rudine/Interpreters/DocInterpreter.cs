@@ -191,7 +191,7 @@ namespace Rudine.Interpreters
         public virtual void ProcessRequest(HttpContext context)
         {
             // ensure the latest content has been processed & imported
-            ImporterController.CreateTemplateItems(DocExchange.Instance);
+            ImporterController.SyncTemplates(DocExchange.Instance);
 
             TemplateFileInfo _TemplateFileInfo = TemplateController.Instance.ParseTemplateFileInfo(context);
 
