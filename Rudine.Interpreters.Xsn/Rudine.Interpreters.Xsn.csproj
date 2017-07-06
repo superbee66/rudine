@@ -48,9 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Rudine.Web\Util\CacheMan.cs">
-      <Link>CacheMan.cs</Link>
-    </Compile>
     <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
       <Link>util\FileSystem.cs</Link>
     </Compile>

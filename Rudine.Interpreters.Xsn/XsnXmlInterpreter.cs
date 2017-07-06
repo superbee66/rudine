@@ -224,12 +224,16 @@ namespace Rudine.Interpreters.Xsn
         private string OpenText(HttpContext context, out string filename)
         {
             filename = TemplateController.GetHttpContextFileName(context);
-            return CacheMan.Cache(() =>
-                                  {
-                                      TemplateFileInfo r;
-                                      using (MemoryStream _MemoryStream = OpenRead(context, out r))
-                                          return _MemoryStream.AsString();
-                                  }, false, "OpenText", context.Request.Url.ToString());
+            //return CacheMan.Cache(() =>
+            //                      {
+            //                          TemplateFileInfo r;
+            //                          using (MemoryStream _MemoryStream = OpenRead(context, out r))
+            //                              return _MemoryStream.AsString();
+            //                      }, false, "OpenText", context.Request.Url.ToString());
+            TemplateFileInfo r;
+            using (MemoryStream _MemoryStream = OpenRead(context, out r))
+                return _MemoryStream.AsString();
+
         }
 
         private static string ParseAttributeValue(string DocData, string attributeName) =>

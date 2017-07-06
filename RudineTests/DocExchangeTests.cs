@@ -1,22 +1,23 @@
-﻿using Rudine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using NUnit.Framework;
-using Rudine.Interpreters.Embeded;
 using Rudine.Template;
 using Rudine.Web;
 using Rudine.Web.Util;
-using RudineTests.Properties;
+using Rudine.Tests.Properties;
 
 namespace Rudine.Tests
 {
     [TestFixture]
     public class DocExchangeTests
     {
+        private static string Extension(string docTypeName) => (string)Resources.ResourceManager.GetObject(docTypeName + "_Extension");
+        private static byte[] Bytes(string docTypeName) => (byte[])Resources.ResourceManager.GetObject(docTypeName);
+
         [SetUp]
         public void TestFixtureSetup()
         {
@@ -45,28 +46,23 @@ namespace Rudine.Tests
                 MemoryCache.Default.Remove(cacheKey);
         }
 
-        [Test]
-        [Sequential]
-        public void CreateTemplateTest(
-            [DocTypeNameValues] string docTypeName,
-            [FileExtensionValues] string fileExtension
-        )
+        public static LightDoc CreateTemplate(string docTypeName)
         {
-            byte[] docBytes = (byte[])Resources.ResourceManager.GetObject(docTypeName);
-
             DocProcessingInstructions pi = new DocProcessingInstructions
             {
                 DocTypeName = docTypeName
             };
 
             DocRev docRev = DocExchange.Instance.CreateTemplate(
-                                           new List<DocRevEntry> {
-                                               new DocRevEntry {
-                                                   Bytes = docBytes,
-                                                   ModDate = DateTime.Now,
-                                                   Name = string.Format("{0}.{1}", docTypeName, fileExtension)
-                                               }
-                                           });
+                new List<DocRevEntry>
+                {
+                    new DocRevEntry
+                    {
+                        Bytes = Bytes(docTypeName),
+                        ModDate = DateTime.Now,
+                        Name = string.Format("{0}.{1}", docTypeName, Extension(docTypeName))
+                    }
+                });
 
             Assert.IsTrue(docRev.DocURN.DocTypeName.Equals(pi.DocTypeName, StringComparison.CurrentCultureIgnoreCase));
             Assert.NotNull(docRev.solutionVersion);
@@ -75,20 +71,15 @@ namespace Rudine.Tests
             LightDoc lightDoc = DocExchange.Instance.SubmitDoc(docRev, "removeThisDocSubmittedByEmail@ok.com");
 
             Assert.NotNull(lightDoc);
+            return lightDoc;
         }
 
-        [Test]
-        [Sequential]
-        public void CreateTest(
-            [DocTypeNameValues] string docTypeName,
-            [FileExtensionValues] string fileExtension
-        )
+        public static BaseDoc Create(string docTypeName)
         {
-            CreateTemplateTest(docTypeName, fileExtension);
+            CreateTemplate(docTypeName);
 
-            string TopDocRev = TemplateController.Instance.TopDocRev(docTypeName);
-
-            Dictionary<string, string> DocKeys = new Dictionary<string, string> {
+            Dictionary<string, string> DocKeys = new Dictionary<string, string>
+            {
                 { "RightNow", DateTime.Now.ToString() },
                 { "CreateTestDocTypeName", docTypeName }
             };
@@ -102,7 +93,21 @@ namespace Rudine.Tests
             BaseDoc createdBaseDoc = DocExchange.Instance.Create(baseDoc);
 
             Assert.AreEqual(baseDoc.DocKeys, createdBaseDoc.DocKeys);
+
+            return createdBaseDoc;
         }
+
+        [Test]
+        [Sequential]
+        public void CreateTemplateTest(
+            [DocTypeNameValues] string docTypeName
+        ) => CreateTemplate(docTypeName);
+
+        [Test]
+        [Sequential]
+        public void CreateTest(
+            [DocTypeNameValues] string docTypeName
+        ) => Create(docTypeName);
 
         [Test]
         [Sequential]
@@ -114,7 +119,7 @@ namespace Rudine.Tests
             Assert.IsFalse(DocExchange.Instance.DocTypeNames()
                                       .Contains(docTypeName));
 
-            CreateTemplateTest(docTypeName, fileExtension);
+            CreateTemplate(docTypeName);
 
             DocRev docrev = (DocRev)DocExchange.Instance.Get(DocRev.MyOnlyDocName, new Dictionary<string, string> { { DocRev.KeyPart1, docTypeName } });
 
@@ -124,24 +129,18 @@ namespace Rudine.Tests
                                      .Contains(docTypeName));
         }
 
-        [Test()]
-        [Sequential]
-        public void TemplateSourcesTest()
-        {
-            var TemplateSources = DocExchange.Instance.TemplateSources();
-            Assert.IsTrue(TemplateSources.Count() == 3);
-        }
-
-        [Test()]
+        [Test]
         public void InterpretersTest()
         {
             Assert.IsTrue(DocExchange.Instance.Interpreters().Count() == 3);
         }
 
-        [Test()]
-        public void AuditTest()
+        [Test]
+        [Sequential]
+        public void TemplateSourcesTest()
         {
-            Assert.Fail();
+            var TemplateSources = DocExchange.Instance.TemplateSources();
+            Assert.IsTrue(TemplateSources.Count() == 3);
         }
     }
 }

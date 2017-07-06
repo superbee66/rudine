@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RudineTests.Properties {
+namespace Rudine.Tests.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace RudineTests.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RudineTests.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Rudine.Tests.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -71,12 +71,30 @@ namespace RudineTests.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to xsn.
+        /// </summary>
+        internal static string BaseLineInfoPath2013_Extension {
+            get {
+                return ResourceManager.GetString("BaseLineInfoPath2013_Extension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] BaseLineOpenOffice4 {
             get {
                 object obj = ResourceManager.GetObject("BaseLineOpenOffice4", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to pdf.
+        /// </summary>
+        internal static string BaseLineOpenOffice4_Extension {
+            get {
+                return ResourceManager.GetString("BaseLineOpenOffice4_Extension", resourceCulture);
             }
         }
     }

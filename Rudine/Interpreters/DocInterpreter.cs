@@ -19,7 +19,7 @@ namespace Rudine.Interpreters
     ///     the master head of an abstract factory pattern applied to bridge our CLR objects & values to native document
     ///     formats supported
     /// </summary>
-    internal class DocInterpreter : IDocTextInterpreter, IDocByteInterpreter
+    internal sealed class DocInterpreter : IDocTextInterpreter, IDocByteInterpreter
     {
         internal static readonly DocBaseInterpreter[] ContentInterpreterInstances =
             Reflection
@@ -188,7 +188,7 @@ namespace Rudine.Interpreters
             InstanceLocatorByName<DocBaseInterpreter>(DocTypeName, DocRev)
                 .Processable(DocTypeName, DocRev);
 
-        public virtual void ProcessRequest(HttpContext context)
+        public void ProcessRequest(HttpContext context)
         {
             // ensure the latest content has been processed & imported
             ImporterController.SyncTemplates(DocExchange.Instance);

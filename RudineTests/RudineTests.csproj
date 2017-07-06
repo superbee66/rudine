@@ -6,8 +6,8 @@
     <ProjectGuid>{229376AE-F476-43BF-8A6F-F4EE57F87AC7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RudineTests</RootNamespace>
-    <AssemblyName>RudineTests</AssemblyName>
+    <RootNamespace>Rudine.Tests</RootNamespace>
+    <AssemblyName>Rudine.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -54,16 +54,15 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="..\Rudine.Web\Util\CacheMan.cs">
-      <Link>CacheMan.cs</Link>
-    </Compile>
     <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
       <Link>FileSystem.cs</Link>
     </Compile>
     <Compile Include="DocDataResourceByteValues.cs" />
     <Compile Include="DocExchangeTests.cs" />
+    <Compile Include="DocPropertyDataTypeMapping.cs" />
     <Compile Include="ImporterControllerTests.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreterTests.cs" />
+    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

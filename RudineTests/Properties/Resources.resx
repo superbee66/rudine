@@ -121,7 +121,13 @@
   <data name="BaseLineInfoPath2013" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\doc\baselineinfopath2013.xsn;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="BaseLineInfoPath2013_Extension" xml:space="preserve">
+    <value>xsn</value>
+  </data>
   <data name="BaseLineOpenOffice4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\doc\baselineopenoffice4.pdf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="BaseLineOpenOffice4_Extension" xml:space="preserve">
+    <value>pdf</value>
   </data>
 </root>

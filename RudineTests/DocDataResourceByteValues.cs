@@ -1,4 +1,6 @@
-﻿using RudineTests.Properties;
+﻿using System;
+using Rudine.Tests.Properties;
+using Rudine.Tests.Properties;
 
 namespace Rudine.Tests
 {
@@ -10,6 +12,11 @@ namespace Rudine.Tests
     class FileExtensionValues : NUnit.Framework.ValuesAttribute
     {
         public FileExtensionValues() : base("xsn", "pdf") { }
+    }
+    
+    class DocFieldDataTypes: NUnit.Framework.ValueSourceAttribute {
+        public DocFieldDataTypes(string sourceName) : base(sourceName) { }
+        public DocFieldDataTypes(Type sourceType, string sourceName) : base(sourceType, sourceName) { }
     }
 
 }
