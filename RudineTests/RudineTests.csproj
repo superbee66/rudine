@@ -57,7 +57,19 @@
   </Choose>
   <ItemGroup>
     <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
-      <Link>FileSystem.cs</Link>
+      <Link>help\FileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\Util\TypeExtensions.cs">
+      <Link>TypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine\RuntimeTypeNamer.cs">
+      <Link>help\RuntimeTypeNamer.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine\Util\Reflection.cs">
+      <Link>help\Reflection.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine\Util\Zips\RuntimeBinaryFormatter.cs">
+      <Link>help\RuntimeBinaryFormatter.cs</Link>
     </Compile>
     <Compile Include="DocDataResourceByteValues.cs" />
     <Compile Include="DocExchangeTests.cs" />

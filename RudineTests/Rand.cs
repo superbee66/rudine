@@ -161,6 +161,7 @@ namespace Rudine.Tests
                     if (!srcType.IsArray)
                         if (!typeof(byte[]).Equals(srcType))
                             if (!typeof(IDictionary).IsAssignableFrom(srcType))
+
                                 if (srcType == typeof(string))
                                     src = (T)(object)string.Format("{0} string property placeholder", StringTransform.Wordify(srcType.Name));
                                 else if (srcType.IsEnum)
@@ -175,18 +176,19 @@ namespace Rudine.Tests
                                     Type enumeratedType = srcType.GetEnumeratedType();
                                     enumeratedType = Nullable.GetUnderlyingType(enumeratedType) ?? enumeratedType;
 
-                                    while (i-- != 0)
-                                        iList.Add(obj_Internal(
-                                            Activator.CreateInstance(enumeratedType),
-                                            new[] { seed, srcType },
-                                            min,
-                                            max,
-                                            stopTypes));
+                                    if (!enumeratedType.IsAbstract)//TODO:initialize types that have no parameterless contructors
+                                        while (i-- != 0)
+                                            iList.Add(obj_Internal(
+                                                Activator.CreateInstance(enumeratedType),
+                                                new[] { seed, srcType },
+                                                min,
+                                                max,
+                                                stopTypes));
                                     src = (T)iList;
                                 }
                                 else
                                 {
-                                    MethodInfo methodInfo = typeof(Rand).GetMethods(BindingFlags.DeclaredOnly).OrderBy(m => int32(m)).FirstOrDefault(m => m.ReturnType == srcType && m.Name != "obj" && m.Name != "obj_Internal");
+                                    MethodInfo methodInfo = typeof(Rand).GetMethods().OrderBy(m => int32(m)).FirstOrDefault(m => m.ReturnType == srcType && m.Name != "Equals" && m.Name != "obj" && m.Name != "obj_Internal");
 
                                     if (methodInfo != null)
                                         src = (T)methodInfo.Invoke(this, methodInfo.GetParameters().Select(p => p.Name == "seed" ? new[] { seed, p.Name } : Type.Missing).ToArray());
