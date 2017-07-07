@@ -18,7 +18,7 @@ namespace Rudine.Interpreters.Pdf
     /// </summary>
     public class PdfInterpreter : DocByteInterpreter
     {
-        private const string TEMPLATE_PDF = "template.pdf";
+
 
         public override ContentInfo ContentInfo => new ContentInfo { ContentFileExtension = "pdf", ContentType = "application/pdf" };
 
@@ -41,7 +41,9 @@ namespace Rudine.Interpreters.Pdf
                 schemaFields = new List<CompositeProperty>();
 
             if (schemaFields.Count == 0)
-                foreach (var docData in docFiles.Where(docFile => docFile.Name.EndsWith(ContentInfo.ContentFileExtension, StringComparison.InvariantCultureIgnoreCase)).OrderByDescending(docFile => docFile.ModDate))
+                foreach (DocRevEntry docData in docFiles
+                            .Where(docFile => docFile.Name.EndsWith(ContentInfo.ContentFileExtension, StringComparison.InvariantCultureIgnoreCase))
+                            .OrderByDescending(docFile => docFile.ModDate))
                     if (schemaFields.Count == 0)
                         using (PdfDocument pdfDocument = OpenRead(docData.Bytes))
                         {
@@ -108,8 +110,13 @@ namespace Rudine.Interpreters.Pdf
 
         private static PdfDocument OpenRead(byte[] docData, PdfDocumentOpenMode openmode = PdfDocumentOpenMode.ReadOnly) => PdfReader.Open(new MemoryStream(docData), openmode);
 
-        private static BaseDoc Create(string DocTypeName, string DocRev) =>
-            Runtime.ActivateBaseDoc(DocTypeName, DocRev, DocExchange.Instance);
+        private static BaseDoc Create(string DocTypeName, string DocRev)
+        {
+            BaseDoc _BaseDoc = Runtime.ActivateBaseDoc(DocTypeName, DocRev, DocExchange.Instance);
+            _BaseDoc.DocTypeName = DocTypeName;
+            _BaseDoc.solutionVersion = DocRev;
+            return _BaseDoc;
+        }
 
         /// <summary>
         ///     enumerate each PdfAcroField, convert it's value to clr type, use reflection to set that value to the clr object
@@ -178,7 +185,7 @@ namespace Rudine.Interpreters.Pdf
 
         public override byte[] WriteByte<T>(T source, bool includeProcessingInformation = true)
         {
-            using (MemoryStream memoryStreamTemplate = TemplateController.Instance.OpenRead(source.DocTypeName, source.solutionVersion, TEMPLATE_PDF))
+            using (MemoryStream memoryStreamTemplate = TemplateController.Instance.OpenRead(source.DocTypeName, source.solutionVersion, AutoFileName(source.DocTypeName, ContentInfo.ContentFileExtension)))
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 memoryStreamTemplate.CopyTo(memoryStream);
