@@ -6,9 +6,9 @@ using System.Runtime.Caching;
 using System.Threading;
 using NUnit.Framework;
 using Rudine.Template;
+using Rudine.Tests.Properties;
 using Rudine.Web;
 using Rudine.Web.Util;
-using Rudine.Tests.Properties;
 
 namespace Rudine.Tests
 {
@@ -68,11 +68,14 @@ namespace Rudine.Tests
             Assert.NotNull(docRev.solutionVersion);
             Assert.IsTrue(docRev.DocChecksum != default(int));
 
-            LightDoc lightDoc = DocExchange.Instance.SubmitDoc(docRev, "removeThisDocSubmittedByEmail@ok.com");
+
+            LightDoc lightDoc = DocExchange.Instance.SubmitDoc(docRev, docSubmittedByEmail);
 
             Assert.NotNull(lightDoc);
             return lightDoc;
         }
+
+        const string docSubmittedByEmail = "removeThisDocSubmittedByEmail@ok.com";
 
         public static BaseDoc Create(string docTypeName)
         {
@@ -111,9 +114,7 @@ namespace Rudine.Tests
 
         [Test]
         [Sequential]
-        public void DocTypeNamesTest(
-            [DocTypeNameValues] string docTypeName,
-            [FileExtensionValues] string fileExtension)
+        public void DocTypeNamesTest([DocTypeNameValues] string docTypeName)
         {
             // there should be no listing until the docrev has presence in the ~/doc/*
             Assert.IsFalse(DocExchange.Instance.DocTypeNames()
@@ -139,8 +140,14 @@ namespace Rudine.Tests
         [Sequential]
         public void TemplateSourcesTest()
         {
-            var TemplateSources = DocExchange.Instance.TemplateSources();
-            Assert.IsTrue(TemplateSources.Count() == 3);
+            Assert.IsTrue(DocExchange.Instance.TemplateSources().Count() == 3);
+        }
+
+        [Test, Combinatorial]
+        public void SubmitDocTest([DocTypeNameValues] string docTypeName, [ValuesAttribute(false, true)] bool DocStatus)
+        {
+            DocExchange.Instance.SubmitDoc(Create(docTypeName), docSubmittedByEmail,null,DocStatus);
+            Assert.Fail();
         }
     }
 }

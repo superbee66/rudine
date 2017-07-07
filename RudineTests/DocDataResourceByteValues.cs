@@ -1,6 +1,5 @@
 ﻿using System;
 using Rudine.Tests.Properties;
-using Rudine.Tests.Properties;
 
 namespace Rudine.Tests
 {
