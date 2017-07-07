@@ -3,9 +3,9 @@ using Rudine.Tests.Properties;
 
 namespace Rudine.Tests
 {
-    class DocTypeNameValues : NUnit.Framework.ValuesAttribute
+    class DocDataSampleValues : NUnit.Framework.ValuesAttribute
     {
-        public DocTypeNameValues() : base(nameof(Resources.BaseLineInfoPath2013), nameof(Resources.BaseLineOpenOffice4)) { }
+        public DocDataSampleValues() : base(nameof(Resources.BaseLineInfoPath2013), nameof(Resources.BaseLineOpenOffice4)) { }
     }
 
     class FileExtensionValues : NUnit.Framework.ValuesAttribute

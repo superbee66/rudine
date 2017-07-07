@@ -43,7 +43,7 @@ namespace Rudine.Tests
 
         [Test]
         [Combinatorial]
-        public void InputFieldTypeMappings([DocTypeNameValues] string docTypeName, [ValueSource(nameof(PropertyTypes))] Type propertyType)
+        public void InputFieldTypeMappings([DocDataSampleValues] string docTypeName, [ValueSource(nameof(PropertyTypes))] Type propertyType)
         {
             BaseDoc baseDoc = DocExchangeTests.Create(docTypeName);
 
