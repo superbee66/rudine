@@ -59,7 +59,7 @@
     </Compile>
     <Compile Include="DocDataResourceByteValues.cs" />
     <Compile Include="DocExchangeTests.cs" />
-    <Compile Include="DocPropertyDataTypeMapping.cs" />
+    <Compile Include="InputTypeMapping.cs" />
     <Compile Include="ImporterControllerTests.cs" />
     <Compile Include="Interpreters\Embeded\EmbededInterpreterTests.cs" />
     <Compile Include="ObjectExtensions.cs" />

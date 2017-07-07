@@ -17,7 +17,9 @@ namespace Rudine.Tests
                         Nullable.GetUnderlyingType(t) != null ? nameof(Nullable) : string.Empty,
                         t.IsArray ? nameof(Array) : string.Empty
                 }.Where(s => !string.IsNullOrWhiteSpace(s)))
-            .Trim('[', ']', '_');
+                  .Replace("]",string.Empty)
+                  .Replace("[",string.Empty)
+                  .Trim(' ', '_');
 
         static IEnumerable<Type> PropertyTypes()
         {
