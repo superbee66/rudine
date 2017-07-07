@@ -17,9 +17,7 @@ namespace Rudine.Tests
                         Nullable.GetUnderlyingType(t) != null ? nameof(Nullable) : string.Empty,
                         t.IsArray ? nameof(Array) : string.Empty
                 }.Where(s => !string.IsNullOrWhiteSpace(s)))
-                  .Replace("]",string.Empty)
-                  .Replace("[",string.Empty)
-                  .Trim(' ', '_');
+            .Trim('[', ']', '_');
 
         static IEnumerable<Type> PropertyTypes()
         {
@@ -43,7 +41,7 @@ namespace Rudine.Tests
 
         [Test]
         [Combinatorial]
-        public void InputFieldTypeMappings([DocDataSampleValues] string docTypeName, [ValueSource(nameof(PropertyTypes))] Type propertyType)
+        public void InputFieldTypeMappings([DocTypeNameValues] string docTypeName, [ValueSource(nameof(PropertyTypes))] Type propertyType)
         {
             BaseDoc baseDoc = DocExchangeTests.Create(docTypeName);
 
