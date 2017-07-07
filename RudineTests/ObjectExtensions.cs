@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace RudineTests
+namespace Rudine.Tests
 {
     public static class ObjectExtensions
     {
