@@ -1,4 +1,5 @@
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace Rudine.Web.Util
     /// </summary>
     public class CompositeType : Type
     {
+        private static readonly CodeDomProvider codeDomProvider = CodeDomProvider.CreateProvider("C#");
+
         private static readonly Dictionary<int, Type> classes = new Dictionary<int, Type>();
 
         private static readonly object GenerateLock = new object();
@@ -24,13 +27,17 @@ namespace Rudine.Web.Util
         public CompositeType(string targetNamespace, string targetName, Type[] sourceTypes, CompositeProperty[] sourceProperties, Type targetBaseType = null, string[] sourcePropertyNameExclutions = null, bool prettyNames = true)
         {
             Namespace = targetNamespace;
+
+            if (!codeDomProvider.IsValidIdentifier(targetName))
+                throw new ArgumentNullException(nameof(targetName), "invalid C# identifier");
+            
             Name = targetName;
             FullName = string.Join(".", targetNamespace, targetName);
             MergedTypeSignature = new CompositeSignature(sourceTypes, sourcePropertyNameExclutions, targetBaseType, prettyNames, sourceProperties);
         }
 
         private CompositeSignature MergedTypeSignature { get; }
-        public override bool Equals(object obj) { return obj is CompositeType ? Equals((CompositeType) obj) : false; }
+        public override bool Equals(object obj) { return obj is CompositeType ? Equals((CompositeType)obj) : false; }
         public bool Equals(CompositeType other) { return GetHashCode().Equals(other.GetHashCode()); }
 
         private void GenerateEquals(TypeBuilder tb, FieldInfo[] fields)
@@ -166,10 +173,8 @@ namespace Rudine.Web.Util
         protected override bool IsCOMObjectImpl() { return UnderlyingSystemType.IsCOMObject; }
         public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters) { return UnderlyingSystemType.InvokeMember(name, invokeAttr, binder, target, args, modifiers, culture, namedParameters); }
 
-        public override Type UnderlyingSystemType
-        {
-            get
-            {
+        public override Type UnderlyingSystemType {
+            get {
                 try
                 {
                     if (!classes.ContainsKey(GetHashCode()))
@@ -185,7 +190,8 @@ namespace Rudine.Web.Util
                                 classes[GetHashCode()] = _TypeBuilder.CreateType();
                     }
                     return classes[GetHashCode()];
-                } catch (Exception)
+                }
+                catch (Exception)
                 {
                     throw;
                 }
@@ -195,31 +201,26 @@ namespace Rudine.Web.Util
         protected override ConstructorInfo GetConstructorImpl(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers) { return UnderlyingSystemType.GetConstructor(bindingAttr, binder, callConvention, types, modifiers); }
         public override string Name { get; }
 
-        public override Guid GUID
-        {
+        public override Guid GUID {
             get { return UnderlyingSystemType.GUID; }
         }
 
-        public override Module Module
-        {
+        public override Module Module {
             get { return MergeTypeModuleBuilder; }
         }
 
-        public override Assembly Assembly
-        {
+        public override Assembly Assembly {
             get { return MergeTypeModuleBuilder.Assembly; }
         }
 
         public override string FullName { get; }
         public override string Namespace { get; }
 
-        public override string AssemblyQualifiedName
-        {
+        public override string AssemblyQualifiedName {
             get { return UnderlyingSystemType.AssemblyQualifiedName; }
         }
 
-        public override Type BaseType
-        {
+        public override Type BaseType {
             get { return MergedTypeSignature._BaseType; }
         }
 
