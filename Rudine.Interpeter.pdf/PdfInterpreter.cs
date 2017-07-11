@@ -177,16 +177,22 @@ namespace Rudine.Interpreters.Pdf
         private static DocProcessingInstructions ReadDocPI(PdfDocument pdfDocument)
         {
             DocProcessingInstructions pi = new DocProcessingInstructions();
-            bool b = false;
             if (pdfDocument != null)
             {
-                pi.DocTitle = pdfDocument.Info.Title;
-                pi.DocTypeName = GetSetDocPIProperty(pdfDocument, nameof(pi.DocTypeName));
-                pi.solutionVersion = GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion));
+                int docChecksum = 0;
+                bool docStatus = false;
 
-                if (bool.TryParse(GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion)), out b))
-                    pi.DocStatus = b;
-
+                pi = new DocProcessingInstructions
+                {
+                    DocChecksum = int.TryParse(GetSetDocPIProperty(pdfDocument, nameof(pi.DocChecksum)), out docChecksum) ? docChecksum : 0,
+                    DocSrc = GetSetDocPIProperty(pdfDocument, nameof(pi.DocSrc)),
+                    DocStatus = bool.TryParse(GetSetDocPIProperty(pdfDocument, nameof(pi.DocStatus), pi.DocStatus), out docStatus) ? new bool?(docStatus) : null,
+                    DocTitle = pdfDocument.Info.Title,
+                    DocTypeName = GetSetDocPIProperty(pdfDocument, nameof(pi.DocTypeName)),
+                    href = GetSetDocPIProperty(pdfDocument, nameof(pi.href)),
+                    name = GetSetDocPIProperty(pdfDocument, nameof(pi.name)),
+                    solutionVersion = GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion))
+                };
 
                 // PDF never seen/served by this app will not have a DocId defined to decrypt
                 string docId = GetSetDocPIProperty(pdfDocument, Parm.DocId);
@@ -263,10 +269,11 @@ namespace Rudine.Interpreters.Pdf
             pdfDocument.Info.Title = pi.DocTitle;
 
             GetSetDocPIProperty(pdfDocument, Parm.DocId, pi.GetDocId());
-            GetSetDocPIProperty(pdfDocument, nameof(pi.DocKeys), pi.DocKeys);
             GetSetDocPIProperty(pdfDocument, nameof(pi.DocStatus), pi.DocStatus);
             GetSetDocPIProperty(pdfDocument, nameof(pi.DocTypeName), pi.DocTypeName);
             GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion), pi.solutionVersion);
+            GetSetDocPIProperty(pdfDocument, nameof(pi.DocChecksum), pi.DocChecksum);
+
         }
     }
 }
