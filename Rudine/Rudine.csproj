@@ -66,6 +66,9 @@
     <Compile Include="..\Rudine.Web\BaseDocController.cs">
       <Link>Web\BaseDocController.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\ContentInfo.cs">
+      <Link>Web\ContentInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\DocProcessingInstructions.cs">
       <Link>Web\DocProcessingInstructions.cs</Link>
     </Compile>
@@ -108,11 +111,11 @@
     <Compile Include="..\Rudine.Web\IDocURN.cs">
       <Link>Web\IDocURN.cs</Link>
     </Compile>
-    <Compile Include="..\Rudine.Web\InterpreterInfo.cs">
-      <Link>Web\InterpreterInfo.cs</Link>
-    </Compile>
     <Compile Include="..\Rudine.Web\LightDoc.cs">
       <Link>Web\LightDoc.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\MagicNumbers.cs">
+      <Link>Web\MagicNumbers.cs</Link>
     </Compile>
     <Compile Include="..\Rudine.Web\Parm.cs">
       <Link>Web\Parm.cs</Link>

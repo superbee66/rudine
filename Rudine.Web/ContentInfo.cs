@@ -6,17 +6,22 @@ namespace Rudine.Web
     public class ContentInfo
     {
         /// <summary>
-        ///     File extensions that should be used when serving the rendered document to the client.
-        ///     PERMANENT!!! This should not change at anytime though out the entire software development life cycle
+        ///     File extensions that should be used when serving the rendered document to the client.   
         /// </summary>
         [DataMember]
         public string ContentFileExtension { get; set; }
 
         /// <summary>
-        ///     PERMANENT!!! This should not change at anytime though out the entire software development life cycle
+        ///     
         /// </summary>
         /// <returns></returns>
         [DataMember]
         public string ContentType { get; set; }
+
+        /// <summary>
+        /// see https://en.wikipedia.org/wiki/List_of_file_signatures
+        /// </summary>
+        [DataMember]
+        public MagicNumbers ContentSignature { get; set; }
     }
 }

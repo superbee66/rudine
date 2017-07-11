@@ -92,8 +92,9 @@
     <Compile Include="IDocIdentifiers.cs" />
     <Compile Include="IDocModel.cs" />
     <Compile Include="IDocURN.cs" />
-    <Compile Include="InterpreterInfo.cs" />
+    <Compile Include="ContentInfo.cs" />
     <Compile Include="LightDoc.cs" />
+    <Compile Include="MagicNumbers.cs" />
     <Compile Include="Parm.cs" />
     <Compile Include="SignatureVerifier.cs" />
     <Compile Include="Util\CompositeProperty.cs" />

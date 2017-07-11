@@ -16,8 +16,8 @@ namespace Rudine.Tests
     [TestFixture]
     public class DocExchangeTests
     {
-        private static string Extension(string docTypeName) => (string) Resources.ResourceManager.GetObject(docTypeName + "_Extension");
-        private static byte[] Bytes(string docTypeName) => (byte[]) Resources.ResourceManager.GetObject(docTypeName);
+        private static string Extension(string docTypeName) => (string)Resources.ResourceManager.GetObject(docTypeName + "_Extension");
+        private static byte[] Bytes(string docTypeName) => (byte[])Resources.ResourceManager.GetObject(docTypeName);
 
         [SetUp]
         public void TestFixtureSetup()
@@ -31,7 +31,8 @@ namespace Rudine.Tests
                     try
                     {
                         new DirectoryInfo(path).rmdir();
-                    } catch (Exception)
+                    }
+                    catch (Exception)
                     {
                         Thread.Sleep(i * 100);
                     }
@@ -121,7 +122,7 @@ namespace Rudine.Tests
 
             CreateTemplate(docTypeName);
 
-            DocRev docrev = (DocRev) DocExchange.Instance.Get(DocRev.MyOnlyDocName, new Dictionary<string, string> { { DocRev.KeyPart1, docTypeName } });
+            DocRev docrev = (DocRev)DocExchange.Instance.Get(DocRev.MyOnlyDocName, new Dictionary<string, string> { { DocRev.KeyPart1, docTypeName } });
 
             Assert.IsNotNull(docrev);
 
@@ -156,6 +157,11 @@ namespace Rudine.Tests
                 .Overlay(nameof(basedoc.DocTypeName), basedoc.DocTypeName)
                 .Overlay(nameof(basedoc.solutionVersion), basedoc.solutionVersion)
                 .Overlay(nameof(basedoc.name), basedoc.name);
+
+            randdoc.DocKeys = basedoc.DocKeys;
+            randdoc.SetDocId(basedoc.GetDocId());
+
+
             DocExchange.Instance.SubmitDoc(randdoc, docSubmittedByEmail, null, DocStatus);
         }
     }
