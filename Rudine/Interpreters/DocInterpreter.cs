@@ -335,8 +335,8 @@ namespace Rudine.Interpreters
 
             if (_DocBaseInterpreter is DocByteInterpreter)
             {
-                byte[] Docx = ((DocByteInterpreter)_DocBaseInterpreter).WriteByte(source, includeProcessingInformation);
-                _MemoryStream.Write(Docx, 0, Docx.Length);
+                byte[] DocBytes = ((DocByteInterpreter)_DocBaseInterpreter).WriteByte(source, includeProcessingInformation);
+                _MemoryStream.Write(DocBytes, 0, DocBytes.Length);
                 _MemoryStream.Position = 0;
                 return _MemoryStream;
             }
