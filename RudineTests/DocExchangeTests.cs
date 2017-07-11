@@ -16,9 +16,6 @@ namespace Rudine.Tests
     [TestFixture]
     public class DocExchangeTests
     {
-        private static string Extension(string docTypeName) => (string)Resources.ResourceManager.GetObject(docTypeName + "_Extension");
-        private static byte[] Bytes(string docTypeName) => (byte[])Resources.ResourceManager.GetObject(docTypeName);
-
         [SetUp]
         public void TestFixtureSetup()
         {
@@ -46,6 +43,9 @@ namespace Rudine.Tests
                                                    .ToList())
                 MemoryCache.Default.Remove(cacheKey);
         }
+
+        private static string Extension(string docTypeName) => (string)Resources.ResourceManager.GetObject(docTypeName + "_Extension");
+        private static byte[] Bytes(string docTypeName) => (byte[])Resources.ResourceManager.GetObject(docTypeName);
 
         public static LightDoc CreateTemplate(string docTypeName)
         {
@@ -100,6 +100,38 @@ namespace Rudine.Tests
             return createdBaseDoc;
         }
 
+        public static BaseDoc CreateRandomBaseDoc(string docTypeName, bool DocStatus)
+        {
+            BaseDoc basedoc = Create(docTypeName);
+
+            BaseDoc randdoc = new Rand().obj(basedoc.Clone());
+
+            randdoc.DocChecksum = basedoc.DocChecksum;
+            randdoc.DocKeys = basedoc.DocKeys;
+            randdoc.DocStatus = DocStatus;
+            randdoc.DocTitle = basedoc.DocTitle;
+            randdoc.DocTypeName = basedoc.DocTypeName;
+            randdoc.solutionVersion = basedoc.solutionVersion;
+            randdoc.name = basedoc.name;
+
+            randdoc.SetDocId(basedoc.GetDocId());
+            return randdoc;
+        }
+
+        [Test]
+        public void AuditTest([DocDataSampleValues] string docTypeName)
+        {
+            BaseDoc randDoc = CreateRandomBaseDoc(docTypeName, false);
+
+            randDoc.DocStatus = false;
+            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail);
+            Assert.AreEqual(DocExchange.Instance.Audit(randDoc.DocTypeName, randDoc.GetDocId()).Count, 1);
+
+            randDoc.DocStatus = true;
+            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail);
+            Assert.AreEqual(DocExchange.Instance.Audit(randDoc.DocTypeName, randDoc.GetDocId()).Count, 2);
+        }
+
         [Test]
         [Sequential]
         public void CreateTemplateTest(
@@ -136,33 +168,36 @@ namespace Rudine.Tests
             Assert.IsTrue(DocExchange.Instance.Interpreters().Count() == 3);
         }
 
+        [Test, Combinatorial]
+        public void SubmitDocParameterizedTest([DocDataSampleValues] string docTypeName, [Values(false, true)] bool DocStatus)
+        {
+            BaseDoc randDoc = CreateRandomBaseDoc(docTypeName, false);
+
+            randDoc.DocStatus = false;
+            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail, null, randDoc.DocStatus);
+
+            randDoc.DocStatus = true;
+            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail, null, randDoc.DocStatus);
+        }
+
+        [Test, Combinatorial]
+        public void SubmitDocTestNonParameterized([DocDataSampleValues] string docTypeName, [Values(false, true)] bool DocStatus)
+        {
+            BaseDoc randDoc = CreateRandomBaseDoc(docTypeName, false);
+
+            randDoc.DocStatus = false;
+            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail);
+
+            randDoc.DocStatus = true;
+            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail);
+
+        }
+
         [Test]
         [Sequential]
         public void TemplateSourcesTest()
         {
             Assert.IsTrue(DocExchange.Instance.TemplateSources().Count() == 3);
-        }
-
-        [Test, Combinatorial]
-        public void SubmitDocTest([DocDataSampleValues] string docTypeName, [Values(false, true)] bool DocStatus)
-        {
-            BaseDoc basedoc = Create(docTypeName);
-
-            BaseDoc randdoc = new Rand()
-                .obj(basedoc.Clone())
-                .Overlay(nameof(basedoc.DocChecksum), basedoc.DocChecksum)
-                .Overlay(nameof(basedoc.DocKeys), basedoc.DocKeys)
-                .Overlay(nameof(basedoc.DocStatus), DocStatus)
-                .Overlay(nameof(basedoc.DocTitle), basedoc.DocTitle)
-                .Overlay(nameof(basedoc.DocTypeName), basedoc.DocTypeName)
-                .Overlay(nameof(basedoc.solutionVersion), basedoc.solutionVersion)
-                .Overlay(nameof(basedoc.name), basedoc.name);
-
-            randdoc.DocKeys = basedoc.DocKeys;
-            randdoc.SetDocId(basedoc.GetDocId());
-
-
-            DocExchange.Instance.SubmitDoc(randdoc, docSubmittedByEmail, null, DocStatus);
         }
     }
 }
