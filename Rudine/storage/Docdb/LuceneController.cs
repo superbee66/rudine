@@ -334,7 +334,6 @@ namespace Rudine.Storage.Docdb
             BaseDoc _BaseDoc = DocInterpreter.Instance.Read(DocData, true);
             DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
 
-            string DocSrc;
             Dictionary<LightDoc, object> _DocSubmissions = new Dictionary<LightDoc, object>();
 
             Document _Document = GetDoc(_BaseDoc.DocTypeName, _BaseDoc.GetDocId());
@@ -379,7 +378,6 @@ namespace Rudine.Storage.Docdb
             BaseDoc _BaseDoc = DocInterpreter.Instance.Read(DocData, true);
             DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
 
-            string DocSrc;
             Dictionary<LightDoc, object> _DocSubmissions = new Dictionary<LightDoc, object>();
 
             Document _Document = GetDoc(_BaseDoc.DocTypeName, _BaseDoc.GetDocId());
