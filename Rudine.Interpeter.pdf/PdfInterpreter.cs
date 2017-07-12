@@ -101,8 +101,9 @@ namespace Rudine.Interpreters.Pdf
             if (!string.IsNullOrWhiteSpace(propertyValueAsString))
                 pdfDocument.Info.Elements.SetString("/" + propertyName, propertyValueAsString);
 
+            //TODO:Research if beta version of PDFSharp is suppose to be wrapping it's property values with ()
             return pdfDocument.Info.Elements.ContainsKey("/" + propertyName)
-                       ? string.Format("{0}", pdfDocument.Info.Elements["/" + propertyName])
+                       ? string.Format("{0}", pdfDocument.Info.Elements["/" + propertyName]).Trim('(', ')')
                        : null;
         }
 
@@ -157,7 +158,22 @@ namespace Rudine.Interpreters.Pdf
                         string value = string.Format("{0}", field.Value);
 
                         PropertyInfo propertyInfo = baseDocType.GetProperty(compositeProperty.Name, compositeProperty.PropertyType);
-                        propertyInfo.SetValue(baseDoc, Convert.ChangeType(value, propertyInfo.PropertyType), null);
+                        if ((Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType).Equals(typeof(Boolean)))
+                        {
+                            //TODO:figure out a more generic way of dealing with values that must be parsed that ChangeType pukes on
+                            bool b;
+                            if (bool.TryParse(
+                                    value.ToLower()
+                                         .Replace("yes", bool.TrueString)
+                                         .Replace("no", bool.FalseString)
+                                         .Replace("1", bool.TrueString)
+                                         .Replace("0", bool.FalseString)
+                                    , out b))
+                                propertyInfo.SetValue(baseDoc, b, null);
+                        }
+                        else
+                            propertyInfo.SetValue(baseDoc, Convert.ChangeType(value, propertyInfo.PropertyType), null);
+
                     }
 
                     basedoc = SetPI(baseDoc, docProcessingInstructions);
