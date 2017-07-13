@@ -26,7 +26,6 @@ namespace Rudine.Web
                 streamAsValue => ReadText(streamAsValue, RelayUrl));
 
         public abstract BaseDoc ReadText(string DocData, string RelayUrl = null);
-        public abstract LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null);
         public abstract LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
         public abstract LightDoc SubmitDoc(BaseDoc DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
 

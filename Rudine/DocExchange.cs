@@ -152,13 +152,6 @@ namespace Rudine
             return Create(_BaseDoc, RelayUrl, false);
         }
 
-        public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null)
-        {
-            throw new NotImplementedException();
-            //LightDoc _LightDoc = LuceneController.Status(DocTypeName, DocId, DocStatus, DocSubmittedByEmail, RelayUrl);
-            //return _LightDoc;
-        }
-
         public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
         {
             // validate the content against it's XSD if it's being "approved" as good captured information for the organization
@@ -204,7 +197,5 @@ namespace Rudine
 
         public override List<ContentInfo> TemplateSources() =>
             DocInterpreter.Instance.TemplateSources();
-
-
     }
 }
