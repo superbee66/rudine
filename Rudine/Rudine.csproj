@@ -196,7 +196,6 @@
     <Compile Include="Storage\Docdb\ShouldSerializeContractResolver.cs" />
     <Compile Include="Exceptions\SubmissionException.cs" />
     <Compile Include="Exceptions\SubmitDeniedException.cs" />
-    <Compile Include="Tasker.cs" />
     <Compile Include="Template\Filesystem\FilesystemTemplateController.cs" />
     <Compile Include="Template\Docdb\DocdbTemplateController.cs" />
     <Compile Include="Template\TemplateController.cs" />

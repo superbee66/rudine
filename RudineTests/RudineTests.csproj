@@ -83,12 +83,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Rand.cs" />
+    <Compile Include="Web\LightDocTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\BaseLineInfoPath2013.xsn" />
-    <None Include="doc\BaseLineOpenOffice4.pdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="doc\BaseLineOpenOffice4.pdf" />
     <None Include="doc\BaseLineOpenOffice4.odt" />
     <None Include="packages.config" />
   </ItemGroup>
