@@ -141,7 +141,6 @@ namespace Rudine.Web.Util
 
         public static bool isBinary(string path)
         {
-            int ch;
             using (StreamReader stream = new StreamReader(path))
                 if (isBinary(stream))
                     return true;

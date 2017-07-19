@@ -65,7 +65,8 @@ namespace Rudine.Interpreters
         /// <returns></returns>
         public int CalcDocChecksum(BaseDoc baseDoc, bool? docStatus = null)
         {
-            docStatus = docStatus ?? baseDoc.DocStatus;
+            if (docStatus == null && baseDoc.DocStatus != null)
+                return CalcDocChecksum(baseDoc, baseDoc.DocStatus);
 
             // absolutely necessary the object is not altered in any way shape of form
             //TODO:implement NormalizeDateTimePropertyValues recursively & properly
@@ -81,7 +82,7 @@ namespace Rudine.Interpreters
             {
                 new XmlSerializer(baseDoc.GetType()).Serialize(_XmlTextWriter, baseDoc);
                 return _StringWriter.ToString()
-                                    .GetHashCode() ^ (docStatus ?? false).GetHashCode();
+                                    .GetHashCode() ^ string.Format("{0}", docStatus).GetHashCode();
             }
         }
 
@@ -335,8 +336,8 @@ namespace Rudine.Interpreters
 
             if (_DocBaseInterpreter is DocByteInterpreter)
             {
-                byte[] Docx = ((DocByteInterpreter)_DocBaseInterpreter).WriteByte(source, includeProcessingInformation);
-                _MemoryStream.Write(Docx, 0, Docx.Length);
+                byte[] docBytes = ((DocByteInterpreter)_DocBaseInterpreter).WriteByte(source, includeProcessingInformation);
+                _MemoryStream.Write(docBytes, 0, docBytes.Length);
                 _MemoryStream.Position = 0;
                 return _MemoryStream;
             }

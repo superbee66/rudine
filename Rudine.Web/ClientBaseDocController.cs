@@ -170,18 +170,6 @@ namespace Rudine.Web
         public override BaseDoc ReadText(string DocData, string RelayUrl = null) =>
             Read(DocData, RelayUrl);
 
-        public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null) =>
-            (LightDoc) GetMethodInfo(DocCmd.Status)
-                .Invoke(UnderlyingWSClient,
-                    new object[]
-                    {
-                        DocTypeName,
-                        DocKeys,
-                        DocStatus,
-                        DocSubmittedByEmail,
-                        RelayUrl
-                    });
-
         private LightDoc Submit(object DocData, string DocSubmittedByEmail, string RelayUrl, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle) =>
             (LightDoc) GetMethodInfo(DocData is byte[] ? DocCmd.SubmitBytes : DocCmd.SubmitText)
                 .Invoke(UnderlyingWSClient,

@@ -48,9 +48,6 @@ namespace Rudine.Web
         BaseDoc ReadText(string DocData, string RelayUrl = null);
 
         [OperationContract]
-        LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null);
-
-        [OperationContract]
         LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
 
         [OperationContract]

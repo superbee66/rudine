@@ -101,8 +101,9 @@ namespace Rudine.Interpreters.Pdf
             if (!string.IsNullOrWhiteSpace(propertyValueAsString))
                 pdfDocument.Info.Elements.SetString("/" + propertyName, propertyValueAsString);
 
+            //TODO:Research if beta version of PDFSharp is suppose to be wrapping it's property values with ()
             return pdfDocument.Info.Elements.ContainsKey("/" + propertyName)
-                       ? string.Format("{0}", pdfDocument.Info.Elements["/" + propertyName])
+                       ? string.Format("{0}", pdfDocument.Info.Elements["/" + propertyName]).Trim('(', ')')
                        : null;
         }
 
@@ -157,7 +158,22 @@ namespace Rudine.Interpreters.Pdf
                         string value = string.Format("{0}", field.Value);
 
                         PropertyInfo propertyInfo = baseDocType.GetProperty(compositeProperty.Name, compositeProperty.PropertyType);
-                        propertyInfo.SetValue(baseDoc, Convert.ChangeType(value, propertyInfo.PropertyType), null);
+                        if ((Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType).Equals(typeof(Boolean)))
+                        {
+                            //TODO:figure out a more generic way of dealing with values that must be parsed that ChangeType pukes on
+                            bool b;
+                            if (bool.TryParse(
+                                    value.ToLower()
+                                         .Replace("yes", bool.TrueString)
+                                         .Replace("no", bool.FalseString)
+                                         .Replace("1", bool.TrueString)
+                                         .Replace("0", bool.FalseString)
+                                    , out b))
+                                propertyInfo.SetValue(baseDoc, b, null);
+                        }
+                        else
+                            propertyInfo.SetValue(baseDoc, Convert.ChangeType(value, propertyInfo.PropertyType), null);
+
                     }
 
                     basedoc = SetPI(baseDoc, docProcessingInstructions);
@@ -177,16 +193,22 @@ namespace Rudine.Interpreters.Pdf
         private static DocProcessingInstructions ReadDocPI(PdfDocument pdfDocument)
         {
             DocProcessingInstructions pi = new DocProcessingInstructions();
-            bool b = false;
             if (pdfDocument != null)
             {
-                pi.DocTitle = pdfDocument.Info.Title;
-                pi.DocTypeName = GetSetDocPIProperty(pdfDocument, nameof(pi.DocTypeName));
-                pi.solutionVersion = GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion));
+                int docChecksum = 0;
+                bool docStatus = false;
 
-                if (bool.TryParse(GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion)), out b))
-                    pi.DocStatus = b;
-
+                pi = new DocProcessingInstructions
+                {
+                    DocChecksum = int.TryParse(GetSetDocPIProperty(pdfDocument, nameof(pi.DocChecksum)), out docChecksum) ? docChecksum : 0,
+                    DocSrc = GetSetDocPIProperty(pdfDocument, nameof(pi.DocSrc)),
+                    DocStatus = bool.TryParse(GetSetDocPIProperty(pdfDocument, nameof(pi.DocStatus), pi.DocStatus), out docStatus) ? new bool?(docStatus) : null,
+                    DocTitle = pdfDocument.Info.Title,
+                    DocTypeName = GetSetDocPIProperty(pdfDocument, nameof(pi.DocTypeName)),
+                    href = GetSetDocPIProperty(pdfDocument, nameof(pi.href)),
+                    name = GetSetDocPIProperty(pdfDocument, nameof(pi.name)),
+                    solutionVersion = GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion))
+                };
 
                 // PDF never seen/served by this app will not have a DocId defined to decrypt
                 string docId = GetSetDocPIProperty(pdfDocument, Parm.DocId);
@@ -263,7 +285,6 @@ namespace Rudine.Interpreters.Pdf
             pdfDocument.Info.Title = pi.DocTitle;
 
             GetSetDocPIProperty(pdfDocument, Parm.DocId, pi.GetDocId());
-            GetSetDocPIProperty(pdfDocument, nameof(pi.DocKeys), pi.DocKeys);
             GetSetDocPIProperty(pdfDocument, nameof(pi.DocStatus), pi.DocStatus);
             GetSetDocPIProperty(pdfDocument, nameof(pi.DocTypeName), pi.DocTypeName);
             GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion), pi.solutionVersion);

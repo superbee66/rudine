@@ -12,7 +12,7 @@ namespace Rudine.Interpreters.Pdf
             CompositeProperty _CompositeProperty = asCompositeProperty((dynamic) o);
            
 
-            if (o.Flags == PdfAcroFieldFlags.Required)
+            if (o.Flags != PdfAcroFieldFlags.Required)
                 if (_CompositeProperty.PropertyType != typeof(string))
                     if (_CompositeProperty.PropertyType != typeof(byte[]))
                         _CompositeProperty.PropertyType = typeof(Nullable<>).MakeGenericType(Nullable.GetUnderlyingType(_CompositeProperty.PropertyType) ?? _CompositeProperty.PropertyType);

@@ -214,6 +214,7 @@ namespace Rudine.Interpreters
             dstBaseDoc = (BaseDoc)PropertyOverlay.Overlay(pi, dstBaseDoc);
             dstBaseDoc.DocTypeName = DocTypeName ?? pi.DocTypeName;
             dstBaseDoc.solutionVersion = DocRev ?? pi.solutionVersion;
+            dstBaseDoc.DocStatus = pi.DocStatus??dstBaseDoc.DocStatus;
             return dstBaseDoc;
         }
 
