@@ -16,17 +16,6 @@ namespace Rudine.Web
     [Serializable]
     public class LightDoc : IDocLogistics, IDocIdentifiers, IComparable<LightDoc>
     {
-        private static readonly JavaScriptSerializer Jsonizer = new JavaScriptSerializer();
-
-        /// <summary>
-        ///     Simply this object in json form
-        /// </summary>
-        [ScriptIgnore]
-        public string DataKeyField
-        {
-            get { return Serialize.Json.Serialize(this); }
-        }
-
         /// <summary>
         ///     Should be the same if this LightDoc represents the first submission for the BaseDoc
         /// </summary>
