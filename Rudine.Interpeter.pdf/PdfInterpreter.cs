@@ -267,6 +267,8 @@ namespace Rudine.Interpreters.Pdf
             GetSetDocPIProperty(pdfDocument, nameof(pi.DocStatus), pi.DocStatus);
             GetSetDocPIProperty(pdfDocument, nameof(pi.DocTypeName), pi.DocTypeName);
             GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion), pi.solutionVersion);
+            GetSetDocPIProperty(pdfDocument, nameof(pi.DocChecksum), pi.DocChecksum);
+
         }
     }
 }
