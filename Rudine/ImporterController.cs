@@ -34,13 +34,13 @@ namespace Rudine
                 false,
                 nameof(AllTemplateExtensions));
 
-        private static DocRev CreateTemplate(BaseDocController baseDocController, FileInfo fileinfo) =>
+        private static DocRev CreateTemplate(BaseDocController baseDocController, FileInfo filepath) =>
           baseDocController.CreateTemplate(
                new List<DocRevEntry> {
                     new DocRevEntry {
-                        Bytes = File.ReadAllBytes(fileinfo.FullName),
-                        ModDate = fileinfo.LastWriteTimeUtc,
-                        Name = fileinfo.FullName.Substring(fileinfo.FullName.Length + 1)
+                        Bytes = File.ReadAllBytes(filepath.FullName),
+                        ModDate = filepath.LastWriteTimeUtc,
+                        Name = Path.GetFileNameWithoutExtension(filepath.FullName)
                     }
                 });
 
@@ -61,7 +61,7 @@ namespace Rudine
                           {
                               Bytes = File.ReadAllBytes(filepath.FullName),
                               ModDate = filepath.LastWriteTimeUtc,
-                              Name = filepath.FullName.Substring(directoryinfo.FullName.Length + 1)
+                              Name = Path.GetFileNameWithoutExtension(filepath.FullName)
                           });
 
             return baseDocController.CreateTemplate(docRev.DocFiles, docRev.DocURN.DocTypeName);
@@ -74,19 +74,21 @@ namespace Rudine
         /// <returns></returns>
         public static List<DocRev> SyncTemplates(BaseDocController baseDocController)
         {
-            //List<DocRev> templatesList = CreateTemplatesList(baseDocController);
-            //string[] DisintctDocFilesMD5 = templatesList.Select(docrev => docrev.DocFilesMD5).Distinct().ToArray();
-            //var Existing = baseDocController.List(
-            //                             new List<string> { nameof(DocRev) },
-            //                             null,
-            //                             null,
-            //                      string.Join(" ", DisintctDocFilesMD5));
+            List<DocRev> templatesList = CreateTemplatesList(baseDocController);
+
+            string[] DisintctDocFilesMD5 = templatesList.Select(docrev => docrev.DocFilesMD5).Distinct().ToArray();
+
+            List<LightDoc> Existing = baseDocController.List(
+                                         new List<string> { nameof(DocRev) },
+                                         null,
+                                         null,
+                                  string.Join(" ", DisintctDocFilesMD5));
 
             return new List<Web.DocRev>();
 
         }
 
-        internal static List<DocRev> CreateTemplatesList(BaseDocController baseDocController)
+        private static List<DocRev> CreateTemplatesList(BaseDocController baseDocController)
         {
             List<DocRev> l = new List<DocRev>();
             if (Directory.Exists(FilesystemTemplateController.DirectoryPath))
