@@ -8,7 +8,7 @@ using Rudine.Web.Util;
 
 namespace Rudine.Template.Filesystem
 {
-    internal class FilesystemTemplateController : ITemplateController
+    public class FilesystemTemplateController : ITemplateController
     {
         /// <summary>
         ///     Sets up the form directory if not there. New or not, all read-only file attributes are removed from sub-folders &
