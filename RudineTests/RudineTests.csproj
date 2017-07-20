@@ -60,7 +60,7 @@
       <Link>help\FileSystem.cs</Link>
     </Compile>
     <Compile Include="..\Rudine.Web\Util\TypeExtensions.cs">
-      <Link>TypeExtensions.cs</Link>
+      <Link>help\TypeExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Rudine\RuntimeTypeNamer.cs">
       <Link>help\RuntimeTypeNamer.cs</Link>
@@ -82,8 +82,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Rand.cs" />
-    <Compile Include="Web\LightDocTests.cs" />
+    <Compile Include="help\Rand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\BaseLineInfoPath2013.xsn" />

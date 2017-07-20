@@ -12,12 +12,15 @@ namespace Rudine.Tests
     {
         static string PropertyTypeNameEnd(Type t) =>
             string.Join("_",
-                new string[] {
-                        (Nullable.GetUnderlyingType(t) ?? t).Name,
-                        Nullable.GetUnderlyingType(t) != null ? nameof(Nullable) : string.Empty,
-                        t.IsArray ? nameof(Array) : string.Empty
-                }.Where(s => !string.IsNullOrWhiteSpace(s)))
-            .Trim('[', ']', '_');
+                      new[]
+                      {
+                          (Nullable.GetUnderlyingType(t) ?? t).Name,
+                          Nullable.GetUnderlyingType(t) != null ? nameof(Nullable) : string.Empty,
+                          t.IsArray ? nameof(Array) : string.Empty
+                      }.Where(s => !string.IsNullOrWhiteSpace(s)))
+                  .Trim('[', ']', '_')
+                  .Replace("]", string.Empty)
+                  .Replace("[", string.Empty);
 
         static IEnumerable<Type> PropertyTypes()
         {
