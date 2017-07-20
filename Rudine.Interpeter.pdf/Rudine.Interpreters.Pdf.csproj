@@ -48,12 +48,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
-      <Link>util\FileSystem.cs</Link>
-    </Compile>
-    <Compile Include="..\Rudine.Web\Util\StreamExtensions.cs">
-      <Link>util\StreamExtensions.cs</Link>
-    </Compile>
     <Compile Include="PdfInterpreter.cs" />
     <Compile Include="PdfAcroFieldExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,6 +61,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
