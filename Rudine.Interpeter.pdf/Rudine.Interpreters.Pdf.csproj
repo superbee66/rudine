@@ -59,6 +59,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Acrobat_DigSig_WorkflowGuide.pdf" />
     <None Include="packages.config" />
     <None Include="PDF32000_2008.pdf" />
     <None Include="pdf_reference_1-7.pdf" />
