@@ -65,7 +65,11 @@ namespace Rudine.Interpreters.Pdf
                             PdfAcroForm acroForm = pdfDocument.AcroForm;
 
                             for (int i = 0; i < acroForm.Fields.Elements.Count; i++)
-                                schemaFields.Add(acroForm.Fields[i].AsCompositeProperty());
+                            {
+                                CompositeProperty compositeProperty = acroForm.Fields[i].AsCompositeProperty();
+                                if (compositeProperty != null)
+                                    schemaFields.Add(acroForm.Fields[i].AsCompositeProperty());
+                            }
 
                             if (schemaFields.Count > 0)
                             {
@@ -154,26 +158,64 @@ namespace Rudine.Interpreters.Pdf
                     for (int i = 0; i < pdfDocument.AcroForm.Fields.Elements.Count; i++)
                     {
                         PdfAcroField field = pdfDocument.AcroForm.Fields[i];
+
+                        // skips fields like pushbuttons
                         CompositeProperty compositeProperty = field.AsCompositeProperty();
-                        string value = string.Format("{0}", field.Value);
 
-                        PropertyInfo propertyInfo = baseDocType.GetProperty(compositeProperty.Name, compositeProperty.PropertyType);
-                        if ((Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType).Equals(typeof(Boolean)))
-                        {
-                            //TODO:figure out a more generic way of dealing with values that must be parsed that ChangeType pukes on
-                            bool b;
-                            if (bool.TryParse(
-                                    value.ToLower()
-                                         .Replace("yes", bool.TrueString)
-                                         .Replace("no", bool.FalseString)
-                                         .Replace("1", bool.TrueString)
-                                         .Replace("0", bool.FalseString)
-                                    , out b))
-                                propertyInfo.SetValue(baseDoc, b, null);
-                        }
-                        else
-                            propertyInfo.SetValue(baseDoc, Convert.ChangeType(value, propertyInfo.PropertyType), null);
+                        if (compositeProperty != null)
+                            if (baseDocType.GetProperty(compositeProperty.Name) != null)
+                            {
+                                PropertyInfo propertyInfo = baseDocType.GetProperty(compositeProperty.Name, compositeProperty.PropertyType);
+                                // work with the non-nullable type
+                                Type PropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType)?? propertyInfo.PropertyType;
 
+                                if (field is PdfCheckBoxField)
+                                {
+                                    PdfCheckBoxField _PdfCheckBoxField = (PdfCheckBoxField)field;
+                                    if (string.Format("{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.CheckedName))
+                                        propertyInfo.SetValue(baseDoc, true);
+                                    else if (string.Format("{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.UncheckedName))
+                                        propertyInfo.SetValue(baseDoc, false);
+                                    else
+                                        propertyInfo.SetValue(baseDoc, null);
+                                }
+                                else
+                                {
+                                    string value = string.Format("{0}", field.Value);
+                                    if ((Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType).Equals(typeof(Boolean)))
+                                    {
+                                        //TODO:figure out a more generic way of dealing with values that must be parsed that ChangeType pukes on
+                                        bool b;
+                                        if (bool.TryParse(
+                                            value.ToLower()
+                                                 .Replace("yes", bool.TrueString)
+                                                 .Replace("no", bool.FalseString)
+                                                 .Replace("1", bool.TrueString)
+                                                 .Replace("0", bool.FalseString),
+                                            out b))
+                                            propertyInfo.SetValue(baseDoc, b, null);
+                                    }
+                                    if (PropertyType == typeof(DateTime))
+                                    {
+                                        DateTime d;
+                                        if (DateTime.TryParse(field.Value.ToString(), out d))
+                                            propertyInfo.SetValue(basedoc, d);
+                                    }
+                                    else
+                                    {
+                                        propertyInfo.SetValue(
+                                            baseDoc,
+                                            PropertyType == typeof(string)
+                                                ? field.Value != null
+                                                ? value
+                                                : null
+                                                : PropertyType == typeof(DateTime)
+                                                    ? DateTime.Parse(field.Value.ToString())
+                                                    : Convert.ChangeType(value, PropertyType),
+                                            null);
+                                    }
+                                }
+                            }
                     }
 
                     basedoc = SetPI(baseDoc, docProcessingInstructions);
@@ -185,9 +227,7 @@ namespace Rudine.Interpreters.Pdf
         public override DocProcessingInstructions ReadDocPI(byte[] docData)
         {
             using (PdfDocument pdfDocument = OpenRead(docData, PdfDocumentOpenMode.InformationOnly))
-            {
                 return ReadDocPI(pdfDocument);
-            }
         }
 
         private static DocProcessingInstructions ReadDocPI(PdfDocument pdfDocument)
@@ -219,11 +259,11 @@ namespace Rudine.Interpreters.Pdf
             return pi;
         }
 
-        public override string ReadDocRev(byte[] docData) => ReadDocPI(docData)
-            .solutionVersion;
+        public override string ReadDocRev(byte[] docData) =>
+            ReadDocPI(docData).solutionVersion;
 
-        public override string ReadDocTypeName(byte[] docData) => ReadDocPI(docData)
-            .DocTypeName;
+        public override string ReadDocTypeName(byte[] docData) =>
+            ReadDocPI(docData).DocTypeName;
 
         public override List<ContentInfo> TemplateSources() => new List<ContentInfo> { ContentInfo };
 
@@ -247,9 +287,14 @@ namespace Rudine.Interpreters.Pdf
                     for (int i = 0; i < pdfDocument.AcroForm.Fields.Elements.Count; i++)
                     {
                         PdfAcroField field = pdfDocument.AcroForm.Fields[i];
-
-                        field.Value = new PdfString(string.Format("{0}", baseDocType.GetProperty(field.nameofCSharpProperty())
-                                                                                    .GetValue(source, null)));
+                        // skips fields like pushbuttons
+                        if (baseDocType.GetProperty(field.NameofCSharpProperty()) != null)
+                        {
+                            field.Value = new PdfString(
+                                string.Format("{0}",
+                                    baseDocType.GetProperty(field.NameofCSharpProperty())
+                                               .GetValue(source, null)));
+                        }
                     }
 
                     if (includeProcessingInformation)
@@ -289,7 +334,6 @@ namespace Rudine.Interpreters.Pdf
             GetSetDocPIProperty(pdfDocument, nameof(pi.DocTypeName), pi.DocTypeName);
             GetSetDocPIProperty(pdfDocument, nameof(pi.solutionVersion), pi.solutionVersion);
             GetSetDocPIProperty(pdfDocument, nameof(pi.DocChecksum), pi.DocChecksum);
-
         }
     }
 }
