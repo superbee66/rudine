@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.AcroForms;
 using PdfSharp.Pdf.Advanced;
@@ -8,39 +10,22 @@ using Rudine.Web.Util;
 
 namespace Rudine.Interpreters.Pdf
 {
+    public class CompositePropertyAndValue : CompositeProperty
+    {
+        public CompositePropertyAndValue(string name, Type type, object value) : base(name, type) { Value = value; }
+        public object Value { get; }
+    }
+
     public static class PdfAcroFieldExtensions
     {
         static readonly string[] _pathsOfInterest = { "/Fields", "/AA", "/F", "/JS" };
 
-        private static CompositeProperty asCompositeProperty(PdfAcroField o) =>
-            new CompositeProperty(o.NameofCSharpProperty(), GetPdfFieldType(o));
-
-        private static CompositeProperty asCompositeProperty(PdfCheckBoxField o) =>
-            new CompositeProperty(o.NameofCSharpProperty(), typeof(bool));
-
-        private static CompositeProperty asCompositeProperty(PdfTextField o) =>
-            new CompositeProperty(o.NameofCSharpProperty(), GetPdfFieldType(o));
-
-        private static CompositeProperty asCompositeProperty(PdfSignatureField o) =>
-            new CompositeProperty(o.NameofCSharpProperty(), typeof(byte[]));
-
-        /// <summary>
-        /// one bool per radio button
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns></returns>
-        private static CompositeProperty asCompositeProperty(PdfRadioButtonField o)
-        {
-            //TODO:represent radio buttons as enums
-            return new CompositeProperty(o.NameofCSharpProperty(), typeof(bool));
-        }
-
-        public static CompositeProperty AsCompositeProperty(this PdfAcroField o)
+        public static CompositePropertyAndValue AsCompositeProperty(this PdfAcroField o)
         {
             if (o is PdfPushButtonField)
                 return null;
 
-            CompositeProperty _CompositeProperty = asCompositeProperty((dynamic)o);
+            CompositePropertyAndValue _CompositeProperty = asCompositePropertyAndValue((dynamic)o);
 
             if (o.Flags != PdfAcroFieldFlags.Required)
                 if (_CompositeProperty.PropertyType != typeof(string))
@@ -50,7 +35,89 @@ namespace Rudine.Interpreters.Pdf
             return _CompositeProperty;
         }
 
-        internal static string GetDateTimeFormat(PdfAcroField o) =>
+        private static CompositePropertyAndValue asCompositePropertyAndValue(PdfAcroField o)
+        {
+            Type _Type = GetPdfFieldType(o);
+            string _Value = string.Format("{0}", o.Value);
+            DateTime _DateTime;
+            DateTime.TryParse(_Value, out _DateTime);
+
+            return DateTime.TryParse(_Value, out _DateTime)
+                ? new CompositePropertyAndValue(o.NameofCSharpProperty(), _Type, _DateTime)
+                : new CompositePropertyAndValue(o.NameofCSharpProperty(), _Type, null);
+        }
+
+        private static CompositePropertyAndValue asCompositePropertyAndValue(PdfCheckBoxField _PdfCheckBoxField)
+        {
+            return new CompositePropertyAndValue(
+                _PdfCheckBoxField.NameofCSharpProperty(),
+                typeof(bool),
+                string.Format("{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.CheckedName)
+                    ? true
+                    : string.Format("{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.UncheckedName)
+                        ? (ValueType)false
+                        : null);
+        }
+
+        //private static CompositePropertyAndValue asCompositePropertyAndValue(PdfTextField o) =>
+        //    new CompositePropertyAndValue(o.NameofCSharpProperty(), GetPdfFieldType(o));
+
+        private static CompositePropertyAndValue asCompositePropertyAndValue(PdfSignatureField o) =>
+            new CompositePropertyAndValue(o.NameofCSharpProperty(), typeof(byte[]), null);
+
+        private static readonly ModuleBuilder EnumTypeModuleBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName("DynamicEnumNamedClasses"), AssemblyBuilderAccess.Run).DefineDynamicModule("EnumModule");
+
+        /// <summary>
+        ///     one bool per radio button
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        private static CompositePropertyAndValue asCompositePropertyAndValue(PdfRadioButtonField o)
+        {
+            if (!o.HasKids)
+                return null;
+
+            string _EnumName = o.NameofCSharpProperty();
+            Type _T = null;
+            int? _SelectValue = null;
+
+            lock (EnumTypeModuleBuilder)
+            {
+                _T = EnumTypeModuleBuilder.GetTypes().FirstOrDefault(t => t.Name == _EnumName);
+
+                if (_T == null)
+                {
+                    EnumBuilder _EnumBuilder = EnumTypeModuleBuilder.DefineEnum(
+                                 o.NameofCSharpProperty(),
+                                 TypeAttributes.Public,
+                                 typeof(int));
+
+                    foreach (PdfReference choice in ((PdfArray)o.Elements["/Kids"]).OfType<PdfReference>())
+                        _EnumBuilder.DefineLiteral(GetEnumItemName(choice), GetEnumItemName(choice).GetHashCode());
+                    _T = _EnumBuilder.CreateType();
+                }
+            }
+
+            if (_T == null)
+                return null;
+
+            int _I = 0;
+            foreach (PdfReference choice in ((PdfArray)o.Elements["/Kids"]).OfType<PdfReference>())
+                if (o.SelectedIndex == _I++)
+                    _SelectValue = GetEnumItemName(choice).GetHashCode();
+
+
+            return new CompositePropertyAndValue(_EnumName, _T, _SelectValue);
+
+
+        }
+
+        private static string GetEnumItemName(PdfReference choice)
+        {
+            return StringTransform.PrettyCSharpIdent(((PdfDictionary)((PdfDictionary)((PdfItem[])((PdfDictionary)choice.Value).Elements.Values)[0]).Elements["/N"]).Elements.First().Key.TrimStart('/'));
+        }
+
+        internal static string detectDateTimeFormat(PdfAcroField o) =>
             getPaths(o).Where(path => path.IndexOf("AFDate_FormatEx") != -1).Select(s => s.Split('(', ')')[1].Trim('"')).FirstOrDefault();
 
         private static string[] getPaths(PdfItem o, string parrentPath = null) =>
@@ -82,7 +149,7 @@ namespace Rudine.Interpreters.Pdf
         }
 
         private static Type GetPdfFieldType(PdfAcroField o) =>
-            GetDateTimeFormat(o) != null
+            detectDateTimeFormat(o) != null
                 ? typeof(DateTime)
                 : o.Value?.GetType().GetProperty("Value")?.PropertyType ?? typeof(string);
 
@@ -98,13 +165,11 @@ namespace Rudine.Interpreters.Pdf
         public static object GetValue(this PdfItem o) => getValue((dynamic)o);
 
         /// <summary>
-        /// takes special consideration for radio button fields
+        ///     takes special consideration for radio button fields
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
         public static string NameofCSharpProperty(this PdfAcroField o) =>
-            StringTransform.PrettyCSharpIdent(o is PdfRadioButtonField
-                ? o.Name + "_" + o.Value
-                : o.Name);
+            StringTransform.PrettyCSharpIdent(o.Name);
     }
 }

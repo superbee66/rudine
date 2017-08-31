@@ -160,62 +160,12 @@ namespace Rudine.Interpreters.Pdf
                         PdfAcroField field = pdfDocument.AcroForm.Fields[i];
 
                         // skips fields like pushbuttons
-                        CompositeProperty compositeProperty = field.AsCompositeProperty();
+                        CompositePropertyAndValue compositeProperty = field.AsCompositeProperty();
 
                         if (compositeProperty != null)
                             if (baseDocType.GetProperty(compositeProperty.Name) != null)
-                            {
-                                PropertyInfo propertyInfo = baseDocType.GetProperty(compositeProperty.Name, compositeProperty.PropertyType);
-                                // work with the non-nullable type
-                                Type PropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType)?? propertyInfo.PropertyType;
-
-                                if (field is PdfCheckBoxField)
-                                {
-                                    PdfCheckBoxField _PdfCheckBoxField = (PdfCheckBoxField)field;
-                                    if (string.Format("{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.CheckedName))
-                                        propertyInfo.SetValue(baseDoc, true);
-                                    else if (string.Format("{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.UncheckedName))
-                                        propertyInfo.SetValue(baseDoc, false);
-                                    else
-                                        propertyInfo.SetValue(baseDoc, null);
-                                }
-                                else
-                                {
-                                    string value = string.Format("{0}", field.Value);
-                                    if ((Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType).Equals(typeof(Boolean)))
-                                    {
-                                        //TODO:figure out a more generic way of dealing with values that must be parsed that ChangeType pukes on
-                                        bool b;
-                                        if (bool.TryParse(
-                                            value.ToLower()
-                                                 .Replace("yes", bool.TrueString)
-                                                 .Replace("no", bool.FalseString)
-                                                 .Replace("1", bool.TrueString)
-                                                 .Replace("0", bool.FalseString),
-                                            out b))
-                                            propertyInfo.SetValue(baseDoc, b, null);
-                                    }
-                                    if (PropertyType == typeof(DateTime))
-                                    {
-                                        DateTime d;
-                                        if (DateTime.TryParse(field.Value.ToString(), out d))
-                                            propertyInfo.SetValue(basedoc, d);
-                                    }
-                                    else
-                                    {
-                                        propertyInfo.SetValue(
-                                            baseDoc,
-                                            PropertyType == typeof(string)
-                                                ? field.Value != null
-                                                ? value
-                                                : null
-                                                : PropertyType == typeof(DateTime)
-                                                    ? DateTime.Parse(field.Value.ToString())
-                                                    : Convert.ChangeType(value, PropertyType),
-                                            null);
-                                    }
-                                }
-                            }
+                                if (compositeProperty.Value != null)
+                                    baseDocType.GetProperty(compositeProperty.Name).SetValue(baseDocType, compositeProperty.Value, null);
                     }
 
                     basedoc = SetPI(baseDoc, docProcessingInstructions);
