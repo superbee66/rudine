@@ -61,6 +61,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TypeParserTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\RudineTests\doc\BaseLineOpenOffice4.pdf">

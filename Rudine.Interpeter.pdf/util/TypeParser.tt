@@ -1,0 +1,39 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+
+using System;
+using System.Linq;
+
+namespace Rudine.Interpreters.Pdf
+{
+	public static class TypeParser
+	{
+		public static Type LcdType(params string[] samples)
+		{
+
+	<#
+	foreach(string typename in new string[] {
+	"bool","sbyte","byte","short","ushort",
+	"int","uint","long","ulong","char",
+	"float","double"
+	}) {
+	#>
+	        <#= typename #> <#= typename #>_test;
+			if (samples.All(s => <#= typename #>.TryParse(s, out <#= typename #>_test)))
+			return typeof(<#= typename #>);
+
+	<#
+
+	}
+	#>
+
+			return typeof(string);
+
+		}
+	}
+}
