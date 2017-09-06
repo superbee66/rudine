@@ -3,7 +3,7 @@
 using System;
 using System.Linq;
 
-namespace Rudine.Interpreters.Pdf
+namespace Rudine.Interpreters.Pdf.util
 {
 	public static class TypeParser
 	{

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Web.Script.Serialization;
 using NUnit.Framework;
+using Rudine.Interpreters.Embeded;
 using Rudine.Web;
 
-namespace Rudine.Interpreters.Embeded.Tests
+namespace Rudine.Tests.Interpreters.Embeded
 {
     [TestFixture]
     public class EmbededInterpreterTests

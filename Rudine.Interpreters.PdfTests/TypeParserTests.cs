@@ -1,7 +1,8 @@
 ﻿using System;
 using NUnit.Framework;
+using Rudine.Interpreters.Pdf.util;
 
-namespace Rudine.Interpreters.Pdf.Tests {
+namespace Rudine.Interpreters.PdfTests {
     [TestFixture]
     public class TypeParserTests {
         [Test]
