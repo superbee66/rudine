@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Rudine.Web.Util;
 
-namespace Rudine.Tests
+namespace Rudine.Tests.help
 {
     /// <summary>
     ///     Hey Greg,

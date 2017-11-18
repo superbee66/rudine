@@ -6,6 +6,7 @@ using System.Runtime.Caching;
 using System.Threading;
 using NUnit.Framework;
 using Rudine.Template;
+using Rudine.Tests.help;
 using Rudine.Tests.Properties;
 using Rudine.Util.Zips;
 using Rudine.Web;

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Rudine.Interpreters.Pdf;
 using Rudine.Interpreters.PdfTests.Properties;
 using Rudine.Web;
 
-namespace Rudine.Interpreters.Pdf.Tests
+namespace Rudine.Interpreters.PdfTests
 {
     [TestFixture]
     public class PdfInterpreterTests

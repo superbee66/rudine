@@ -46,7 +46,7 @@ namespace Rudine.Interpreters.Xsn
 
         private const string InfoPathDesignerPackageFileExtension = "xsn";
         private const string templateFileName = "template.xml";
-        private const string schemaFileName = "myschema.xsd";
+        public const string schemaFileName = "myschema.xsd";
 
         /// <summary>
         ///     matches 0001-01-01T00:00:00, 0 & false; things considered default values in this solution
@@ -60,7 +60,7 @@ namespace Rudine.Interpreters.Xsn
         ///     Default value upon class construction is xml processing instructions specific to Microsoft Office InfoPath & an
         ///     additional instruction set named mso-infoPathSolution specific to this application
         /// </summary>
-        private readonly WriteXmlProcessingInstructions WriteXmlProcessingInstructions;
+        public WriteXmlProcessingInstructions WriteXmlProcessingInstructions;
 
         public XsnXmlInterpreter() { WriteXmlProcessingInstructions = WriteInfoPathProcessingInstructions; }
 
