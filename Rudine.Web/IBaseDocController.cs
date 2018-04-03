@@ -12,29 +12,16 @@ namespace Rudine.Web
     ///     [0] Entity Framework Code First-> Database
     /// </summary>
     [ServiceContract]
-    public interface IBaseDocController
+    public interface IBaseDocController : IRudineController
     {
         [OperationContract]
-        List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null);
-
-        [OperationContract]
         BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null);
-
-        [OperationContract]
-        BaseDoc Get(string DocTypeName, Dictionary<string, string> DocKeys = null, string DocId = null, string RelayUrl = null);
-
         [OperationContract]
         DocTypeInfo Info(string DocTypeName);
-
         [OperationContract]
         List<ContentInfo> Interpreters();
-
-        [OperationContract]
-        List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null);
-
         [OperationContract]
         BaseDoc ReadBytes(byte[] DocData, string RelayUrl = null);
-
         /// <summary>
         ///     not represented as an OperationContract as WCF requires there to be only one Stream parameter in the method. If the
         ///     Rudine.Web lib is reference on the client, it will take care of this limitation by immediately translating the
@@ -46,16 +33,10 @@ namespace Rudine.Web
         /// <param name="RelayUrl"></param>
         /// <returns></returns>
         BaseDoc ReadStream(Stream DocData, string RelayUrl = null);
-
         [OperationContract]
         BaseDoc ReadText(string DocData, string RelayUrl = null);
-
         [OperationContract]
         LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null);
-
-        [OperationContract]
-        LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
-
         /// <summary>
         ///     not represented as an OperationContract as WCF requires there to be only one Stream parameter in the method. If the
         ///     Rudine.Web lib is reference on the client, it will take care of this limitation by immediately translating the
@@ -70,8 +51,5 @@ namespace Rudine.Web
         /// <param name="DocTitle"></param>
         /// <returns></returns>
         LightDoc SubmitStream(Stream DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
-
-        [OperationContract]
-        LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
     }
 }

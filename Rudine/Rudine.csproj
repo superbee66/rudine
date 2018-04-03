@@ -102,6 +102,9 @@
     <Compile Include="..\Rudine.Web\InterpreterInfo.cs">
       <Link>Web\InterpreterInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\IRudineController.cs">
+      <Link>Web\IRudineController.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\LightDoc.cs">
       <Link>Web\LightDoc.cs</Link>
     </Compile>
@@ -170,6 +173,7 @@
     <Compile Include="RuntimeTypeNamer.cs" />
     <Compile Include="Storage\Docdb\BaseDocExtensions.cs" />
     <Compile Include="Storage\Docdb\DocumentExtensions.cs" />
+    <Compile Include="Storage\IStorageController.cs" />
     <Compile Include="Storage\Docdb\LuceneControllerExtension.cs" />
     <Compile Include="Storage\Docdb\ShouldSerializeContractResolver.cs" />
     <Compile Include="Exceptions\SubmissionException.cs" />

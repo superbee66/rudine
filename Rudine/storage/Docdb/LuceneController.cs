@@ -19,7 +19,7 @@ using Version = Lucene.Net.Util.Version;
 
 namespace Rudine.Storage.Docdb
 {
-    internal class LuceneController
+    internal class LuceneController : IStorageController
     {
         /// <summary>
         ///     should the index be optimized when some other outside method requests us to?
@@ -82,6 +82,16 @@ namespace Rudine.Storage.Docdb
         internal const int PAGE_SIZE_DEFAULT = 150;
 
         /// <summary>
+        ///     ListDocuments always returns results in reverse-chronological order
+        /// </summary>
+        private static readonly Sort _ListDocumentsSort = new Sort(new SortField(Parm.LogSequenceNumber, SortField.LONG, true));
+
+        public LuceneController()
+        {
+            CreateNeeded();
+        }
+
+        /// <summary>
         ///     defaults to RequestPaths\db\PhysicalApplicationPath when running in an IIS apppool
         /// </summary>
         public string DirectoryPath { get; set; }
@@ -107,18 +117,15 @@ namespace Rudine.Storage.Docdb
             return _Audit;
         }
 
-        public List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = PAGE_SIZE_DEFAULT, int PageIndex = 0, string RelayUrl = null)
-        {
-            return ListDocuments(
-                DocTypeNames,
-                DocKeys,
-                DocProperties,
-                KeyWord,
-                PageSize,
-                PageIndex,
-                RelayUrl,
-                DirectoryPath).Select(m => m.GetBinaryValue(Parm.LightDoc).FromBytes<LightDoc>()).ToList();
-        }
+        public List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = PAGE_SIZE_DEFAULT, int PageIndex = 0, string RelayUrl = null) => ListDocuments(
+            DocTypeNames,
+            DocKeys,
+            DocProperties,
+            KeyWord,
+            PageSize,
+            PageIndex,
+            RelayUrl,
+            DirectoryPath).Select(m => m.GetBinaryValue(Parm.LightDoc).FromBytes<LightDoc>()).ToList();
 
         /// <summary>
         /// </summary>
@@ -136,20 +143,20 @@ namespace Rudine.Storage.Docdb
             DocKeys = DocKeys ?? DocKeyEncrypter.DocIdToKeys(DocId);
 
             foreach (KeyValuePair<string, string> _Item in DocKeys)
-                _RequiredDocKeys[_Item.Key] = new List<string> { _Item.Value };
+                _RequiredDocKeys[_Item.Key] = new List<string> {_Item.Value};
 
             //BUG:DocStatus is not persisted by in the DocData; this band-aid gets it from the LightDoc in order to return it to the calling DataContract method
-            foreach (Document _Document in ListDocuments(new List<string> { DocTypeName }, _RequiredDocKeys, null, null, 1, 0, RelayUrl, DirectoryPath))
+            foreach (Document _Document in ListDocuments(new List<string> {DocTypeName}, _RequiredDocKeys, null, null, 1, 0, RelayUrl, DirectoryPath))
             {
                 _BaseDoc = _Document.AsDocSubmissions().Last().Key.DocIsBinary
-                               ? DocInterpreter.Instance.Read((byte[])_Document.AsDocSubmissions().Last().Value, true)
-                               : DocInterpreter.Instance.Read((string)_Document.AsDocSubmissions().Last().Value, true);
+                    ? DocInterpreter.Instance.Read((byte[]) _Document.AsDocSubmissions().Last().Value, true)
+                    : DocInterpreter.Instance.Read((string) _Document.AsDocSubmissions().Last().Value, true);
 
                 if (_BaseDoc.DocKeys.Count == DocKeys.Count)
                 {
                     _BaseDoc.DocSrc = Nav.ToUrl(DocTypeName, DocId, RelayUrl);
                     // there is a chance the DocStatus may not be set when it comes to items like DocRev BaseDocType(s)
-                    _BaseDoc.DocStatus = bool.Parse(_Document.Get(Parm.DocStatus) ?? Boolean.FalseString);
+                    _BaseDoc.DocStatus = bool.Parse(_Document.Get(Parm.DocStatus) ?? bool.FalseString);
                     break;
                 }
             }
@@ -161,176 +168,20 @@ namespace Rudine.Storage.Docdb
         {
             Document _Document = GetDoc(DocTypeName, DocId, RelayUrl);
             return _Document == null
-                       ? null
-                       : _Document.AsDocSubmissions()
-                                  .Last(m => LogSequenceNumber == 0 || m.Key.LogSequenceNumber == LogSequenceNumber)
-                                  .Value;
+                ? null
+                : _Document.AsDocSubmissions()
+                    .Last(m => LogSequenceNumber == 0 || m.Key.LogSequenceNumber == LogSequenceNumber)
+                    .Value;
         }
 
-        public string GetDocDataText(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (string)GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
-        public byte[] GetDocDataBytes(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (byte[])GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
+        public string GetDocDataText(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) =>
+            (string) GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber);
 
-        /// <summary>
-        ///     ListDocuments always returns results in reverse-chronological order
-        /// </summary>
-        private static readonly Sort _ListDocumentsSort = new Sort(new SortField(Parm.LogSequenceNumber, SortField.LONG, true));
-
-        internal List<Document> ListDocuments(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null, string IndexDirectory = null)
-        {
-            if (CreateNeeded())
-                return new List<Document>();
-
-            //TODO:need to build the query bypassing Parse method of the lucene API (currently we stringbuild the query only for the underlying QueryParser.Parse to take it appart
-            string _DocTypeNames = KeysToPredicate(Parm.DocTypeName, DocTypeNames);
-            string _DocKeyFields = KeysToPredicate(DocKeys);
-            string _DocPropertyFields = KeysToPredicate(DocProperties);
-            string _keywords = string.IsNullOrWhiteSpace(KeyWord)
-                                   ? string.Empty
-                                   : string.Format("+{0}:{1}*",
-                                       Parm.DocData,
-                                       KeyWord.Trim(' ', '*'));
-
-            if (_keywords.Length > 0)
-                if (_keywords.IndexOf(' ') > 0)
-                    _keywords = _keywords.Replace("*", "");
-
-            List<string> _Fields = new List<string>();
-            if (!string.IsNullOrWhiteSpace(_DocTypeNames))
-                _Fields.Add(Parm.DocTypeName);
-
-            if (!string.IsNullOrWhiteSpace(_DocKeyFields))
-                _Fields.AddRange(DocKeys.Keys.ToList());
-
-            if (!string.IsNullOrWhiteSpace(_DocPropertyFields))
-                _Fields.AddRange(DocProperties.Keys.ToList());
-
-            string _QueryString = string.Join(" ", new[]
-            {
-                _DocTypeNames,
-                _DocKeyFields,
-                _DocPropertyFields,
-                _keywords
-            }.Where(m => !string.IsNullOrWhiteSpace(m) && m != "+()").Select(m => string.Format("{0}", m)).ToArray());
-
-            using (KeywordAnalyzer _KeywordAnalyzer = new KeywordAnalyzer())
-            using (PerFieldAnalyzerWrapper _PerFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(_KeywordAnalyzer))
-            using (IndexSearcher _Searcher = new IndexSearcher(FSDirectory.Open(DirectoryPath), true))
-            {
-                ScoreDoc[] _ScoreDoc = _Searcher.Search(new MultiFieldQueryParser(LUCENE_VERSION,
-                        _Fields.ToArray(),
-                        _PerFieldAnalyzerWrapper)
-                {
-                    AllowLeadingWildcard = false
-                }.Parse(_QueryString),
-                    null,
-                    PageIndex * PageSize + PageSize,
-                    _ListDocumentsSort).ScoreDocs;
-
-                return PageIndex * PageSize < _ScoreDoc.Length
-                           ? _ScoreDoc.Skip(PageIndex * PageSize).Select(m => _Searcher.Doc(
-                                                                             m.Doc,
-                                                                             //BANDAID:for some reason binary fields don't seem to lazy load; they throw an IO exception
-                                                                             // until this is resolved it will be assumed the full document (all byte[] fields) will be
-                                                                             // needed thus avoiding any lazy loading here
-                                                                             PageSize == 1
-                                                                                 ? null
-                                                                                 : LazyLoadFieldSelector.Instance)).ToList()
-                           : new List<Document>();
-            }
-        }
-
-        private class LazyLoadFieldSelector : FieldSelector
-        {
-            public static readonly LazyLoadFieldSelector Instance = new LazyLoadFieldSelector();
-
-            private static readonly string[] LAZY_LOAD_FIELDS =
-            {
-                Parm.Submissions,
-                Parm.DocStatus,
-                Parm.LogSequenceNumber,
-                Parm.DocTypeName,
-                Parm.DocChecksum
-            };
-
-            public FieldSelectorResult Accept(string fieldName)
-            {
-                return fieldName == Parm.LightDoc
-                           ? FieldSelectorResult.LOAD
-                           : LAZY_LOAD_FIELDS.Contains(fieldName)
-                               ? FieldSelectorResult.LAZY_LOAD
-                               : FieldSelectorResult.NO_LOAD;
-            }
-        }
-
-        private Document GetDoc(string DocTypeName, string DocId = null, string RelayUrl = null, string IndexDirectory = null)
-        {
-            Dictionary<string, List<string>> _RequiredDocKeys = new Dictionary<string, List<string>>();
-
-            foreach (KeyValuePair<string, string> _Item in DocKeyEncrypter.DocIdToKeys(DocId))
-                _RequiredDocKeys[_Item.Key] = new List<string>
-                {
-                    _Item.Value
-                };
-
-            //TODO:GetDoc needs to query by the exact key, not that a subset of DocKeys exist
-            Document _Document = ListDocuments(new List<string>
-                {
-                    DocTypeName
-                },
-                _RequiredDocKeys,
-                null,
-                null,
-                1,
-                0,
-                RelayUrl,
-                IndexDirectory).FirstOrDefault();
-
-            return _Document;
-        }
-
-        public LuceneController() { CreateNeeded(); }
-
-        private bool CreateNeeded()
-        {
-            DirectoryPath = RequestPaths.GetPhysicalApplicationPath("doc_db");
-
-            // ensure the import folder actually exists
-            if (!Directory.Exists(DirectoryPath))
-            {
-                new DirectoryInfo(DirectoryPath)
-                    .mkdir()
-                    .Attributes = FileAttributes.NotContentIndexed | FileAttributes.Hidden;
-                return true;
-            }
-
-            return !Directory.EnumerateFiles(DirectoryPath).Any();
-        }
-
-        private static string KeysToPredicate(string FieldName, List<string> DocTypes)
-        {
-            return DocTypes == null && DocTypes.Count > 0
-                       ? string.Empty
-                       : string.Format(DocTypes.Count == 1
-                                           ? "+{0}"
-                                           : "+({0})",
-                           string.Join(" OR ",
-                               DocTypes.Select(m => string.Format("{0}:\"{1}\"",
-                                                   FieldName,
-                                                   m))));
-        }
-
-        private static string KeysToPredicate(Dictionary<string, List<string>> Keys)
-        {
-            return Keys == null
-                       ? string.Empty
-                       : string.Join(" ",
-                           Keys.Keys.Cast<string>().Select(m => string.Format("{0}",
-                                                               KeysToPredicate(m,
-                                                                   Keys[m]))).ToArray());
-        }
+        public byte[] GetDocDataBytes(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) =>
+            (byte[]) GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber);
 
         //TODO:folder SubmitBytes & SubmitText
-        public LightDoc SubmitBytes(byte[] DocData)
+        public LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
         {
             BaseDoc _BaseDoc = DocInterpreter.Instance.Read(DocData, true);
             DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
@@ -375,7 +226,7 @@ namespace Rudine.Storage.Docdb
             return _LightDoc;
         }
 
-        public LightDoc SubmitText(string DocData)
+        public LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
         {
             BaseDoc _BaseDoc = DocInterpreter.Instance.Read(DocData, true);
             DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
@@ -418,6 +269,150 @@ namespace Rudine.Storage.Docdb
             }
 
             return _LightDoc;
+        }
+
+        internal List<Document> ListDocuments(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null, string IndexDirectory = null)
+        {
+            if (CreateNeeded())
+                return new List<Document>();
+
+            //TODO:need to build the query bypassing Parse method of the lucene API (currently we stringbuild the query only for the underlying QueryParser.Parse to take it appart
+            string _DocTypeNames = KeysToPredicate(Parm.DocTypeName, DocTypeNames);
+            string _DocKeyFields = KeysToPredicate(DocKeys);
+            string _DocPropertyFields = KeysToPredicate(DocProperties);
+            string _keywords = string.IsNullOrWhiteSpace(KeyWord)
+                ? string.Empty
+                : string.Format("+{0}:{1}*",
+                    Parm.DocData,
+                    KeyWord.Trim(' ', '*'));
+
+            if (_keywords.Length > 0)
+                if (_keywords.IndexOf(' ') > 0)
+                    _keywords = _keywords.Replace("*", "");
+
+            List<string> _Fields = new List<string>();
+            if (!string.IsNullOrWhiteSpace(_DocTypeNames))
+                _Fields.Add(Parm.DocTypeName);
+
+            if (!string.IsNullOrWhiteSpace(_DocKeyFields))
+                _Fields.AddRange(DocKeys.Keys.ToList());
+
+            if (!string.IsNullOrWhiteSpace(_DocPropertyFields))
+                _Fields.AddRange(DocProperties.Keys.ToList());
+
+            string _QueryString = string.Join(" ", new[]
+            {
+                _DocTypeNames,
+                _DocKeyFields,
+                _DocPropertyFields,
+                _keywords
+            }.Where(m => !string.IsNullOrWhiteSpace(m) && m != "+()").Select(m => string.Format("{0}", m)).ToArray());
+
+            using (KeywordAnalyzer _KeywordAnalyzer = new KeywordAnalyzer())
+            using (PerFieldAnalyzerWrapper _PerFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(_KeywordAnalyzer))
+            using (IndexSearcher _Searcher = new IndexSearcher(FSDirectory.Open(DirectoryPath), true))
+            {
+                ScoreDoc[] _ScoreDoc = _Searcher.Search(new MultiFieldQueryParser(LUCENE_VERSION,
+                        _Fields.ToArray(),
+                        _PerFieldAnalyzerWrapper)
+                    {
+                        AllowLeadingWildcard = false
+                    }.Parse(_QueryString),
+                    null,
+                    PageIndex * PageSize + PageSize,
+                    _ListDocumentsSort).ScoreDocs;
+
+                return PageIndex * PageSize < _ScoreDoc.Length
+                    ? _ScoreDoc.Skip(PageIndex * PageSize).Select(m => _Searcher.Doc(
+                        m.Doc,
+                        //BANDAID:for some reason binary fields don't seem to lazy load; they throw an IO exception
+                        // until this is resolved it will be assumed the full document (all byte[] fields) will be
+                        // needed thus avoiding any lazy loading here
+                        PageSize == 1
+                            ? null
+                            : LazyLoadFieldSelector.Instance)).ToList()
+                    : new List<Document>();
+            }
+        }
+
+        private Document GetDoc(string DocTypeName, string DocId = null, string RelayUrl = null, string IndexDirectory = null)
+        {
+            Dictionary<string, List<string>> _RequiredDocKeys = new Dictionary<string, List<string>>();
+
+            foreach (KeyValuePair<string, string> _Item in DocKeyEncrypter.DocIdToKeys(DocId))
+                _RequiredDocKeys[_Item.Key] = new List<string>
+                {
+                    _Item.Value
+                };
+
+            //TODO:GetDoc needs to query by the exact key, not that a subset of DocKeys exist
+            Document _Document = ListDocuments(new List<string>
+                {
+                    DocTypeName
+                },
+                _RequiredDocKeys,
+                null,
+                null,
+                1,
+                0,
+                RelayUrl,
+                IndexDirectory).FirstOrDefault();
+
+            return _Document;
+        }
+
+        private bool CreateNeeded()
+        {
+            DirectoryPath = RequestPaths.GetPhysicalApplicationPath("doc_db");
+
+            // ensure the import folder actually exists
+            if (!Directory.Exists(DirectoryPath))
+            {
+                new DirectoryInfo(DirectoryPath)
+                        .mkdir()
+                        .Attributes = FileAttributes.NotContentIndexed | FileAttributes.Hidden;
+                return true;
+            }
+
+            return !Directory.EnumerateFiles(DirectoryPath).Any();
+        }
+
+        private static string KeysToPredicate(string FieldName, List<string> DocTypes) =>
+            DocTypes == null && DocTypes.Count > 0
+                ? string.Empty
+                : string.Format(DocTypes.Count == 1
+                        ? "+{0}"
+                        : "+({0})",
+                    string.Join(" OR ",
+                        DocTypes.Select(m => string.Format("{0}:\"{1}\"",
+                            FieldName,
+                            m))));
+
+        private static string KeysToPredicate(Dictionary<string, List<string>> Keys) => Keys == null
+            ? string.Empty
+            : string.Join(" ",
+                Keys.Keys.Cast<string>().Select(m => string.Format("{0}",
+                    KeysToPredicate(m,
+                        Keys[m]))).ToArray());
+
+        internal class LazyLoadFieldSelector : FieldSelector
+        {
+            public static readonly LazyLoadFieldSelector Instance = new LazyLoadFieldSelector();
+
+            private static readonly string[] LAZY_LOAD_FIELDS =
+            {
+                Parm.Submissions,
+                Parm.DocStatus,
+                Parm.LogSequenceNumber,
+                Parm.DocTypeName,
+                Parm.DocChecksum
+            };
+
+            public FieldSelectorResult Accept(string fieldName) => fieldName == Parm.LightDoc
+                ? FieldSelectorResult.LOAD
+                : LAZY_LOAD_FIELDS.Contains(fieldName)
+                    ? FieldSelectorResult.LAZY_LOAD
+                    : FieldSelectorResult.NO_LOAD;
         }
     }
 }

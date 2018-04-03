@@ -16,8 +16,10 @@ using Rudine.Util;
 using Rudine.Web;
 using Rudine.Web.Util;
 
-namespace Rudine {
-    public class DocExchange : BaseDocController, IDocKnownTypes {
+namespace Rudine
+{
+    public class DocExchange : BaseDocController, IDocKnownTypes
+    {
         internal static readonly LuceneController LuceneController = new LuceneController();
         internal static readonly Lazy<DocExchange> _Instance = new Lazy<DocExchange>(() => new DocExchange());
 
@@ -44,20 +46,22 @@ namespace Rudine {
         /// </summary>
         /// <returns>current DocTypeNames known to this system</returns>
         public List<Type> DocTypeServedItems() =>
-            CacheMan.Cache(() => {
-                               List<Type> l = new List<Type>();
+            CacheMan.Cache(() =>
+            {
+                List<Type> l = new List<Type>();
 
-                               Parallel.ForEach(
-                                   DocTypeDirectories(),
-                                   DocTypeName => l.Add(Runtime.ActivateBaseDocType(DocTypeName, TemplateController.Instance.TopDocRev(DocTypeName))));
+                Parallel.ForEach(
+                    DocTypeDirectories(),
+                    DocTypeName => l.Add(Runtime.ActivateBaseDocType(DocTypeName, TemplateController.Instance.TopDocRev(DocTypeName))));
 
-                               return l;
-                           }, false, "DocTypes");
+                return l;
+            }, false, "DocTypes");
 
         public override List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null) =>
             LuceneController.Audit(DocTypeName, DocId, RelayUrl);
 
-        public override BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null) {
+        public override BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null)
+        {
             return Create(Doc, RelayUrl, true);
         }
 
@@ -73,7 +77,8 @@ namespace Rudine {
         /// <param name="RelayUrl"></param>
         /// <param name="ProcessTemplate"></param>
         /// <returns></returns>
-        public virtual BaseDoc Create(BaseDoc Doc, string RelayUrl = null, bool ProcessTemplate = true) {
+        public virtual BaseDoc Create(BaseDoc Doc, string RelayUrl = null, bool ProcessTemplate = true)
+        {
             string DocTypeName = Doc.DocTypeName;
 
             // apply ~/form/{DocTypeName}/template.xml values to document passed into us
@@ -88,13 +93,15 @@ namespace Rudine {
             return Doc;
         }
 
-        internal static IEnumerable<string> DocTypeDirectories() {
+        internal static IEnumerable<string> DocTypeDirectories()
+        {
             return Directory
                 .EnumerateDirectories(FilesystemTemplateController.DirectoryPath)
                 .Select(path => new DirectoryInfo(path).Name);
         }
 
-        public override BaseDoc Get(string DocTypeName, Dictionary<string, string> DocKeys = null, string DocId = null, string RelayUrl = null) {
+        public override BaseDoc Get(string DocTypeName, Dictionary<string, string> DocKeys = null, string DocId = null, string RelayUrl = null)
+        {
             return LuceneController.Get(DocTypeName, DocKeys, DocId, RelayUrl);
             ;
         }
@@ -109,7 +116,8 @@ namespace Rudine {
         /// <param name="DocKeys"></param>
         /// <param name="DocTitle"></param>
         /// <returns></returns>
-        public LightDoc Import(Stream DocData) {
+        public LightDoc Import(Stream DocData)
+        {
             LightDoc _LightDoc = SubmitStream(DocData, WindowsIdentity.GetCurrent()
                                                                       .Name);
             string TargetDocName = _LightDoc.GetTargetDocName(), TargetDocVer = _LightDoc.GetTargetDocVer();
@@ -128,8 +136,10 @@ namespace Rudine {
             return _LightDoc;
         }
 
-        public override DocTypeInfo Info(string DocTypeName) {
-            return new DocTypeInfo {
+        public override DocTypeInfo Info(string DocTypeName)
+        {
+            return new DocTypeInfo
+            {
                 //   DocTypeName = DocTypeName,
                 // DocTypeVer = TemplateController.Instance.TopDocRev(DocTypeName),
                 Description = DocInterpreter.Instance.GetDescription(DocTypeName)
@@ -138,33 +148,38 @@ namespace Rudine {
             };
         }
 
-        public override List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null) {
+        public override List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null)
+        {
             return List_With_DocSrc(DocTypeNames, DocKeys, DocProperties, KeyWord, PageSize, PageIndex, RelayUrl)
                 .ToList();
         }
 
-        private static IEnumerable<LightDoc> List_With_DocSrc(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null) {
-            foreach (LightDoc _LightDoc in LuceneController.List(DocTypeNames, DocKeys, DocProperties, KeyWord, PageSize, PageIndex, RelayUrl)) {
+        private static IEnumerable<LightDoc> List_With_DocSrc(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null)
+        {
+            foreach (LightDoc _LightDoc in LuceneController.List(DocTypeNames, DocKeys, DocProperties, KeyWord, PageSize, PageIndex, RelayUrl))
+            {
                 _LightDoc.DocSrc = Nav.ToUrl(_LightDoc.DocTypeName, _LightDoc.DocId, RelayUrl);
                 yield return _LightDoc;
             }
         }
 
-        private static T NormalizeDateTimePropertyValues<T>(T o) {
+        private static T NormalizeDateTimePropertyValues<T>(T o)
+        {
             // normalize the datetime properties since they are mangled in the XmlSerialization/DataContractSerilaization process(s)
             foreach (PropertyInfo p in o.GetType()
                                         .GetProperties())
                 p.SetValue(
                     o,
                     (Nullable.GetUnderlyingType(p.PropertyType) ?? p.PropertyType) == typeof(DateTime)
-                        ? ((DateTime) (p.GetValue(o, null) ?? DateTime.MinValue)).ToLocalTime()
+                        ? ((DateTime)(p.GetValue(o, null) ?? DateTime.MinValue)).ToLocalTime()
                         : NormalizeDateTimePropertyValues(p.GetValue(o, null)),
                     null);
 
             return o;
         }
 
-        private static byte[] ProcessPI(byte[] DocData, string DocSubmittedByEmail, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle) {
+        private static byte[] ProcessPI(byte[] DocData, string DocSubmittedByEmail, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle)
+        {
             DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
             int DocChecksum = DocInterpreter.Instance.CalcDocChecksum(DocData, DocStatus);
             // make sure something has changed since this doc was served up
@@ -173,7 +188,8 @@ namespace Rudine {
             return DocInterpreter.Instance.ModPI(DocData, DocSubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle, DocChecksum);
         }
 
-        private static string ProcessPI(string DocData, string DocSubmittedByEmail, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle) {
+        private static string ProcessPI(string DocData, string DocSubmittedByEmail, bool? DocStatus, DateTime? SubmittedDate, Dictionary<string, string> DocKeys, string DocTitle)
+        {
             DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
             int DocChecksum = DocInterpreter.Instance.CalcDocChecksum(DocData, DocStatus);
             // make sure something has changed since this doc was served up
@@ -182,43 +198,48 @@ namespace Rudine {
             return DocInterpreter.Instance.ModPI(DocData, DocSubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle, DocChecksum);
         }
 
-        public override BaseDoc ReadBytes(byte[] DocData, string RelayUrl = null) {
+        public override BaseDoc ReadBytes(byte[] DocData, string RelayUrl = null)
+        {
             BaseDoc _BaseDoc = DocInterpreter.Instance.Read(DocData, true);
             return Create(_BaseDoc, RelayUrl, false);
         }
 
-        public override BaseDoc ReadText(string DocData, string RelayUrl = null) {
+        public override BaseDoc ReadText(string DocData, string RelayUrl = null)
+        {
             BaseDoc _BaseDoc = DocInterpreter.Instance.Read(DocData, true);
             return Create(_BaseDoc, RelayUrl, false);
         }
 
-        public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null) {
+        public override LightDoc Status(string DocTypeName, Dictionary<string, string> DocKeys, bool DocStatus, string DocSubmittedByEmail, string RelayUrl = null)
+        {
             throw new NotImplementedException();
             //LightDoc _LightDoc = LuceneController.Status(DocTypeName, DocId, DocStatus, DocSubmittedByEmail, RelayUrl);
             //return _LightDoc;
         }
 
-        public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) {
+        public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
+        {
             // validate the content against it's XSD if it's being "approved" as good captured information for the organization
             // now is a good time to do this as the exception we want the user to see first would have hacazd there chance
             DocInterpreter.Instance.Validate(DocData);
             DocData = ProcessPI(DocData, DocSubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle);
-            LightDoc _LightDoc = LuceneController.SubmitBytes(DocData);
+            LightDoc _LightDoc = LuceneController.SubmitBytes(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
             return _LightDoc;
         }
 
-        public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) {
+        public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
+        {
             // validate the content against it's XSD if it's being "approved" as good captured information for the organization
             // now is a good time to do this as the exception we want the user to see first would have hacazd there chance
             DocInterpreter.Instance.Validate(DocData);
             DocData = ProcessPI(DocData, DocSubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle);
-            LightDoc _LightDoc = LuceneController.SubmitText(DocData);
+            LightDoc _LightDoc = LuceneController.SubmitText(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
             return _LightDoc;
         }
 
         public override List<ContentInfo> Interpreters() =>
-            DocInterpreter.ContentInterpreterInstances.Select(m=>m.ContentInfo).ToList();
+            DocInterpreter.ContentInterpreterInstances.Select(m => m.ContentInfo).ToList();
     }
 }
