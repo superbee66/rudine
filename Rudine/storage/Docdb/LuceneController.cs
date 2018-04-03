@@ -170,8 +170,6 @@ namespace Rudine.Storage.Docdb
         public string GetDocDataText(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (string)GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
         public byte[] GetDocDataBytes(string DocTypeName, string DocId = null, string RelayUrl = null, long LogSequenceNumber = 0) { return (byte[])GetDocData(DocTypeName, DocId, RelayUrl, LogSequenceNumber); }
 
-        #region private
-
         /// <summary>
         ///     ListDocuments always returns results in reverse-chronological order
         /// </summary>
@@ -421,7 +419,5 @@ namespace Rudine.Storage.Docdb
 
             return _LightDoc;
         }
-
-        #endregion
     }
 }
