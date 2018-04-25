@@ -13,8 +13,8 @@ namespace Rudine
         {
             return string.Format("{0}.{1}.{2}.{3}",
                 d.Year,
-                string.Format("{0}{1}", d.Month.ToString().PadLeft(2, '0'), d.Day.ToString().PadLeft(2, '0')),
-                string.Format("{0}{1}", d.Hour.ToString().PadLeft(2, '0'), d.Minute.ToString().PadLeft(2, '0')),
+                string.Format("{0}{1}", d.Month, d.Day),
+                string.Format("{0}{1}", d.Hour, d.Minute),
                 d.Second);
         }
     }
