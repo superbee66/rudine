@@ -10,7 +10,7 @@ namespace Rudine.Web
     ///     Writes a Lucene document store database string field value that acts as a unique among
     ///     all other documents (of any DocType) persisted to the primary repository of this solution
     /// </summary>
-    [DataContract(Namespace = "urn:rudine.progablab.com")]
+    [DataContract(Namespace = DocURN.RudineXmlNamespace)]
     [Serializable]
     public class DocTerm : BaseAutoIdent
     {
@@ -27,18 +27,15 @@ namespace Rudine.Web
         [DataMember]
         public virtual string DocTypeName
         {
-            get { return (_docTypeName ?? (_docTypeName = GetType().Name)); }
+            get { return _docTypeName ?? (_docTypeName = GetType().Name); }
             set { _docTypeName = value; }
         }
 
-        public string AsTermTxt()
+        public string AsTermTxt() => Serialize.Json.Serialize(new
         {
-            return Serialize.Json.Serialize(new
-            {
-                //TODO:sort dictionary before serializing
-                DocTypeName,
-                DocKeys
-            });
-        }
+            //TODO:sort dictionary before serializing
+            DocTypeName,
+            DocKeys
+        });
     }
 }

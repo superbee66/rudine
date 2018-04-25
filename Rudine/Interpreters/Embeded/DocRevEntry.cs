@@ -4,7 +4,7 @@ using Rudine.Web;
 
 namespace Rudine.Interpreters.Embeded
 {
-    [XmlType(Namespace = "urn:rudine.progablab.com")]
+    [XmlType(Namespace = Web.DocURN.RudineXmlNamespace)]
     [Serializable]
     public class DocRevEntry : BaseAutoIdent
     {

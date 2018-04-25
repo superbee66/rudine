@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using Rudine.Properties;
 using Rudine.Template.Filesystem;
 using Rudine.Util.Types;
 using Rudine.Util.Xsds;
@@ -52,10 +53,10 @@ namespace Rudine.Interpreters
                 CodeGenerationOptions.GenerateOrder | CodeGenerationOptions.GenerateProperties,
                 new StringCollection());
 
-            myclasses_cs = Runtime.CustomizeXsdToCSharpOutput(DocTypeName, myclasses_cs, null, new[] { "IDocModel" });
+            myclasses_cs = Runtime.CustomizeXsdToCSharpOutput(DocTypeName, myclasses_cs, null, new[] { nameof(IDocModel) });
 
-            if (Directory.Exists(RequestPaths.GetPhysicalApplicationPath("App_Code")))
-                File.WriteAllText(RequestPaths.GetPhysicalApplicationPath("App_Code", DocTypeName + ".cs"), myclasses_cs, Encoding.Unicode);
+            if (Directory.Exists(RequestPaths.GetPhysicalApplicationPath(Resources.App_Code_DirectoryPath)))
+                File.WriteAllText(RequestPaths.GetPhysicalApplicationPath(Resources.App_Code_DirectoryPath, DocTypeName + ".cs"), myclasses_cs, Encoding.Unicode);
             else
                 File.WriteAllText(_DocDirectoryInfo.FullName + @"\\example.cs", myclasses_cs, Encoding.Unicode);
 

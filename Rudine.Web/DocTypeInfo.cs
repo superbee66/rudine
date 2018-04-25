@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Rudine.Web
 {
-    [DataContract(Namespace = "urn:rudine.progablab.com")]
+    [DataContract(Namespace = RudineXmlNamespace)]
     [Serializable]
     public class DocTypeInfo : DocURN
     {

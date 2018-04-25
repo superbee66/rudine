@@ -64,7 +64,7 @@ namespace Rudine.Template.Filesystem
         /// <summary>
         /// </summary>
         /// <param name="_DirectoryInfo"></param>
-        /// <param name="TargetDocTypeVer"></param>
+        /// <param name=Properties.Resources.TargetDocTypeVer></param>
         /// <param name="TargetDocMD5"></param>
         /// <returns>DocTypeVer only if the DocTypeName can be interpreted from a same file</returns>
         public static string ScanContentFolder(DirectoryInfo _DirectoryInfo, out string TargetDocTypeVer, out string TargetDocMD5)

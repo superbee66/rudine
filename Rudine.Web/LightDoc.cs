@@ -12,7 +12,7 @@ namespace Rudine.Web
     ///     A different LighDoc is created for every submission of the BaseDoc. Normal
     ///     queries to the system should only yield the latest LighDoc for there BaseDocs
     /// </summary>
-    [DataContract(Namespace = "urn:rudine.progablab.com")]
+    [DataContract(Namespace = DocURN.RudineXmlNamespace)]
     [Serializable]
     public class LightDoc : IDocLogistics, IDocIdentifiers, IComparable<LightDoc>
     {
@@ -22,10 +22,16 @@ namespace Rudine.Web
         ///     Simply this object in json form
         /// </summary>
         [ScriptIgnore]
-        public string DataKeyField
-        {
-            get { return Serialize.Json.Serialize(this); }
-        }
+        public string DataKeyField => Serialize.Json.Serialize(this);
+
+        [DataMember]
+        public string DocId { get; set; }
+
+        /// <summary>
+        ///     Indicates if the response of DocSrc will be text or binary format
+        /// </summary>
+        [DataMember]
+        public bool DocIsBinary { get; set; }
 
         /// <summary>
         ///     Should be the same if this LightDoc represents the first submission for the BaseDoc
@@ -61,12 +67,9 @@ namespace Rudine.Web
                 i = (DocStatus != null && DocStatus.Value).CompareTo(Other.DocStatus != null && Other.DocStatus.Value);
 
             if (i == 0)
-                i = String.Compare(DocTitle, Other.DocTitle, StringComparison.OrdinalIgnoreCase);
+                i = string.Compare(DocTitle, Other.DocTitle, StringComparison.OrdinalIgnoreCase);
             return i;
         }
-
-        [DataMember]
-        public string DocId { get; set; }
 
         /// <summary>
         ///     Reflects the current status of the persisted BaseDoc
@@ -80,29 +83,19 @@ namespace Rudine.Web
         public string DocSrc { get; set; }
 
         /// <summary>
-        ///     Indicates if the response of DocSrc will be text or binary format
-        /// </summary>
-        [DataMember]
-        public bool DocIsBinary { get; set; }
-
-        /// <summary>
         ///     uses a serialize-deserialize technique to construct a new LightDoc
         /// </summary>
         /// <param name="o"></param>
         /// <returns>property filled LightDoc</returns>
-        public static LightDoc FromObject(object o)
-        {
-            //TODO:Make this FromObject conversion method type safe & "round-trippable" by restructuring architecture
-            return (LightDoc) Serialize.Json.Deserialize(
-                Serialize.Json.Serialize(o),
-                typeof(LightDoc));
-        }
+        public static LightDoc FromObject(object o) => (LightDoc) Serialize.Json.Deserialize(
+            Serialize.Json.Serialize(o),
+            typeof(LightDoc));
 
         /// <summary>
         ///     self inflate from json (DataKeyField) string
         /// </summary>
         /// <param name="Json"></param>
         /// <returns></returns>
-        public static LightDoc Parse(string Json) { return Serialize.Json.Deserialize<LightDoc>(Json); }
+        public static LightDoc Parse(string Json) => Serialize.Json.Deserialize<LightDoc>(Json);
     }
 }

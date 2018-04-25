@@ -74,8 +74,8 @@ namespace Rudine.Interpreters.Embeded
 
             _DOCREV.DocKeys = new Dictionary<string, string>
             {
-                { "TargetDocTypeName", _DOCREV.Target.DocTypeName },
-                { "TargetDocTypeVer", _DOCREV.Target.solutionVersion }
+                { Properties.Resources.TargetDocTypeNameKey, _DOCREV.Target.DocTypeName },
+                { Properties.Resources.TargetDocTypeVerKey, _DOCREV.Target.solutionVersion }
             };
             return _DOCREV;
         }

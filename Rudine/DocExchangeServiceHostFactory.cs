@@ -4,6 +4,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Description;
+using Rudine.Properties;
 using Rudine.Template.Filesystem;
 using Rudine.Web.Util;
 
@@ -24,8 +25,8 @@ namespace Rudine
             new[]
                 {
                     FilesystemTemplateController.DirectoryPath,
-                    Directory.Exists(RequestPaths.GetPhysicalApplicationPath("App_Code"))
-                        ? RequestPaths.GetPhysicalApplicationPath("App_Code")
+                    Directory.Exists(RequestPaths.GetPhysicalApplicationPath(Resources.App_Code_DirectoryPath))
+                        ? RequestPaths.GetPhysicalApplicationPath(Resources.App_Code_DirectoryPath)
                         : string.Empty
                 }
                 .Where(Directory.Exists)

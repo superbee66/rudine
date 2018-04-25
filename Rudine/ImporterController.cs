@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 using Rudine.Exceptions;
 using Rudine.Interpreters;
 using Rudine.Interpreters.Embeded;
-
+using Rudine.Properties;
 using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Util.Cabs;
@@ -29,7 +29,7 @@ namespace Rudine
     public static class ImporterController
     {
         public static string DirectoryFullName {
-            get { return RequestPaths.GetPhysicalApplicationPath("import"); }
+            get { return RequestPaths.GetPhysicalApplicationPath(Resources.import_DirectoryPath); }
         }
 
         static ImporterController() { Reflection.LoadBinDlls(); }
@@ -111,7 +111,7 @@ namespace Rudine
             DirectoryInfo _DirectoryInfo = new DirectoryInfo(sourceFolderPath);
 
             if (workingFolderPath == null)
-                workingFolderPath = RequestPaths.GetPhysicalApplicationPath("import");
+                workingFolderPath = RequestPaths.GetPhysicalApplicationPath(Resources.import_DirectoryPath);
 
             //// ensure the import folder actually exists
             new DirectoryInfo(workingFolderPath)
@@ -135,8 +135,8 @@ namespace Rudine
                 DocRevBaseDoc.MD5 = DocMD5;
                 DocRevBaseDoc.DocKeys = new Dictionary<string, string>
                     {
-                        { "TargetDocTypeName", DocTypeName },
-                        { "TargetDocTypeVer", DocTypeVer }
+                        { Properties.Resources.TargetDocTypeNameKey, DocTypeName },
+                        { Properties.Resources.TargetDocTypeVerKey, DocTypeVer }
                     };
 
                 foreach (KeyValuePair<string, string> file in files)
@@ -208,7 +208,7 @@ namespace Rudine
                 }
 
                 // create placeholder App_Code\DocTypeName.c_ files for developer to get started with myschema.xsd generation via cSharp file editing & thus auto translating
-                string App_Code_Directory_Fullname = RequestPaths.GetPhysicalApplicationPath("App_Code");
+                string App_Code_Directory_Fullname = RequestPaths.GetPhysicalApplicationPath(Resources.App_Code_DirectoryPath);
                 if (Directory.Exists(App_Code_Directory_Fullname))
                     Tasker.StartNewTask(() =>
                                         {

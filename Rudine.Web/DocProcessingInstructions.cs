@@ -9,21 +9,19 @@ namespace Rudine.Web
     ///     Writes Microsoft InfoPath specific & IPB proprietary XML processing instructions on each document
     ///     destined to be opened by the end-user.
     /// </summary>
-    [DataContract(Namespace = "urn:rudine.progablab.com")]
+    [DataContract(Namespace = DocURN.RudineXmlNamespace)]
     [Serializable]
     public class DocProcessingInstructions : DocTerm
     {
-        public bool IsDocRev() { return DocTypeName.Equals(Parm.DocRev, StringComparison.CurrentCultureIgnoreCase); }
-
-        [DataMember]
-        public string DocSrc { get; set; }
-
         private bool? docStatus;
 
         [XmlIgnore]
         [ScriptIgnore]
         [DataMember]
         public virtual int DocChecksum { get; set; }
+
+        [DataMember]
+        public string DocSrc { get; set; }
 
         [XmlIgnore]
         [DataMember]
@@ -64,6 +62,8 @@ namespace Rudine.Web
         [XmlIgnore]
         [ScriptIgnore]
         public virtual string solutionVersion { get; set; }
+
+        public bool IsDocRev() => DocTypeName.Equals(Parm.DocRev, StringComparison.CurrentCultureIgnoreCase);
 
         //TODO:Test to make sure solutionVersion { get; private set; } to { get; set; } did not break anything
     }

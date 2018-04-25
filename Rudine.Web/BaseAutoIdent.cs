@@ -8,7 +8,7 @@ namespace Rudine.Web
     /// <summary>
     ///     The base of all entities utilizing a single auto increment integer id.
     /// </summary>
-    [DataContract(Namespace = "urn:rudine.progablab.com")]
+    [DataContract(Namespace = DocURN.RudineXmlNamespace)]
     [Serializable]
     public abstract class BaseAutoIdent
     {

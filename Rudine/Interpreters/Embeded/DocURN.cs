@@ -1,10 +1,11 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 using Rudine.Web;
 
 namespace Rudine.Interpreters.Embeded
 {
-    [XmlType(Namespace = "urn:rudine.progablab.com")]
-    [System.SerializableAttribute()]
+    [XmlType(Namespace = Web.DocURN.RudineXmlNamespace)]
+    [Serializable]
     public class DocURN : BaseAutoIdent
     {
         private string docTypeNameField;
