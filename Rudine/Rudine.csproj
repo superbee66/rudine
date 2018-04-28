@@ -168,11 +168,17 @@
     <Compile Include="Interpreters\DocBaseInterpreter.cs" />
     <Compile Include="Interpreters\DocTextInterpreter.cs" />
     <Compile Include="DocExchange.cs" />
+    <Compile Include="KeywordTypeExtensions.cs" />
     <Compile Include="LightDocExtensions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Runtime.cs" />
     <Compile Include="RuntimeTypeNamer.cs" />
@@ -231,6 +237,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Hyland.Types">
+      <HintPath>..\..\DDD.App.OnBaseBridge\DDD.App.OnBaseBridge\lib\Hyland.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="Hyland.Unity">
+      <HintPath>..\..\DDD.App.OnBaseBridge\DDD.App.OnBaseBridge\lib\Hyland.Unity.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
@@ -278,7 +290,12 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

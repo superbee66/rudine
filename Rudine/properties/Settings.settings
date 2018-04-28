@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Rudine.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="OnBaseUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://dtsobappt03a.azdes.gov/obappservernt/service.asmx</Value>
+    </Setting>
+    <Setting Name="OnBaseUser" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">D027621</Value>
+    </Setting>
+    <Setting Name="OnBasePassword" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Spring2018</Value>
+    </Setting>
+    <Setting Name="OnBaseDataSource" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">OBTest</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

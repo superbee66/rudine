@@ -51,7 +51,7 @@ namespace Rudine.Web.Util
         private static string CollapseUnderscores(string original) =>
             Regex.Replace(original, "[_]+", "_");
 
-        public static string PrettyCSharpIdent(string original, int characters = int.MaxValue) =>
+        public static string PrettyCSharpIdent(this string original, int characters = int.MaxValue) =>
             CollapseUnderscores(PrettyMsSqlIdent(original, characters));
 
         /// <summary>

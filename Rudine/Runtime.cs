@@ -303,7 +303,7 @@ namespace Rudine
                 match => string.Format(
                     "{0}[DataMember(Name = \"{1}\", EmitDefaultValue = false)]{2}",
                     match.Groups[1].Value, /* 0 */
-                    StringTransform.PrettyCSharpIdent(match.Groups[4].Value), /* 1 */
+                    match.Groups[4].Value.PrettyCSharpIdent(), /* 1 */
                     match.Value), /* 3 */
                 RegexOptions.IgnoreCase);
 
@@ -380,10 +380,9 @@ this is applied to all classes.
 */
                     DocTypeName == match.Groups[7].Value
                         ? match.Groups[7].Value
-                        : DocTypeName + "_" + StringTransform.PrettyCSharpIdent(
-                              string.IsNullOrWhiteSpace(match.Groups[3].Value)
-                                  ? match.Groups[7].Value
-                                  : match.Groups[3].Value.Trim(',', ' ', '"')),
+                        : DocTypeName + "_" + (string.IsNullOrWhiteSpace(match.Groups[3].Value)
+                              ? match.Groups[7].Value
+                              : match.Groups[3].Value.Trim(',', ' ', '"')).PrettyCSharpIdent(),
                     DocTypeName == match.Groups[7].Value
                         ? ApplyToPrimaryClass
                         : ApplyToSecondayClasses),
