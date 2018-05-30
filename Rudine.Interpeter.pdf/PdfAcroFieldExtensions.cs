@@ -93,7 +93,12 @@ namespace Rudine.Interpreters.Pdf
                                  typeof(int));
 
                     foreach (PdfReference choice in ((PdfArray)o.Elements["/Kids"]).OfType<PdfReference>())
-                        _EnumBuilder.DefineLiteral(GetEnumItemName(choice), GetEnumItemName(choice).GetHashCode());
+                    {
+                        string _EnumItemName = GetEnumItemName(choice);
+                        if (!string.IsNullOrWhiteSpace(_EnumItemName))
+                            _EnumBuilder.DefineLiteral(_EnumItemName, _EnumItemName.GetHashCode());
+                    }
+
                     _T = _EnumBuilder.CreateType();
                 }
             }
@@ -114,7 +119,8 @@ namespace Rudine.Interpreters.Pdf
 
         private static string GetEnumItemName(PdfReference choice)
         {
-            return StringTransform.PrettyCSharpIdent(((PdfDictionary)((PdfDictionary)((PdfItem[])((PdfDictionary)choice.Value).Elements.Values)[0]).Elements["/N"]).Elements.First().Key.TrimStart('/'));
+            string _TrimStart = ((PdfDictionary)((PdfDictionary)((PdfItem[])((PdfDictionary)choice.Value).Elements.Values)[0]).Elements["/N"]).Elements.First().Key.TrimStart('/');
+            return StringTransform.PrettyCSharpIdent(_TrimStart);
         }
 
         internal static string detectDateTimeFormat(PdfAcroField o) =>
