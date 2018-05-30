@@ -40,7 +40,7 @@ namespace Rudine
                     new DocRevEntry {
                         Bytes = File.ReadAllBytes(filepath.FullName),
                         ModDate = filepath.LastWriteTimeUtc,
-                        Name = Path.GetFileNameWithoutExtension(filepath.FullName)
+                        Name = Path.GetFileName(filepath.FullName)
                     }
                 });
 
@@ -61,7 +61,7 @@ namespace Rudine
                           {
                               Bytes = File.ReadAllBytes(filepath.FullName),
                               ModDate = filepath.LastWriteTimeUtc,
-                              Name = Path.GetFileNameWithoutExtension(filepath.FullName)
+                              Name = Path.GetFileName(filepath.FullName)
                           });
 
             return baseDocController.CreateTemplate(docRev.DocFiles, docRev.DocURN.DocTypeName);
@@ -76,13 +76,18 @@ namespace Rudine
         {
             List<DocRev> templatesList = CreateTemplatesList(baseDocController);
 
-            string[] DisintctDocFilesMD5 = templatesList.Select(docrev => docrev.DocFilesMD5).Distinct().ToArray();
+            string[] _DistinctDocFilesMd5 = templatesList.Select(docrev => docrev.DocFilesMD5).Distinct().ToArray();
 
-            List<LightDoc> Existing = baseDocController.List(
+            List<LightDoc> _Existing = baseDocController.List(
                                          new List<string> { nameof(DocRev) },
                                          null,
                                          null,
-                                  string.Join(" ", DisintctDocFilesMD5));
+                                  string.Join(" ", _DistinctDocFilesMd5));
+
+
+            if( _Existing.Count!=templatesList.Count)
+                foreach( DocRev _DocRev in templatesList)
+                    baseDocController.SubmitDoc(_DocRev,string.Empty);
 
             return new List<Web.DocRev>();
 
