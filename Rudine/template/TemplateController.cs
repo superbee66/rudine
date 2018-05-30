@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Web;
-using Rudine.Interpreters.Embeded;
 using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Web;

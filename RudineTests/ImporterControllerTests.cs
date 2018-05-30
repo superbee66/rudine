@@ -1,11 +1,8 @@
 ﻿using NUnit.Framework;
-using Rudine;
 using Rudine.Web;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Rudine.Template.Filesystem;
 using Rudine.Web.Util;
 

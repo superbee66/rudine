@@ -7,8 +7,6 @@ using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Rudine.Exceptions;
 using Rudine.Interpreters;
-using Rudine.Interpreters.Embeded;
-
 using Rudine.Web;
 using Directory = System.IO.Directory;
 
