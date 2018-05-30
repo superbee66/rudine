@@ -93,6 +93,7 @@ namespace Rudine.Tests
                 TemplateController.Instance.TopDocRev(docTypeName),
                 DocExchange.Instance);
             baseDoc.DocKeys = DocKeys;
+            baseDoc.DocTypeName = docTypeName;
 
             BaseDoc createdBaseDoc = DocExchange.Instance.Create(baseDoc);
 
