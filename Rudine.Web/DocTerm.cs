@@ -27,7 +27,7 @@ namespace Rudine.Web
         [DataMember]
         public virtual string DocTypeName
         {
-            get { return (_docTypeName ?? (_docTypeName = GetType().Name)); }
+            get { return _docTypeName; }
             set { _docTypeName = value; }
         }
 
