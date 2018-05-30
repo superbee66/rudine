@@ -17,9 +17,11 @@ namespace Rudine.Web.Util
             or
         }
 
-        public static string SPLIT_DELIM_DEFAULT = " ";
+        private static readonly CSharpCodeProvider _CSharpCodeProvider = new CSharpCodeProvider();
 
         private static readonly TextInfo enUSTextInfo = new CultureInfo("en-US", false).TextInfo;
+
+        public static string SPLIT_DELIM_DEFAULT = " ";
 
         private static readonly Regex WordifyRegex = new Regex(
             @"(?<=[A-Za-z])(?<x>[0-9])|
@@ -29,16 +31,14 @@ namespace Rudine.Web.Util
 		(_)(?<x>[\w-[_]])",
             RegexOptions.IgnorePatternWhitespace);
 
-        private static readonly CSharpCodeProvider _CSharpCodeProvider = new CSharpCodeProvider();
-
-        public static string CamelCase(string subject, string wordDelim = "", int maxLength = Int32.MaxValue)
+        public static string CamelCase(string subject, string wordDelim = "", int maxLength = int.MaxValue)
         {
-            if (maxLength == Int32.MaxValue)
+            if (maxLength == int.MaxValue)
                 return
                     enUSTextInfo.ToTitleCase(
-                                    Wordify(subject).ToLower())
-                                .Replace(" ", wordDelim);
-            string s = String.Empty;
+                            Wordify(subject).ToLower())
+                        .Replace(" ", wordDelim);
+            string s = string.Empty;
             foreach (string word in Wordify(subject).ToLower().Split(' ').Where(word => s.Length + word.Length + 1 < maxLength))
                 if (s.Length == 0)
                     s += word;
@@ -51,15 +51,19 @@ namespace Rudine.Web.Util
         private static string CollapseUnderscores(string original) =>
             Regex.Replace(original, "[_]+", "_");
 
+
         public static string PrettyCSharpIdent(string original, int characters = int.MaxValue) =>
-            CollapseUnderscores(PrettyMsSqlIdent(original, characters));
+            CollapseUnderscores(PrettyMsSqlIdent(
+                Regex.IsMatch(original[0].ToString(), "[^a-z_]", RegexOptions.IgnoreCase)
+                    ? string.Format("var{0}", original)
+                    : original, characters));
 
         /// <summary>
         /// </summary>
         /// <param name="original"></param>
         /// <param name="characters"></param>
         /// <returns>Title-casing, underscore separated with 128 character limitation ensuring MSSQL column name compatibility</returns>
-        public static string PrettyMsSqlIdent(string original, int characters = 128) => 
+        public static string PrettyMsSqlIdent(string original, int characters = 128) =>
             CollapseUnderscores(SafeIdentifier(CamelCase(original, "_", characters)).TrimEnd('_'));
 
         public static string SafeIdentifier(string subject)
@@ -71,8 +75,8 @@ namespace Rudine.Web.Util
                 .TrimStart('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0');
 
             return _CSharpCodeProvider.IsValidIdentifier(s)
-                       ? s
-                       : "_" + s;
+                ? s
+                : "_" + s;
         }
 
         /// <summary>
@@ -96,7 +100,7 @@ namespace Rudine.Web.Util
 
             if (vals.Length > 1)
             {
-                vals[0] = String.Join(", ",
+                vals[0] = string.Join(", ",
                     vals).Trim(',',
                     ' ');
 
@@ -121,11 +125,9 @@ namespace Rudine.Web.Util
         /// </summary>
         /// <param name="subject">thisIs_The-Subject</param>
         /// <returns>This Is The Subject</returns>
-        public static string Wordify(string subject)
-        {
-            return !String.IsNullOrWhiteSpace(subject) ?
-                       WordifyRegex.Replace(subject,
-                           " ${x}") : subject;
-        }
+        public static string Wordify(string subject) => !string.IsNullOrWhiteSpace(subject)
+            ? WordifyRegex.Replace(subject,
+                " ${x}")
+            : subject;
     }
 }
