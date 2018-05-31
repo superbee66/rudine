@@ -186,16 +186,16 @@ namespace Rudine.Web
                         DocTitle
                     });
 
-        public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
-            Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
+        public override LightDoc SubmitBytes(byte[] DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
+            Submit(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
-        public override LightDoc SubmitDoc(BaseDoc DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)  =>
+        public override LightDoc SubmitDoc(BaseDoc DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)  =>
             (LightDoc) GetMethodInfo(DocCmd.SubmitDoc)
                 .Invoke(UnderlyingWSClient,
                     new object[]
                     {
                         DocData,
-                        DocSubmittedByEmail,
+                        SubmittedByEmail,
                         string.IsNullOrWhiteSpace(RelayUrl)
                             ? DefaultRelayUrl
                             : RelayUrl,
@@ -205,8 +205,8 @@ namespace Rudine.Web
                         DocTitle
                     });
 
-        public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
-            Submit(DocData, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
+        public override LightDoc SubmitText(string DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
+            Submit(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
         public override List<ContentInfo> TemplateSources() =>
             (List<ContentInfo>) _UnderlyingControllerType.GetMethod(nameof(TemplateSources))

@@ -151,12 +151,12 @@ namespace Rudine
             return Create(_BaseDoc, RelayUrl, false);
         }
 
-        public override LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
+        public override LightDoc SubmitBytes(byte[] DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
         {
             // validate the content against it's XSD if it's being "approved" as good captured information for the organization
             // now is a good time to do this as the exception we want the user to see first would have hacazd there chance
             DocInterpreter.Instance.Validate(DocData);
-            DocData = ProcessPI(DocData, DocSubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle);
+            DocData = ProcessPI(DocData, SubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
             LightDoc _LightDoc = LuceneController.SubmitBytes(DocData);
 
@@ -180,15 +180,15 @@ namespace Rudine
             return _LightDoc;
         }
 
-        public override LightDoc SubmitDoc(BaseDoc DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
-            SubmitStream(DocInterpreter.Instance.WriteStream(DocData, true), DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
+        public override LightDoc SubmitDoc(BaseDoc DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
+            SubmitStream(DocInterpreter.Instance.WriteStream(DocData, true), SubmittedByEmail, SubmittedDate, RelayUrl, DocStatus, DocKeys, DocTitle);
 
-        public override LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
+        public override LightDoc SubmitText(string DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
         {
             // validate the content against it's XSD if it's being "approved" as good captured information for the organization
             // now is a good time to do this as the exception we want the user to see first would have hacazd there chance
             DocInterpreter.Instance.Validate(DocData);
-            DocData = ProcessPI(DocData, DocSubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle);
+            DocData = ProcessPI(DocData, SubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle);
             LightDoc _LightDoc = LuceneController.SubmitText(DocData);
 
             return _LightDoc;

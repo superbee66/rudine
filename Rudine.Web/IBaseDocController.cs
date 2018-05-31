@@ -48,10 +48,10 @@ namespace Rudine.Web
         BaseDoc ReadText(string DocData, string RelayUrl = null);
 
         [OperationContract]
-        LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        LightDoc SubmitBytes(byte[] DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
 
         [OperationContract]
-        LightDoc SubmitDoc(BaseDoc DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        LightDoc SubmitDoc(BaseDoc DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
 
         /// <summary>
         ///     not represented as an OperationContract as WCF requires there to be only one Stream parameter in the method. If the
@@ -59,16 +59,16 @@ namespace Rudine.Web
         ///     Stream parameter into a byte array or string.
         /// </summary>
         /// <param name="DocData"></param>
-        /// <param name="DocSubmittedByEmail"></param>
+        /// <param name="SubmittedByEmail"></param>
+        /// <param name="SubmittedDate"></param>
         /// <param name="RelayUrl"></param>
         /// <param name="DocStatus"></param>
-        /// <param name="SubmittedDate"></param>
         /// <param name="DocKeys"></param>
         /// <param name="DocTitle"></param>
         /// <returns></returns>
-        LightDoc SubmitStream(Stream DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        LightDoc SubmitStream(Stream DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
 
         [OperationContract]
-        LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        LightDoc SubmitText(string DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
     }
 }

@@ -26,25 +26,25 @@ namespace Rudine.Web
                 streamAsValue => ReadText(streamAsValue, RelayUrl));
 
         public abstract BaseDoc ReadText(string DocData, string RelayUrl = null);
-        public abstract LightDoc SubmitBytes(byte[] DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
-        public abstract LightDoc SubmitDoc(BaseDoc DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        public abstract LightDoc SubmitBytes(byte[] DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        public abstract LightDoc SubmitDoc(BaseDoc DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
 
         /// <summary>
         /// </summary>
         /// <param name="DocData">detected as bytes or a string</param>
-        /// <param name="DocSubmittedByEmail"></param>
+        /// <param name="SubmittedByEmail"></param>
+        /// <param name="SubmittedDate"></param>
         /// <param name="RelayUrl"></param>
         /// <param name="DocStatus"></param>
-        /// <param name="SubmittedDate"></param>
         /// <param name="DocKeys"></param>
         /// <param name="DocTitle"></param>
         /// <returns></returns>
-        public LightDoc SubmitStream(Stream DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
+        public LightDoc SubmitStream(Stream DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
             DocData.Spork(
-                streamAsValue => SubmitBytes(streamAsValue, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle),
-                streamAsValue => SubmitText(streamAsValue, DocSubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle));
+                streamAsValue => SubmitBytes(streamAsValue, SubmittedByEmail, SubmittedDate, RelayUrl, DocStatus, DocKeys, DocTitle),
+                streamAsValue => SubmitText(streamAsValue, SubmittedByEmail, SubmittedDate, RelayUrl, DocStatus, DocKeys, DocTitle));
 
-        public abstract LightDoc SubmitText(string DocData, string DocSubmittedByEmail, string RelayUrl = null, bool? DocStatus = null, DateTime? SubmittedDate = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
+        public abstract LightDoc SubmitText(string DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null);
         public abstract List<ContentInfo> TemplateSources();
     }
 }

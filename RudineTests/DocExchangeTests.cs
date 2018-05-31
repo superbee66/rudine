@@ -176,10 +176,10 @@ namespace Rudine.Tests
             BaseDoc randDoc = CreateRandomBaseDoc(docTypeName, false);
 
             randDoc.DocStatus = false;
-            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail, null, randDoc.DocStatus);
+            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail, null, null, randDoc.DocStatus, null);
 
             randDoc.DocStatus = true;
-            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail, null, randDoc.DocStatus);
+            DocExchange.Instance.SubmitDoc(randDoc, docSubmittedByEmail, null, null, randDoc.DocStatus, null);
         }
 
         [Test, Combinatorial]
