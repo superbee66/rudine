@@ -217,9 +217,6 @@
     <Compile Include="Util\Zips\Compressor.cs" />
     <Compile Include="Util\Zips\RuntimeBinaryFormatter.cs" />
     <Compile Include="Util\PropertyOverlay.cs" />
-    <Compile Include="Util\DictionaryExtensions.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Util\RijndaelEnhanced.cs">
       <SubType>Code</SubType>
     </Compile>

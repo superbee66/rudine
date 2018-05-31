@@ -2,20 +2,21 @@
 
 namespace Rudine
 {
+    /// <summary>
+    ///     Produces a string legal for parsing by the System.Version Type
+    /// </summary>
     public static class DocRevDateTimeExtension
     {
         /// <summary>
-        ///     makes a docrev from datetime
+        ///     makes a DocRev from datetime
         /// </summary>
-        /// <param name="d">recommended to be of UTC</param>
+        /// <param name="DateTime">recommended to be of UTC</param>
         /// <returns></returns>
-        public static string AsDocRev(this DateTime d)
-        {
-            return string.Format("{0}.{1}.{2}.{3}",
-                d.Year,
-                string.Format("{0}{1}", d.Month.ToString().PadLeft(2, '0'), d.Day.ToString().PadLeft(2, '0')),
-                string.Format("{0}{1}", d.Hour.ToString().PadLeft(2, '0'), d.Minute.ToString().PadLeft(2, '0')),
-                d.Second);
-        }
+        public static string AsDocRev(this DateTime DateTime) =>
+            string.Format("{0}.{1}.{2}.{3}",
+                DateTime.Year,
+                string.Format("{0}{1}", DateTime.Month.ToString().PadLeft(2, '0'), DateTime.Day.ToString().PadLeft(2, '0')),
+                string.Format("{0}{1}", DateTime.Hour.ToString().PadLeft(2, '0'), DateTime.Minute.ToString().PadLeft(2, '0')),
+                DateTime.Second);
     }
 }

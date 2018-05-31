@@ -2,19 +2,22 @@
 
 namespace Rudine.Util
 {
+    /// <summary>
+    ///     Hosts a routine to convert a simple .Net string to a System.IO.MemoryStream
+    /// </summary>
     internal static class StringExtensions
     {
-        public static MemoryStream AsMemoryStream(this string s)
+        public static MemoryStream AsMemoryStream(this string String)
         {
-            MemoryStream _MemoryStream = new MemoryStream();
-            StreamWriter _StreamWriter = new StreamWriter(_MemoryStream)
+            MemoryStream memoryStream = new MemoryStream();
+            StreamWriter streamWriter = new StreamWriter(memoryStream)
             {
                 AutoFlush = true
             };
-            _StreamWriter.Write(s);
-            _StreamWriter.Flush();
-            _MemoryStream.Position = 0;
-            return _MemoryStream;
+            streamWriter.Write(String);
+            streamWriter.Flush();
+            memoryStream.Position = 0;
+            return memoryStream;
         }
     }
 }
