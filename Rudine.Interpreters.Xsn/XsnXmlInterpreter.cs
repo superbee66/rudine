@@ -623,7 +623,7 @@ namespace Rudine.Interpreters.Xsn
 
                         throw new Exception(
                             string.Format(
-                                "TODO:Put back this valiation message from repo as I deleted the resx on accident",
+                                "TODO:Put back this validation message from repo as I deleted the resx on accident",
                                 ValidationMessagesCount,
                                 ValidationMessageMarkDown));
                     }
