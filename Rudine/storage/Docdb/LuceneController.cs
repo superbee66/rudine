@@ -328,12 +328,14 @@ namespace Rudine.Storage.Docdb
                                                                    Keys[m]))).ToArray());
         }
 
-        //TODO:folder SubmitBytes & SubmitText
-        public LightDoc SubmitBytes(byte[] DocData)
-        {
-            BaseDoc _BaseDoc = DocInterpreter.Instance.Read(DocData, true);
-            DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
+        public LightDoc SubmitBytes(byte[] DocData) =>
+            Submit(DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData));
 
+        public LightDoc SubmitText(string DocData) =>
+            Submit(DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData));
+
+        private LightDoc Submit(object DocData, BaseDoc _BaseDoc, DocProcessingInstructions _DocProcessingInstructions)
+        {
             Dictionary<LightDoc, object> _DocSubmissions = new Dictionary<LightDoc, object>();
 
             Document _Document = GetDoc(_BaseDoc.DocTypeName, _BaseDoc.GetDocId());
@@ -356,50 +358,6 @@ namespace Rudine.Storage.Docdb
             LightDoc _LightDoc = _BaseDoc.ToLightDoc();
             _LightDoc.DocSubmitDate = DateTime.Now;
             _LightDoc.DocIsBinary = true;
-
-            _DocSubmissions.Add(_LightDoc, DocData);
-
-            using (StandardAnalyzer _StandardAnalyzer = new StandardAnalyzer(LUCENE_VERSION))
-            using (IndexWriter _CurrentIndexWriter = new IndexWriter(Open(), _StandardAnalyzer, CreateNeeded(), IndexWriter.MaxFieldLength.UNLIMITED))
-            {
-                if (_DocSubmissions.Count > 1)
-                    _CurrentIndexWriter.UpdateDocument(_BaseDoc.docTermFromBaseDoc(), _DocSubmissions.AsDocument());
-                else
-                    _CurrentIndexWriter.AddDocument(_DocSubmissions.AsDocument());
-
-                _CurrentIndexWriter.Commit();
-            }
-
-            return _LightDoc;
-        }
-
-        public LightDoc SubmitText(string DocData)
-        {
-            BaseDoc _BaseDoc = DocInterpreter.Instance.Read(DocData, true);
-            DocProcessingInstructions _DocProcessingInstructions = DocInterpreter.Instance.ReadDocPI(DocData);
-
-            Dictionary<LightDoc, object> _DocSubmissions = new Dictionary<LightDoc, object>();
-
-            Document _Document = GetDoc(_BaseDoc.DocTypeName, _BaseDoc.GetDocId());
-
-            if (_Document != null)
-            {
-                if (_DocProcessingInstructions.DocChecksum == int.Parse(_Document.Get(Parm.DocChecksum)))
-                    if (!_DocProcessingInstructions.IsDocRev())
-                        throw new NoChangesSinceLastSubmitException();
-                    else
-                        return _BaseDoc.ToLightDoc();
-
-                if (!_DocProcessingInstructions.IsDocRev())
-                    if ((_Document.Get(Parm.DocStatus) ?? bool.FalseString) == bool.TrueString)
-                        throw new NoOverwriteOfPreviouslyApproveException();
-
-                _DocSubmissions = _Document.AsDocSubmissions();
-            }
-
-            LightDoc _LightDoc = _BaseDoc.ToLightDoc();
-            _LightDoc.DocSubmitDate = DateTime.Now;
-            _LightDoc.DocIsBinary = false;
 
             _DocSubmissions.Add(_LightDoc, DocData);
 
