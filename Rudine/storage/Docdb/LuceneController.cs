@@ -329,12 +329,12 @@ namespace Rudine.Storage.Docdb
         }
 
         public LightDoc SubmitBytes(byte[] DocData) =>
-            Submit(DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData));
+            Submit(DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData), true);
 
         public LightDoc SubmitText(string DocData) =>
-            Submit(DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData));
+            Submit(DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData), false);
 
-        private LightDoc Submit(object DocData, BaseDoc _BaseDoc, DocProcessingInstructions _DocProcessingInstructions)
+        private LightDoc Submit(object DocData, BaseDoc _BaseDoc, DocProcessingInstructions _DocProcessingInstructions, bool DocIsBinary)
         {
             Dictionary<LightDoc, object> _DocSubmissions = new Dictionary<LightDoc, object>();
 
@@ -357,7 +357,7 @@ namespace Rudine.Storage.Docdb
 
             LightDoc _LightDoc = _BaseDoc.ToLightDoc();
             _LightDoc.DocSubmitDate = DateTime.Now;
-            _LightDoc.DocIsBinary = true;
+            _LightDoc.DocIsBinary = DocIsBinary;
 
             _DocSubmissions.Add(_LightDoc, DocData);
 
