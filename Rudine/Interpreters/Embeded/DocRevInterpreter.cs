@@ -15,7 +15,7 @@ namespace Rudine.Interpreters.Embeded
     ///     a glorified set of zipping routine that convert to and from a BaseDoc holding bytes that represent supporting
     ///     content for that BaseDoc/DocRev definition
     /// </summary>
-    public class EmbededInterpreter : DocByteInterpreter
+    public class DocRevInterpreter : DocByteInterpreter
     {
         private static readonly JavaScriptSerializer _JavaScriptSerializer = new JavaScriptSerializer();
 

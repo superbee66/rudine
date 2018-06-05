@@ -13,7 +13,7 @@ namespace Rudine.Tests.Interpreters.Embeded
         [Test]
         public void CreateTest()
         {
-            DocRev basedoc = (DocRev)new EmbededInterpreter().Create("DocRev");
+            DocRev basedoc = (DocRev)new DocRevInterpreter().Create("DocRev");
 
             Assert.IsTrue(basedoc is BaseDoc);
             Assert.IsTrue(basedoc is DocRev);
@@ -28,8 +28,8 @@ namespace Rudine.Tests.Interpreters.Embeded
         public void WritePITest()
         {
             FileInfo file = new FileInfo("Hi.txt");
-            EmbededInterpreter _EmbededInterpreter = new EmbededInterpreter();
-            DocRev docRev_A = (DocRev)_EmbededInterpreter.Create("DocRev");
+            DocRevInterpreter _DocRevInterpreter = new DocRevInterpreter();
+            DocRev docRev_A = (DocRev)_DocRevInterpreter.Create("DocRev");
 
 
             File.WriteAllText(file.FullName, "Hello World!");
@@ -47,7 +47,7 @@ namespace Rudine.Tests.Interpreters.Embeded
             docRev_A = (DocRev)DocExchange.Instance.Create(docRev_A);
 
             // round-trip the object to make sure serialization is working everywhere
-            DocRev docRev_B = (DocRev)DocExchange.Instance.ReadBytes(_EmbededInterpreter.WriteByte(docRev_A));
+            DocRev docRev_B = (DocRev)DocExchange.Instance.ReadBytes(_DocRevInterpreter.WriteByte(docRev_A));
 
             Assert.AreEqual(_JavaScriptSerializer.Serialize(docRev_A), _JavaScriptSerializer.Serialize(docRev_B));
 

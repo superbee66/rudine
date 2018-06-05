@@ -36,7 +36,7 @@ namespace Rudine.Interpreters.PdfTests
             Assert.AreEqual(_DocRev.DocURN.DocTypeName, pi.DocTypeName);
             Assert.NotNull(_DocRev.solutionVersion);
 
-            LightDoc _LightDoc = DocExchange.Instance.SubmitBytes(new Embeded.EmbededInterpreter().WriteByte(_DocRev), "removeThisDocSubmittedByEmail@ok.com");
+            LightDoc _LightDoc = DocExchange.Instance.SubmitBytes(new Embeded.DocRevInterpreter().WriteByte(_DocRev), "removeThisDocSubmittedByEmail@ok.com");
 
             Assert.NotNull(_LightDoc);
 

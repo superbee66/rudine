@@ -171,7 +171,7 @@
     <Compile Include="DocKeyEncrypter.cs" />
     <Compile Include="DocProcessingInstructionsExtensions.cs" />
     <Compile Include="ImporterController.cs" />
-    <Compile Include="Interpreters\Embeded\EmbededInterpreter.cs" />
+    <Compile Include="Interpreters\Embeded\DocRevInterpreter.cs" />
     <Compile Include="Interpreters\IDocBaseInterpreter.cs" />
     <Compile Include="Interpreters\IDocByteInterpreter.cs" />
     <Compile Include="Interpreters\IDocTextInterpreter.cs" />
