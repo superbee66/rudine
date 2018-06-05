@@ -11,16 +11,16 @@ namespace Rudine.Tests
     public class InputTypeMapping
     {
         static string PropertyTypeNameEnd(Type t) =>
-            string.Join("_",
-                      new[]
-                      {
-                          (Nullable.GetUnderlyingType(t) ?? t).Name,
-                          Nullable.GetUnderlyingType(t) != null ? nameof(Nullable) : string.Empty,
-                          t.IsArray ? nameof(Array) : string.Empty
-                      }.Where(s => !string.IsNullOrWhiteSpace(s)))
-                  .Trim('[', ']', '_')
-                  .Replace("]", string.Empty)
-                  .Replace("[", string.Empty);
+           string.Format("_{0}", string.Join("_",
+                   new[]
+                   {
+                       (Nullable.GetUnderlyingType(t) ?? t).Name,
+                       Nullable.GetUnderlyingType(t) != null ? nameof(Nullable) : string.Empty,
+                       t.IsArray ? nameof(Array) : string.Empty
+                   }.Where(s => !string.IsNullOrWhiteSpace(s)))
+               .Trim('[', ']', '_')
+               .Replace("]", string.Empty)
+               .Replace("[", string.Empty));
 
         static IEnumerable<Type> PropertyTypes()
         {
