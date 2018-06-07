@@ -332,7 +332,8 @@ namespace Rudine.Storage.Docdb
             Submit(DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData), true);
 
         public LightDoc SubmitText(string DocData) =>
-            Submit(DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData), false);
+            Submit(
+                DocData, DocInterpreter.Instance.Read(DocData, true), DocInterpreter.Instance.ReadDocPI(DocData), false);
 
         private LightDoc Submit(object DocData, BaseDoc _BaseDoc, DocProcessingInstructions _DocProcessingInstructions, bool DocIsBinary)
         {
@@ -371,6 +372,26 @@ namespace Rudine.Storage.Docdb
 
                 _CurrentIndexWriter.Commit();
             }
+
+            FileInfo _FileInfo = new FileInfo(
+                string.Format("{0}.{1}", RequestPaths.GetPhysicalApplicationPath(
+
+                        new[] { "doc_db", _BaseDoc.DocTypeName }
+                            .Union(
+                        _BaseDoc
+                            .DocKeys
+                            .OrderBy(m => m.Key)
+                            .Select(m => StringTransform.PrettyMsSqlIdent(string.Format("{0} {1}", FileSystem.CleanFileName(m.Key), FileSystem.CleanFileName(m.Value))))
+                            ).ToArray()
+
+                        ),
+                    DocInterpreter.InstanceLocatorByName<DocBaseInterpreter>(_BaseDoc.DocTypeName, _BaseDoc.solutionVersion).ContentInfo.ContentFileExtension));
+
+            _FileInfo.Directory.mkdir();
+            if (DocIsBinary)
+                File.WriteAllBytes(_FileInfo.FullName, (byte[])DocData);
+            else
+                File.WriteAllText(_FileInfo.FullName, (string)DocData);
 
             return _LightDoc;
         }

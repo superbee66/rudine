@@ -48,7 +48,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExternalPdfInterpreter.cs" />
+    <None Include="ExternalPdfInterpreter.cs.ignore" />
     <Compile Include="PdfInterpreter.cs" />
     <Compile Include="PdfAcroFieldExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

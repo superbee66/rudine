@@ -4,11 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Web.Script.Serialization;
 
 namespace Rudine.Tests
 {
     public static class ObjectExtensions
     {
+        private static readonly JavaScriptSerializer JavaScriptSerializer = new JavaScriptSerializer();
+        /// <summary>
+        /// json serializes the two object then compares the text
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="that"></param>
+        /// <returns></returns>
+        public static bool EquelText(this object @this, object @that) =>
+            JavaScriptSerializer.Serialize(@this).Equals(JavaScriptSerializer.Serialize(@this));
+
         public static T Overlay<T, TT>(this T o, string propertyNameWildcardExpression, out HashSet<TT> existingValues) where T : class
         {
             existingValues = new HashSet<TT>();

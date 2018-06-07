@@ -87,6 +87,9 @@
     <Compile Include="..\Rudine.Web\DocURN.cs">
       <Link>Web\DocURN.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\ExternalDoc.cs">
+      <Link>Web\ExternalDoc.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\IBaseDoc.cs">
       <Link>Web\IBaseDoc.cs</Link>
     </Compile>
@@ -110,6 +113,9 @@
     </Compile>
     <Compile Include="..\Rudine.Web\IDocURN.cs">
       <Link>Web\IDocURN.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\IExternalDoc.cs">
+      <Link>Web\IExternalDoc.cs</Link>
     </Compile>
     <Compile Include="..\Rudine.Web\LightDoc.cs">
       <Link>Web\LightDoc.cs</Link>
@@ -172,6 +178,26 @@
     <Compile Include="DocProcessingInstructionsExtensions.cs" />
     <Compile Include="ImporterController.cs" />
     <Compile Include="Interpreters\Embeded\DocRevInterpreter.cs" />
+    <Compile Include="Interpreters\Embeded\ExternalDocByteInterpreter.cs" />
+    <Compile Include="Storage\Sql\BaseAutoIdentExtensions.cs" />
+    <Compile Include="Storage\Sql\BaseDocExtensions.cs" />
+    <Compile Include="Storage\Sql\DocKey.cs" />
+    <Compile Include="Storage\Sql\Merge\ClassMerger.cs" />
+    <Compile Include="Storage\Sql\Merge\ClassProperty.cs" />
+    <Compile Include="Storage\Sql\Merge\ClassSignature.cs" />
+    <Compile Include="Storage\Sql\Merge\ImplicitTypeConversionExtension.cs" />
+    <Compile Include="Storage\Sql\ModelConfiguration.cs" />
+    <Compile Include="Storage\Sql\Reverser\Entity.cs" />
+    <Compile Include="Storage\Sql\Reverser\EntityBase.cs" />
+    <Compile Include="Storage\Sql\Reverser\Handler.cs" />
+    <Compile Include="Storage\Sql\Reverser\TextTemplatingEngineHost.cs" />
+    <Compile Include="Storage\Sql\SqlController.cs" />
+    <Compile Include="Storage\Sql\SqlDB.cs" />
+    <Compile Include="Storage\Sql\SqlDBContext.cs" />
+    <Compile Include="Storage\Sql\SqlDbMigrationsConfiguration.cs" />
+    <Compile Include="Storage\Sql\SqlTableAttributeConvention.cs" />
+    <None Include="App.config" />
+    <None Include="Interpreters\Embeded\ExternalInterpreterFactory.cs.ignore" />
     <Compile Include="Interpreters\IDocBaseInterpreter.cs" />
     <Compile Include="Interpreters\IDocByteInterpreter.cs" />
     <Compile Include="Interpreters\IDocTextInterpreter.cs" />
@@ -229,6 +255,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
@@ -241,6 +275,18 @@
       <HintPath>..\packages\Lucene.Net.3.0.3\lib\NET40\Lucene.Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.AspNet.DynamicData.EFProvider, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.DynamicData.EFProvider.6.0.0\lib\net40\Microsoft.AspNet.DynamicData.EFProvider.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.EntityDataSource, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.EntityDataSource.6.0.0\lib\net40\Microsoft.AspNet.EntityDataSource.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\tfs\dCForms\Dev-SS0VS2015\Src\packages\Microsoft.VisualStudio.TextTemplating.Interfaces.10.0.10.0.30319\lib\net40\Microsoft.VisualStudio.TextTemplating.Interfaces.10.0.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -248,8 +294,11 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Design" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization">
@@ -260,12 +309,14 @@
     <Reference Include="System.Web">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Extensions">
       <Private>False</Private>
     </Reference>
     <Reference Include="System.XML, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>

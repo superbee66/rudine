@@ -1,0 +1,34 @@
+﻿using Rudine.Interpreters.Embeded;
+using Rudine.Web;
+
+namespace Rudine.Interpreters.Pdf
+{
+    public class ExternalInterpreter<T> where T : DocByteInterpreter
+    {
+
+    }
+
+    public class ExternalPdfInterpreter : PdfInterpreter
+    {
+        private string WrapperBytesFileName =>
+            AutoFileName(nameof(ExternalPdfInterpreter).Replace("Interpreter", string.Empty), ContentInfo.ContentFileExtension);
+
+        public override bool Processable(string docTypeName, string docRev) =>
+            true;
+
+        public override BaseDoc Read(byte[] docData, bool docRevStrict = false) =>
+            DocRevInterpreter.Instance.Read(WritePI(docData, new DocProcessingInstructions()), docRevStrict);
+
+        public override DocProcessingInstructions ReadDocPI(byte[] docData) =>
+            DocRevInterpreter.Instance.ReadDocPI(WritePI(docData, new DocProcessingInstructions()));
+
+        public override string ReadDocRev(byte[] docData) =>
+            DocRev.MyOnlyDocVersion;
+
+        public override string ReadDocTypeName(byte[] docData) =>
+            DocRev.MyOnlyDocName;
+
+        public override byte[] WritePI(byte[] docData, DocProcessingInstructions pi) =>
+            ExternalInterpreterFactory.AsDocRev(docData, pi, WrapperBytesFileName);
+    }
+}

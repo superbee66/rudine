@@ -17,96 +17,115 @@ namespace Rudine.Interpreters.Embeded
     /// </summary>
     public class DocRevInterpreter : DocByteInterpreter
     {
-        private static readonly JavaScriptSerializer _JavaScriptSerializer = new JavaScriptSerializer();
+        private static readonly Lazy<DocRevInterpreter> _Instance = new Lazy<DocRevInterpreter>(() => new DocRevInterpreter());
+        public static DocRevInterpreter Instance => _Instance.Value;
+
 
         /// <summary>
         ///     utilizes actual MY_ONLY_DOC_NAME as the file extension, content is zip compression 9
         /// </summary>
-        public override ContentInfo ContentInfo =>
-            new ContentInfo
+        public override ContentInfo ContentInfo => new ContentInfo
+        {
+            ContentFileExtension = "zip",
+            ContentType = "application/octet-stream",
+            ContentSignature = new MagicNumbers
             {
-                ContentFileExtension = DocRev.MyOnlyDocName,
-                ContentType = "application/octet-stream",
-                ContentSignature = new MagicNumbers
-                {
-                    Bytes = new byte[] { 0x50, 0x4B, 0x03, 0x04 },
-                    Offset = 0
-                }
-            };
+                Bytes = new byte[] { 0x50, 0x4B, 0x03, 0x04 },
+                Offset = 0
+            }
+        };
+        private static readonly JavaScriptSerializer _JavaScriptSerializer = new JavaScriptSerializer();
 
         /// <summary>
         /// </summary>
-        /// <param name= DocRev.MY_ONLY_DOCKEY_1>accepts only DcoRev (MY_ONLY_DOC_NAME)</param>
+        /// <param name= MY_ONLY_DOCKEY_1>accepts only DcoRev (MY_ONLY_DOC_NAME)</param>
         /// <returns></returns>
         public override BaseDoc Create(string DocTypeName)
         {
             if (!DocTypeName.Equals(DocRev.MyOnlyDocName, StringComparison.InvariantCultureIgnoreCase))
-                throw new ArgumentException(String.Empty, nameof(DocTypeName));
+                throw new ArgumentException(string.Empty, nameof(DocTypeName));
 
             return Create();
         }
 
-        private static DocRev Create()
+        private DocRev Create() => new DocRev
         {
-            return new DocRev
-            {
-                DocFiles = new List<DocRevEntry>(),
-                DocURN = new DocURN(),
-                DocTypeName = DocRev.MyOnlyDocName,
-                solutionVersion = DocRev.MyOnlyDocVersion
-            };
-        }
+            DocFiles = new List<DocRevEntry>(),
+            DocURN = new DocURN(),
+            DocTypeName = DocRev.MyOnlyDocName,
+            solutionVersion = DocRev.MyOnlyDocVersion
+        };
 
         public override string GetDescription(string DocTypeName) => null;
 
         public override string HrefVirtualFilename(string DocTypeName, string DocRev) => null;
 
-        public override bool Processable(string DocTypeName, string docRev) =>
-            DocTypeName.Equals(DocRev.MyOnlyDocName)
-            &&
-            docRev.Equals(DocRev.MyOnlyDocVersion);
+        public override bool Processable(string DocTypeName, string docRev) => DocTypeName.Equals(DocRev.MyOnlyDocName)
+                                                                               &&
+                                                                               docRev.Equals(DocRev.MyOnlyDocVersion);
 
         /// <summary>
-        ///     extracts contents of the zip file into a DocRev object
+        ///     Extracts contents of the zip file into a DocRev object.
         /// </summary>
         /// <param name="DocData"></param>
         /// <param name="DocRevStrict"></param>
-        /// <returns></returns>
+        /// <returns>null when DocURN & Schema can't be extracted from bytes</returns>
         public override BaseDoc Read(byte[] DocData, bool DocRevStrict = false)
         {
             DocRev _DOCREV = Create();
 
             using (MemoryStream _MemoryStream = new MemoryStream(DocData))
+            {
                 if (!ContentInfo.ContentSignature.IsMagic(_MemoryStream))
                     _DOCREV = null;
                 else
                     using (ZipFile _ZipFile = new ZipFile(_MemoryStream))
+                    {
                         foreach (ZipEntry _ZipEntry in _ZipFile)
 
                             if (_ZipEntry.Name.Equals(DocRev.ManifestFileName, StringComparison.InvariantCultureIgnoreCase))
+                            {
                                 _DOCREV.DocURN = _JavaScriptSerializer.Deserialize<DocURN>(Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry)
-                                                                                                                              .AsBytes()));
+                                    .AsBytes()));
+                            }
 
-                            else if (_ZipEntry.Name.Equals(DocRev.PIFileName, StringComparison.InvariantCultureIgnoreCase))
-                                _DOCREV = (DocRev)SetPI(_DOCREV, _JavaScriptSerializer.Deserialize<DocProcessingInstructions>(Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry)
-                                                                                                                                                                  .AsBytes())));
+                            else
+                            {
+                                if (_ZipEntry.Name.Equals(DocRev.PIFileName, StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    _DOCREV = (DocRev)SetPI(_DOCREV, _JavaScriptSerializer.Deserialize<DocProcessingInstructions>(Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry)
+                                        .AsBytes())));
+                                }
 
-                            else if (_ZipEntry.Name.Equals(DocRev.SchemaFileName, StringComparison.InvariantCultureIgnoreCase))
-                                _DOCREV.DocSchema = Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry)
-                                                                                       .AsBytes());
+                                else
+                                {
+                                    if (_ZipEntry.Name.Equals(DocRev.SchemaFileName, StringComparison.InvariantCultureIgnoreCase))
+                                        _DOCREV.DocSchema = Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry)
+                                            .AsBytes());
 
-                            else if (_ZipEntry.IsFile)
-                                _DOCREV.DocFiles.Add(
-                                    new DocRevEntry
-                                    {
-                                        Bytes = _ZipFile.GetInputStream(_ZipEntry)
-                                                        .AsBytes(),
-                                        Name = _ZipEntry.Name,
-                                        ModDate = _ZipEntry.DateTime.ToLocalTime()
-                                    });
-            return _DOCREV;
+                                    else if (_ZipEntry.IsFile)
+                                        _DOCREV.DocFiles.Add(
+                                            new DocRevEntry
+                                            {
+                                                Bytes = _ZipFile.GetInputStream(_ZipEntry).AsBytes(),
+                                                Name = _ZipEntry.Name,
+                                                ModDate = _ZipEntry.DateTime.ToLocalTime()
+                                            });
+                                }
+                            }
+                    }
+            }
+
+            return _DOCREV.DocURN != null && !string.IsNullOrWhiteSpace(_DOCREV.DocSchema)
+                ? _DOCREV
+                : null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="DocData"></param>
+        /// <returns>null when bytes can't be read properly</returns>
         public override DocProcessingInstructions ReadDocPI(byte[] DocData) => Read(DocData);
 
         public override string ReadDocRev(byte[] DocData) => ReadDocPI(DocData)?.solutionVersion;
@@ -115,7 +134,9 @@ namespace Rudine.Interpreters.Embeded
 
         public override List<ContentInfo> TemplateSources() => new List<ContentInfo> { ContentInfo };
 
-        public override void Validate(byte[] DocData) { }
+        public override void Validate(byte[] DocData)
+        {
+        }
 
         public override byte[] WriteByte<T>(T source, bool includeProcessingInformation = true)
         {
@@ -126,18 +147,23 @@ namespace Rudine.Interpreters.Embeded
                 _ZipOutputStream.SetLevel(9); //0-9, 9 being the highest level of compression
                 DateTime DefaultModDate = _DocRev.DocFiles.Max(DocFile => DocFile.ModDate.ToLocalTime());
 
-                List<DocRevEntry> _DocInfoDocRevEntry = new List<DocRevEntry> {
-                    new DocRevEntry {
+                List<DocRevEntry> _DocInfoDocRevEntry = new List<DocRevEntry>();
+
+                if (_DocRev.DocURN != null)
+                    _DocInfoDocRevEntry.Add(new DocRevEntry
+                    {
                         Bytes = Encoding.Default.GetBytes(_JavaScriptSerializer.Serialize(_DocRev.DocURN ?? new DocURN())),
                         ModDate = DefaultModDate,
                         Name = DocRev.ManifestFileName
-                    },
-                    new DocRevEntry {
-                        Bytes = Encoding.Default.GetBytes(_DocRev.DocSchema ?? String.Empty),
+                    });
+
+                if (!string.IsNullOrWhiteSpace(_DocRev.DocSchema))
+                    _DocInfoDocRevEntry.Add(new DocRevEntry
+                    {
+                        Bytes = Encoding.Default.GetBytes(_DocRev.DocSchema ?? string.Empty),
                         ModDate = DefaultModDate,
                         Name = DocRev.SchemaFileName
-                    }
-                };
+                    });
 
                 if (includeProcessingInformation)
                     _DocInfoDocRevEntry.Add(

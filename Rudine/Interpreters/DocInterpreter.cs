@@ -21,17 +21,27 @@ namespace Rudine.Interpreters
     /// </summary>
     internal sealed class DocInterpreter : IDocTextInterpreter, IDocByteInterpreter
     {
-        internal static readonly DocBaseInterpreter[] ContentInterpreterInstances =
-            Reflection
+        internal static readonly DocBaseInterpreter[] ContentInterpreterInstances;
+
+        static DocInterpreter()
+        {
+            ContentInterpreterInstances=Reflection
                 .LoadBinDlls()
                 .SelectMany(a => a.GetTypes())
                 .Where(type => !type.IsAbstract)
                 .Where(type => !type.IsInterface)
-                .Where(type => type.BaseType == typeof(DocTextInterpreter) || type.BaseType == typeof(DocByteInterpreter))
-                .Select(type => ((DocBaseInterpreter)Activator.CreateInstance(type)))
+                .Where(type => type.IsSubclassOf(typeof(DocTextInterpreter)) || type.IsSubclassOf(typeof(DocByteInterpreter)))
+                .Select(type => (DocBaseInterpreter)Activator.CreateInstance(type))
                 .ToArray();
+        }
 
-        public static readonly DocInterpreter Instance = new DocInterpreter();
+        private static readonly Lazy<DocInterpreter> _Instance = new Lazy<DocInterpreter>(() => new DocInterpreter());
+
+        /// <summary>
+        ///     singleton instance safe for multithreading
+        /// </summary>
+        public static DocInterpreter Instance => _Instance.Value;
+
 
         public string ContentFileExtension =>
             "dat";

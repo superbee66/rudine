@@ -36,7 +36,7 @@ namespace Rudine
         /// <summary>
         ///     Utilized by CompileAssembly
         /// </summary>
-        private static readonly Dictionary<string, string> USING_NAMESPACES = new[]
+        internal static readonly Dictionary<string, string> USING_NAMESPACES = new[]
         {
             typeof(List<>),
             typeof(DataContractSerializer),
@@ -45,7 +45,8 @@ namespace Rudine
             typeof(IBaseDocController),
             typeof(Runtime),
             typeof(GeneratedCodeAttribute),
-            typeof(DesignerCategoryAttribute)
+            typeof(DesignerCategoryAttribute),
+            typeof( System.Data.Entity.DbContext)
         }.ToDictionary(m => m.Namespace, n => Path.GetFileName(n.Assembly.Location));
 
 

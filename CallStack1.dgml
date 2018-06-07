@@ -1,0 +1,490 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph DataVirtualized="True" Layout="Sugiyama" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="(@1 @11 Type=LightDocExtensions Member=(Name=GetTargetDocVer OverloadingParameters=[(@1 @12 Type=LightDoc)]))" Category="CodeSchema_Method" Bounds="133.373333333333,187.215,125.333333333333,25.96" CodeSchemaProperty_IsExtension="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsStatic="True" CommonLabel="GetTargetDocVer" Icon="CodeSchema_Method" Label="GetTargetDocVer" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/LightDocExtensions.cs StartLineNumber=42 StartCharacterOffset=0 EndLineNumber=42 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="(@1 @11 Type=RuntimeTypeNamer Member=(Name=Validate OverloadingParameters=[@16,@16,(@4 @5 Type=(Name=String ArrayRank=1 ParentType=String))]))" Category="CodeSchema_Method" Bounds="486.035,706.0425,78.01,25.96" CodeSchemaProperty_IsPrivate="True" CodeSchemaProperty_IsStatic="True" CommonLabel="Validate" Icon="CodeSchema_Method" Label="Validate" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/RuntimeTypeNamer.cs StartLineNumber=105 StartCharacterOffset=0 EndLineNumber=105 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="(@1 @12 Type=DocProcessingInstructions Member=IsDocRev)" Category="CodeSchema_Method" Bounds="352.978333333333,244.8625,84.1233333333333,25.96" CodeSchemaProperty_IsPublic="True" CommonLabel="IsDocRev" Icon="CodeSchema_Method" Label="IsDocRev" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine.Web/DocProcessingInstructions.cs StartLineNumber=15 StartCharacterOffset=0 EndLineNumber=15 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="(@1 Namespace=Rudine.Storage.Docdb Type=DocumentExtensions Member=(Name=AsDocument OverloadingParameters=[(@4 Namespace=System.Collections.Generic Type=(Name=Dictionary GenericParameterCount=2 GenericArguments=[(@1 @12 Type=LightDoc),(@4 @5 Type=Object)]))]))" Category="CodeSchema_Method" Bounds="0,302.51,104.08,25.96" CodeSchemaProperty_IsExtension="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsStatic="True" CommonLabel="AsDocument" Icon="CodeSchema_Method" Label="AsDocument" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Storage/Docdb/DocumentExtensions.cs StartLineNumber=30 StartCharacterOffset=0 EndLineNumber=30 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="(@25 Namespace=Rudine.Tests Type=ExternalPdfInterpreterTests Member=AnonymousMethod__0)" Category="CodeSchema_Method" Bounds="51.1183333333333,129.5675,157.843333333333,25.96" CodeSchemaProperty_IsAnonymous="True" Label="AnonymousMethod__0" SourceLocation="(Assembly=file:///C:/mycode/rudine/RudineTests/ExternalPdfInterpreterTests.cs StartLineNumber=59 StartCharacterOffset=0 EndLineNumber=59 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeMap_TestAsset" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@10" Category="CodeSchema_Method" Bounds="251.035,302.51,78.01,25.96" CodeSchemaProperty_IsPublic="True" CommonLabel="Validate" Icon="CodeSchema_Method" Label="Validate" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Interpreters/DocInterpreter.cs StartLineNumber=306 StartCharacterOffset=0 EndLineNumber=306 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@13" Category="CodeSchema_Method" Bounds="493.901666666667,302.51,62.2766666666666,25.96" CodeSchemaProperty_IsPublic="True" CommonLabel="Read" Icon="CodeSchema_Method" Label="Read" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Interpreters/DocInterpreter.cs StartLineNumber=269 StartCharacterOffset=0 EndLineNumber=269 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@15" Category="CodeSchema_Method" Bounds="493.901666666667,360.1575,62.2766666666666,25.96" CodeSchemaProperty_IsPublic="True" CommonLabel="Read" Icon="CodeSchema_Method" IsOverloaded="True" Label="Read" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine.Interpeter.pdf/PdfInterpreter.cs StartLineNumber=141 StartCharacterOffset=0 EndLineNumber=141 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@17" Category="CodeSchema_Method" Bounds="489.875,417.805,70.33,25.96" CodeSchemaProperty_IsPrivate="True" CodeSchemaProperty_IsStatic="True" CommonLabel="Create" Icon="CodeSchema_Method" Label="Create" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine.Interpeter.pdf/PdfInterpreter.cs StartLineNumber=35 StartCharacterOffset=0 EndLineNumber=35 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@18" Category="CodeSchema_Method" Bounds="452.003333333333,590.7475,146.073333333333,25.96" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsStatic="True" CommonLabel="CalcCSharpFullName" Icon="CodeSchema_Method" Label="CalcCSharpFullName" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/RuntimeTypeNamer.cs StartLineNumber=47 StartCharacterOffset=0 EndLineNumber=47 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@19" Category="CodeSchema_Method" Bounds="446.198333333333,648.395,157.683333333333,25.96" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsStatic="True" CommonLabel="CalcCSharpNamespace" Icon="CodeSchema_Method" Label="CalcCSharpNamespace" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/RuntimeTypeNamer.cs StartLineNumber=62 StartCharacterOffset=0 EndLineNumber=62 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@20" Category="CodeSchema_Method" Bounds="463.141666666667,475.4525,123.796666666667,25.96" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsStatic="True" CommonLabel="ActivateBaseDoc" Icon="CodeSchema_Method" Label="ActivateBaseDoc" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Runtime.cs StartLineNumber=53 StartCharacterOffset=0 EndLineNumber=53 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@21" Category="CodeSchema_Method" Bounds="450.76,533.1,148.56,25.96" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsStatic="True" CommonLabel="ActivateBaseDocType" Icon="CodeSchema_Method" Label="ActivateBaseDocType" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Runtime.cs StartLineNumber=59 StartCharacterOffset=0 EndLineNumber=59 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@22" Category="CodeSchema_Method" Bounds="15.2766666666666,244.8625,73.5266666666666,25.96" CodeSchemaProperty_IsPrivate="True" CommonLabel="Submit" Icon="CodeSchema_Method" Label="Submit" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Storage/Docdb/LuceneController.cs StartLineNumber=369 StartCharacterOffset=0 EndLineNumber=369 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@24" Category="CodeSchema_Method" Bounds="242.49,57.6475,95.1,25.96" CodeSchemaProperty_IsPublic="True" CommonLabel="WritePITest" Icon="CodeSchema_Method" Label="WritePITest" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine.Interpreters.PdfTests/ExternalPdfInterpreterTests.cs StartLineNumber=36 StartCharacterOffset=0 EndLineNumber=36 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeMap_TestAsset" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@26" Category="CodeSchema_Method" Bounds="116.49,57.6475,95.1,25.96" CodeSchemaProperty_IsPublic="True" CommonLabel="WritePITest" Icon="CodeSchema_Method" Label="WritePITest" SourceLocation="(Assembly=file:///C:/mycode/rudine/RudineTests/ExternalPdfInterpreterTests.cs StartLineNumber=49 StartCharacterOffset=0 EndLineNumber=49 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeMap_TestAsset" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@30" Category="CodeSchema_CallStackUnresolvedMethod" Bounds="568.441666666667,244.8625,133.196666666667,25.96" Label="CalcDocChecksum" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Interpreters/DocInterpreter.cs StartLineNumber=57 StartCharacterOffset=0 EndLineNumber=57 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@32" Category="CodeSchema_CallStackUnresolvedMethod" Bounds="352.118333333333,187.215,85.8433333333333,25.96" Label="ProcessPI" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/DocExchange.cs StartLineNumber=124 StartCharacterOffset=0 EndLineNumber=124 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@33" Category="CodeSchema_CallStackUnresolvedMethod" Bounds="239.215,129.5675,101.65,25.96" Label="SubmitBytes" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/DocExchange.cs StartLineNumber=159 StartCharacterOffset=0 EndLineNumber=159 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@34" Category="CodeSchema_CallStackUnresolvedMethod" Bounds="467.646666666667,244.8625,70.7866666666666,25.96" Label="ModPI" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Interpreters/DocInterpreter.cs StartLineNumber=177 StartCharacterOffset=0 EndLineNumber=177 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@7" Category="CodeSchema_Method" Bounds="348.773333333333,360.1575,114.533333333333,25.96" CodeSchemaProperty_IsPrivate="True" CodeSchemaProperty_IsStatic="True" CommonLabel="LocateInstance" Icon="CodeSchema_Method" Label="LocateInstance" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Interpreters/DocInterpreter.cs StartLineNumber=147 StartCharacterOffset=0 EndLineNumber=147 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@8" Category="CodeSchema_Method" Bounds="359.451666666667,302.51,93.1766666666667,25.96" CodeSchemaProperty_IsPublic="True" CommonLabel="ReadDocPI" Icon="CodeSchema_Method" Label="ReadDocPI" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Interpreters/DocInterpreter.cs StartLineNumber=277 StartCharacterOffset=0 EndLineNumber=277 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="@9" Category="CodeSchema_Method" Bounds="1.21499999999992,187.215,101.65,25.96" CodeSchemaProperty_IsPublic="True" CommonLabel="SubmitBytes" Icon="CodeSchema_Method" Label="SubmitBytes" SourceLocation="(Assembly=file:///C:/mycode/rudine/Rudine/Storage/Docdb/LuceneController.cs StartLineNumber=331 StartCharacterOffset=0 EndLineNumber=331 EndCharacterOffset=0)">
+      <Category Ref="CallStackEntry" />
+      <Category Ref="CodeSchema_SourceLocation" />
+    </Node>
+    <Node Id="ExternalCodeRootNode" Category="ExternalCallStackEntry" Bounds="243.546666666667,0,92.9866666666667,25.96" Label="External Code">
+      <Category Ref="CallStackEntry" />
+    </Node>
+  </Nodes>
+  <Links>
+    <Link Source="@10" Target="@7" Category="CallStackDirectCall" Bounds="316.158752441406,328.470001220703,55.702880859375,27.6821899414063" />
+    <Link Source="@13" Target="@15" Category="CallStackDirectCall" Bounds="525.039978027344,328.470001220703,0,22.6875" />
+    <Link Source="@13" Target="@7" Category="CallStackDirectCall" Bounds="440.933868408203,328.470001220703,57.3119201660156,27.7637634277344" />
+    <Link Source="@15" Target="@17" Category="CallStackDirectCall" Bounds="525.039978027344,386.117492675781,0,22.6875" />
+    <Link Source="@17" Target="@20" Category="CallStackDirectCall" Bounds="525.039978027344,443.765014648438,0,22.6875" />
+    <Link Source="@18" Target="@19" Category="CallStackDirectCall" Bounds="525.039978027344,616.70751953125,0,22.6875" />
+    <Link Source="@19" Target="(@1 @11 Type=RuntimeTypeNamer Member=(Name=Validate OverloadingParameters=[@16,@16,(@4 @5 Type=(Name=String ArrayRank=1 ParentType=String))]))" Category="CallStackDirectCall" Bounds="525.039978027344,674.35498046875,0,22.6875" />
+    <Link Source="@20" Target="@21" Category="CallStackDirectCall" Bounds="525.039978027344,501.412506103516,0,22.6874694824219" />
+    <Link Source="@21" Target="@18" Category="CallStackDirectCall" Bounds="525.039978027344,559.059997558594,0,22.6875" />
+    <Link Source="@22" Target="(@1 Namespace=Rudine.Storage.Docdb Type=DocumentExtensions Member=(Name=AsDocument OverloadingParameters=[(@4 Namespace=System.Collections.Generic Type=(Name=Dictionary GenericParameterCount=2 GenericArguments=[(@1 @12 Type=LightDoc),(@4 @5 Type=Object)]))]))" Category="CallStackDirectCall" Bounds="52.0400009155273,270.822509765625,0,22.6875" />
+    <Link Source="@24" Target="@33" Category="CallStackDirectCall" Bounds="290.040008544922,83.6074981689453,0,36.9599990844727" />
+    <Link Source="@26" Target="(@25 Namespace=Rudine.Tests Type=ExternalPdfInterpreterTests Member=AnonymousMethod__0)" Category="CallStackIndirectCall" Bounds="140.022811889648,83.6074981689453,17.8809204101563,37.8234176635742" Label="External Code" LabelBounds="74.0533333333335,98.6075000000001,72.9866666666667,15.96" />
+    <Link Source="@30" Target="@13" Category="CallStackDirectCall" Bounds="557.779418945313,270.822509765625,52.4927978515625,27.5097961425781" />
+    <Link Source="@32" Target="(@1 @12 Type=DocProcessingInstructions Member=IsDocRev)" Category="CallStackDirectCall" Bounds="395.040008544922,213.175003051758,0,22.6875" />
+    <Link Source="@32" Target="@30" Category="CallStackDirectCall" Bounds="437.943969726563,210.500442504883,134.30615234375,32.2600708007813" />
+    <Link Source="@32" Target="@34" Category="CallStackDirectCall" Bounds="419.357452392578,213.175003051758,51.4253845214844,27.4494781494141" />
+    <Link Source="@32" Target="@8" Category="CallStackDirectCall" Bounds="322.040008544922,213.175003051758,40.1264038085938,86.3422393798828" />
+    <Link Source="@33" Target="(@1 @11 Type=LightDocExtensions Member=(Name=GetTargetDocVer OverloadingParameters=[(@1 @12 Type=LightDoc)]))" Category="CallStackDirectCall" Bounds="224.877334594727,155.527496337891,43.9974822998047,26.9823913574219" />
+    <Link Source="@33" Target="@10" Category="CallStackDirectCall" Bounds="290.040008544922,155.527496337891,0,137.982513427734" />
+    <Link Source="@33" Target="@32" Category="CallStackDirectCall" Bounds="313.681976318359,155.527496337891,49.8268737792969,27.3561553955078" />
+    <Link Source="@33" Target="@9" Category="CallStackDirectCall" Bounds="110.736206054688,154.64599609375,129.35466003418,31.3318176269531" />
+    <Link Source="@34" Target="@8" Category="CallStackDirectCall" Bounds="435.617492675781,270.822509765625,45.5818481445313,27.0894775390625" />
+    <Link Source="@8" Target="@7" Category="CallStackDirectCall" Bounds="406.040008544922,328.470001220703,0,22.6875" />
+    <Link Source="@9" Target="@22" Category="CallStackDirectCall" Bounds="52.0400009155273,213.175003051758,0,22.6875" />
+    <Link Source="ExternalCodeRootNode" Target="@24" Category="CallStackIndirectCall" Bounds="290.040008544922,25.9599990844727,0,22.6875" />
+    <Link Source="ExternalCodeRootNode" Target="@26" Category="CallStackIndirectCall" Bounds="200.594451904297,25.9599990844727,61.0751953125,27.9431114196777" />
+  </Links>
+  <Categories>
+    <Category Id="CallStackDirectCall" Label="Call Stack direct call" CanBeDataDriven="True" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="Call Stack direct call" OutgoingActionLabel="Call Stack direct call" />
+    <Category Id="CallStackEntry" Label="Call Stack Entry" CanBeDataDriven="True" IsProviderRoot="False" NavigationActionLabel="Call Stack Entry" />
+    <Category Id="CallStackIndirectCall" Label="Call Stack indirect call" CanBeDataDriven="True" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="Call Stack indirect call" OutgoingActionLabel="Call Stack indirect call" />
+    <Category Id="CodeMap_TestAsset" Label="Test Asset" CanBeDataDriven="True" IsProviderRoot="False" NavigationActionLabel="Test Assets" />
+    <Category Id="CodeSchema_CallStackUnresolvedMethod" Label="Unresolved Method" CanBeDataDriven="True" DefaultAction="Microsoft.AllOutBoundLinks" IsProviderRoot="False" NavigationActionLabel="Unresolved Method" />
+    <Category Id="CodeSchema_Member" Label="Member" CanBeDataDriven="True" DefaultAction="Microsoft.Contains" Icon="CodeSchema_Field" NavigationActionLabel="Members" />
+    <Category Id="CodeSchema_Method" Label="Method" BasedOn="CodeSchema_Member" CanBeDataDriven="True" DefaultAction="Link:Forward:CodeSchema_Calls" Icon="CodeSchema_Method" NavigationActionLabel="Methods" />
+    <Category Id="CodeSchema_SourceLocation" Label="Source Location" Icon="File" />
+    <Category Id="ExternalCallStackEntry" Label="External Call Stack Entry" CanBeDataDriven="True" IsProviderRoot="False" NavigationActionLabel="External Call Stack Entry" />
+  </Categories>
+  <Properties>
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="CanBeDataDriven" Label="CanBeDataDriven" Description="CanBeDataDriven" DataType="System.Boolean" />
+    <Property Id="CanLinkedNodesBeDataDriven" Label="CanLinkedNodesBeDataDriven" Description="CanLinkedNodesBeDataDriven" DataType="System.Boolean" />
+    <Property Id="CodeSchemaProperty_IsAnonymous" Label="Is Anonymous" Description="Flag indicating if this delegate, type, or method is anonymous" DataType="System.Boolean" />
+    <Property Id="CodeSchemaProperty_IsExtension" Label="Is Extension" Description="Flag indicating if the method is an extension method" DataType="System.Boolean" />
+    <Property Id="CodeSchemaProperty_IsPrivate" Label="Is Private" Description="Flag to indicate the scope is Private" DataType="System.Boolean" />
+    <Property Id="CodeSchemaProperty_IsPublic" Label="Is Public" Description="Flag to indicate the scope is Public" DataType="System.Boolean" />
+    <Property Id="CodeSchemaProperty_IsStatic" Label="Is Static" Description="Flag to indicate the member is a static member" DataType="System.Boolean" />
+    <Property Id="CommonLabel" DataType="System.String" />
+    <Property Id="DataVirtualized" Label="Data Virtualized" Description="If true, the graph can contain nodes and links that represent data for virtualized nodes/links (i.e. not actually created in the graph)." DataType="System.Boolean" />
+    <Property Id="DefaultAction" Label="DefaultAction" Description="DefaultAction" DataType="System.String" />
+    <Property Id="Expression" DataType="System.String" />
+    <Property Id="GroupLabel" DataType="System.String" />
+    <Property Id="Icon" Label="Icon" DataType="System.String" />
+    <Property Id="IncomingActionLabel" Label="IncomingActionLabel" Description="IncomingActionLabel" DataType="System.String" />
+    <Property Id="IsEnabled" DataType="System.Boolean" />
+    <Property Id="IsOverloaded" Label="IsOverloaded" Description="IsOverloaded" DataType="System.Boolean" />
+    <Property Id="IsProviderRoot" Label="IsProviderRoot" Description="IsProviderRoot" DataType="System.Boolean" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="LabelBounds" DataType="System.Windows.Rect" />
+    <Property Id="Layout" DataType="System.String" />
+    <Property Id="NavigationActionLabel" Label="NavigationActionLabel" Description="NavigationActionLabel" DataType="System.String" />
+    <Property Id="OutgoingActionLabel" Label="OutgoingActionLabel" Description="OutgoingActionLabel" DataType="System.String" />
+    <Property Id="SourceLocation" Label="Start Line Number" DataType="Microsoft.VisualStudio.GraphModel.CodeSchema.SourceLocation" />
+    <Property Id="TargetType" DataType="System.Type" />
+    <Property Id="Value" DataType="System.String" />
+    <Property Id="ValueLabel" DataType="System.String" />
+    <Property Id="Visibility" Label="Visibility" Description="Defines whether a node in the graph is visible or not" DataType="System.Windows.Visibility" />
+  </Properties>
+  <QualifiedNames>
+    <Name Id="ArrayRank" Label="Array Rank" ValueType="System.String" />
+    <Name Id="Assembly" Label="Assembly" ValueType="Uri" />
+    <Name Id="GenericArguments" Label="Generic Arguments" ValueType="Microsoft.VisualStudio.GraphModel.GraphNodeIdCollection" />
+    <Name Id="GenericParameterCount" Label="Generic Parameter Count" ValueType="System.String" />
+    <Name Id="IsUnresolved" Label="Is Unresolved" ValueType="System.String" />
+    <Name Id="Member" Label="Member" ValueType="System.Object" />
+    <Name Id="Name" Label="Name" ValueType="System.String" />
+    <Name Id="Namespace" Label="Namespace" ValueType="System.String" />
+    <Name Id="OverloadingParameters" Label="Parameter" ValueType="Microsoft.VisualStudio.GraphModel.GraphNodeIdCollection" Formatter="NameValueNoEscape" />
+    <Name Id="ParentType" Label="Parent Type" ValueType="System.Object" />
+    <Name Id="Type" Label="Type" ValueType="System.Object" />
+  </QualifiedNames>
+  <IdentifierAliases>
+    <Alias n="1" Uri="Assembly=$(c9065636-b397-4fb3-b9de-8fe5a754210a.OutputPathUri)" />
+    <Alias n="2" Id="Namespace=Rudine.Interpreters" />
+    <Alias n="3" Id="Type=DocInterpreter" />
+    <Alias n="4" Uri="Assembly=$(FxReferenceAssembliesUri)/.NETFramework/v4.6.1/mscorlib.dll" />
+    <Alias n="5" Id="Namespace=System" />
+    <Alias n="6" Id="OverloadingParameters=[(@4 @5 Type=(Name=Byte ArrayRank=1 ParentType=Byte))]" />
+    <Alias n="7" Id="(@1 @2 @3 Member=(Name=LocateInstance @6))" />
+    <Alias n="8" Id="(@1 @2 @3 Member=(Name=ReadDocPI @6))" />
+    <Alias n="9" Id="(@1 Namespace=Rudine.Storage.Docdb Type=LuceneController Member=(Name=SubmitBytes @6))" />
+    <Alias n="10" Id="(@1 @2 @3 Member=(Name=Validate @6))" />
+    <Alias n="11" Id="Namespace=Rudine" />
+    <Alias n="12" Id="Namespace=Rudine.Web" />
+    <Alias n="13" Id="(@1 @2 @3 Member=(Name=Read OverloadingParameters=[(@4 @5 Type=(Name=Byte ArrayRank=1 ParentType=Byte)),(@4 @5 Type=Boolean)]))" />
+    <Alias n="14" Uri="Assembly=$(25dfa9b7-ce29-4772-9e02-49e60192369f.OutputPathUri)" />
+    <Alias n="15" Id="(@14 Namespace=Rudine.Interpreters.Pdf Type=PdfInterpreter Member=(Name=Read OverloadingParameters=[(@4 @5 Type=(Name=Byte ArrayRank=1 ParentType=Byte)),(@4 @5 Type=Boolean)]))" />
+    <Alias n="16" Id="(@4 @5 Type=String)" />
+    <Alias n="17" Id="(@14 Namespace=Rudine.Interpreters.Pdf Type=PdfInterpreter Member=(Name=Create OverloadingParameters=[@16,@16]))" />
+    <Alias n="18" Id="(@1 @11 Type=RuntimeTypeNamer Member=(Name=CalcCSharpFullName OverloadingParameters=[@16,@16,(@4 @5 Type=(Name=String ArrayRank=1 ParentType=String))]))" />
+    <Alias n="19" Id="(@1 @11 Type=RuntimeTypeNamer Member=(Name=CalcCSharpNamespace OverloadingParameters=[@16,@16,(@4 @5 Type=(Name=String ArrayRank=1 ParentType=String))]))" />
+    <Alias n="20" Id="(@1 @11 Type=Runtime Member=(Name=ActivateBaseDoc OverloadingParameters=[@16,@16,(@1 @12 Type=IBaseDocController),(@4 @5 Type=(Name=String ArrayRank=1 ParentType=String))]))" />
+    <Alias n="21" Id="(@1 @11 Type=Runtime Member=(Name=ActivateBaseDocType OverloadingParameters=[@16,@16,(@1 @12 Type=IBaseDocController),(@4 @5 Type=(Name=String ArrayRank=1 ParentType=String))]))" />
+    <Alias n="22" Id="(@1 Namespace=Rudine.Storage.Docdb Type=LuceneController Member=(Name=Submit OverloadingParameters=[(@4 @5 Type=Object),(@1 @12 Type=BaseDoc),(@1 @12 Type=DocProcessingInstructions),(@4 @5 Type=Boolean)]))" />
+    <Alias n="23" Uri="Assembly=$(9abdeb76-2d97-4809-9390-f4690f003667.OutputPathUri)" />
+    <Alias n="24" Id="(@23 Namespace=Rudine.Interpreters.Pdf.Tests Type=ExternalPdfInterpreterTests Member=WritePITest)" />
+    <Alias n="25" Uri="Assembly=$(229376ae-f476-43bf-8a6f-f4ee57f87ac7.OutputPathUri)" />
+    <Alias n="26" Id="(@25 Namespace=Rudine.Tests Type=ExternalPdfInterpreterTests Member=WritePITest)" />
+    <Alias n="27" Uri="Assembly=Rudine.dll" />
+    <Alias n="28" Id="(Type=&quot;byte[]&quot; Name=DocData)" />
+    <Alias n="29" Id="IsUnresolved=True" />
+    <Alias n="30" Id="(Name=Rudine.Interpreters.DocInterpreter.CalcDocChecksum @27 Type=int OverloadingParameters=[@28,(Type=bool? Name=docStatus)] @29)" />
+    <Alias n="31" Id="Type=string" />
+    <Alias n="32" Id="(Name=Rudine.DocExchange.ProcessPI @27 Type=&quot;byte[]&quot; OverloadingParameters=[@28,(@31 Name=DocSubmittedByEmail),(Type=bool? Name=DocStatus),(Type=System.DateTime? Name=SubmittedDate),(Type=&quot;System.Collections.Generic.Dictionary&lt;string, string&gt;&quot; Name=DocKeys),(@31 Name=DocTitle)] @29)" />
+    <Alias n="33" Id="(Name=Rudine.DocExchange.SubmitBytes @27 Type=Rudine.Web.LightDoc OverloadingParameters=[@28,(@31 Name=SubmittedByEmail),(Type=System.DateTime? Name=SubmittedDate),(@31 Name=RelayUrl),(Type=bool? Name=DocStatus),(Type=&quot;System.Collections.Generic.Dictionary&lt;string, string&gt;&quot; Name=DocKeys),(@31 Name=DocTitle)] @29)" />
+    <Alias n="34" Id="(Name=Rudine.Interpreters.DocInterpreter.ModPI @27 Type=&quot;byte[]&quot; OverloadingParameters=[@28,(@31 Name=DocSubmittedByEmail),(Type=bool? Name=DocStatus),(Type=System.DateTime? Name=SubmittedDate),(Type=&quot;System.Collections.Generic.Dictionary&lt;string, string&gt;&quot; Name=DocKeys),(@31 Name=DocTitle),(Type=int? Name=DocChecksum),(@31 Name=href)] @29)" />
+  </IdentifierAliases>
+  <Styles>
+    <Style TargetType="Link" GroupLabel="Current Call Stack Link" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('CurrentCallStackCall')" />
+      <Setter Property="Stroke" Value="#FFD93701" />
+      <Setter Property="Weight" Value="1" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Call Stack Indirect Link" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('CallStackIndirectCall')" />
+      <Setter Property="Stroke" Value="#FFB8B8B8" />
+      <Setter Property="StrokeDashArray" Value="4 1" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Call Stack Direct Link" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('CallStackDirectCall')" />
+      <Setter Property="Stroke" Value="#FFB8B8B8" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Current Call Stack (no source)" ValueLabel="True">
+      <Condition Expression="HasCategory('CurrentCallStackEntry') And !HasCategory('CodeSchema_SourceLocation')" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#FFA5A5A5" />
+      <Setter Property="Stroke" Value="#FF0072C6" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="External And Current" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('ExternalCallStackEntry') And HasCategory('CurrentCallStackEntry')" />
+      <Setter Property="Background" Value="#FFFFF8F0" />
+      <Setter Property="Stroke" Value="#FFCE5100" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Current Call Stack (source)" ValueLabel="True">
+      <Condition Expression="HasCategory('CurrentCallStackEntry') And !HasCategory('QueryResult')" />
+      <Setter Property="Background" Value="#FFFFE3C6" />
+      <Setter Property="Stroke" Value="#FFD93701" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="External Call Stack" ValueLabel="True">
+      <Condition Expression="HasCategory('ExternalCallStackEntry')" />
+      <Setter Property="Background" Value="#FFF7F7F7" />
+      <Setter Property="StrokeDashArray" Value="1 3" />
+      <Setter Property="Foreground" Value="#FFA5A5A5" />
+      <Setter Property="Stroke" Value="#FFA5A5A5" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Results" ValueLabel="True">
+      <Condition Expression="HasCategory('QueryResult')" />
+      <Setter Property="Background" Value="#FFBCFFBE" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Test Project" ValueLabel="Test Project">
+      <Condition Expression="HasCategory('CodeMap_TestProject')" />
+      <Setter Property="Icon" Value="CodeMap_TestProject" />
+      <Setter Property="Background" Value="#FF307A69" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Web Project" ValueLabel="Web Project">
+      <Condition Expression="HasCategory('CodeMap_WebProject')" />
+      <Setter Property="Icon" Value="CodeMap_WebProject" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Windows Store Project" ValueLabel="Windows Store Project">
+      <Condition Expression="HasCategory('CodeMap_WindowsStoreProject')" />
+      <Setter Property="Icon" Value="CodeMap_WindowsStoreProject" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Phone Project" ValueLabel="Phone Project">
+      <Condition Expression="HasCategory('CodeMap_PhoneProject')" />
+      <Setter Property="Icon" Value="CodeMap_PhoneProject" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Portable Library" ValueLabel="Portable Library">
+      <Condition Expression="HasCategory('CodeMap_PortableLibraryProject')" />
+      <Setter Property="Icon" Value="CodeMap_PortableLibraryProject" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="WPF Project" ValueLabel="WPF Project">
+      <Condition Expression="HasCategory('CodeMap_WpfProject')" />
+      <Setter Property="Icon" Value="CodeMap_WpfProject" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="VSIX Project" ValueLabel="VSIX Project">
+      <Condition Expression="HasCategory('CodeMap_VsixProject')" />
+      <Setter Property="Icon" Value="CodeMap_VsixProject" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Modeling Project" ValueLabel="Modeling Project">
+      <Condition Expression="HasCategory('CodeMap_ModelingProject')" />
+      <Setter Property="Icon" Value="CodeMap_ModelingProject" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Assembly" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Assembly')" />
+      <Setter Property="Background" Value="#FF094167" />
+      <Setter Property="Stroke" Value="#FF094167" />
+      <Setter Property="Icon" Value="CodeSchema_Assembly" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Namespace" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Namespace')" />
+      <Setter Property="Background" Value="#FF0E619A" />
+      <Setter Property="Stroke" Value="#FF0E619A" />
+      <Setter Property="Icon" Value="CodeSchema_Namespace" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Interface" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Interface')" />
+      <Setter Property="Background" Value="#FF1382CE" />
+      <Setter Property="Stroke" Value="#FF1382CE" />
+      <Setter Property="Icon" Value="CodeSchema_Interface" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Struct" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Struct')" />
+      <Setter Property="Background" Value="#FF1382CE" />
+      <Setter Property="Stroke" Value="#FF1382CE" />
+      <Setter Property="Icon" Value="CodeSchema_Struct" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Enumeration" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Enum')" />
+      <Setter Property="Background" Value="#FF1382CE" />
+      <Setter Property="Stroke" Value="#FF1382CE" />
+      <Setter Property="Icon" Value="CodeSchema_Enum" />
+      <Setter Property="LayoutSettings" Value="List" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Delegate" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Delegate')" />
+      <Setter Property="Background" Value="#FF1382CE" />
+      <Setter Property="Stroke" Value="#FF1382CE" />
+      <Setter Property="Icon" Value="CodeSchema_Delegate" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Class" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Type')" />
+      <Setter Property="Background" Value="#FF1382CE" />
+      <Setter Property="Stroke" Value="#FF1382CE" />
+      <Setter Property="Icon" Value="CodeSchema_Class" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Property" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Property')" />
+      <Setter Property="Background" Value="#FFE0E0E0" />
+      <Setter Property="Stroke" Value="#FFE0E0E0" />
+      <Setter Property="Icon" Value="CodeSchema_Property" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Method" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Method') Or HasCategory('CodeSchema_CallStackUnresolvedMethod')" />
+      <Setter Property="Background" Value="#FFE0E0E0" />
+      <Setter Property="Stroke" Value="#FFE0E0E0" />
+      <Setter Property="Icon" Value="CodeSchema_Method" />
+      <Setter Property="LayoutSettings" Value="List" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Event" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Event')" />
+      <Setter Property="Background" Value="#FFE0E0E0" />
+      <Setter Property="Stroke" Value="#FFE0E0E0" />
+      <Setter Property="Icon" Value="CodeSchema_Event" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Field" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Field')" />
+      <Setter Property="Background" Value="#FFE0E0E0" />
+      <Setter Property="Stroke" Value="#FFE0E0E0" />
+      <Setter Property="Icon" Value="CodeSchema_Field" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Out Parameter" ValueLabel="Has category">
+      <Condition Expression="CodeSchemaProperty_IsOut = 'True'" />
+      <Setter Property="Icon" Value="CodeSchema_OutParameter" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Parameter" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_Parameter')" />
+      <Setter Property="Icon" Value="CodeSchema_Parameter" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Local Variable" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_LocalExpression')" />
+      <Setter Property="Icon" Value="CodeSchema_LocalExpression" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Externals" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Externals')" />
+      <Setter Property="Background" Value="#FF424242" />
+      <Setter Property="Stroke" Value="#FF424242" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Inherits From" ValueLabel="True">
+      <Condition Expression="HasCategory('InheritsFrom')" />
+      <Setter Property="Stroke" Value="#FF00A600" />
+      <Setter Property="StrokeDashArray" Value="2 0" />
+      <Setter Property="DrawArrow" Value="true" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Implements" ValueLabel="True">
+      <Condition Expression="HasCategory('Implements')" />
+      <Setter Property="Stroke" Value="#8000A600" />
+      <Setter Property="StrokeDashArray" Value="2 2" />
+      <Setter Property="DrawArrow" Value="true" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Calls" ValueLabel="True">
+      <Condition Expression="HasCategory('CodeSchema_Calls')" />
+      <Setter Property="Stroke" Value="#FFFF00FF" />
+      <Setter Property="StrokeDashArray" Value="2 0" />
+      <Setter Property="DrawArrow" Value="true" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Function Pointer" ValueLabel="True">
+      <Condition Expression="HasCategory('CodeSchema_FunctionPointer')" />
+      <Setter Property="Stroke" Value="#FFFF00FF" />
+      <Setter Property="StrokeDashArray" Value="2 2" />
+      <Setter Property="DrawArrow" Value="true" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Field Read" ValueLabel="True">
+      <Condition Expression="HasCategory('CodeSchema_FieldRead')" />
+      <Setter Property="Stroke" Value="#FF00AEEF" />
+      <Setter Property="StrokeDashArray" Value="2 2" />
+      <Setter Property="DrawArrow" Value="true" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Field Write" ValueLabel="True">
+      <Condition Expression="HasCategory('CodeSchema_FieldWrite')" />
+      <Setter Property="Stroke" Value="#FF00AEEF" />
+      <Setter Property="DrawArrow" Value="true" />
+      <Setter Property="IsHidden" Value="false" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Inherits From" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('InheritsFrom') And Target.HasCategory('CodeSchema_Class')" />
+      <Setter Property="TargetDecorator" Value="OpenArrow" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Implements" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('Implements') And Target.HasCategory('CodeSchema_Interface')" />
+      <Setter Property="TargetDecorator" Value="OpenArrow" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Comment Link" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="Source.HasCategory('Comment')" />
+      <Setter Property="Stroke" Value="#FFE5C365" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Cursor Location Changed" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="IsCursorLocation" />
+      <Setter Property="IndicatorWest" Value="WestIndicator" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Disabled Breakpoint Location Changed" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="DisabledBreakpointCount" />
+      <Setter Property="IndicatorWest" Value="WestIndicator" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Enabled Breakpoint Location Changed" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="EnabledBreakpointCount" />
+      <Setter Property="IndicatorWest" Value="WestIndicator" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Instruction Pointer Location Changed" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="IsInstructionPointerLocation" />
+      <Setter Property="IndicatorWest" Value="WestIndicator" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Current Callstack Changed" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="IsCurrentCallstackFrame" />
+      <Setter Property="IndicatorWest" Value="WestIndicator" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Return" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('CodeSchema_ReturnTypeLink')" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="References" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('References')" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Uses Attribute" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('CodeSchema_AttributeUse')" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Solution Folder" ValueLabel="True" Visibility="Hidden">
+      <Condition Expression="HasCategory('CodeMap_SolutionFolder')" />
+      <Setter Property="Background" Value="#FFDEBA83" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Project Reference" ValueLabel="Project Reference">
+      <Condition Expression="HasCategory('CodeMap_ProjectReference')" />
+      <Setter Property="Stroke" Value="#9A9A9A" />
+      <Setter Property="StrokeDashArray" Value="2 2" />
+      <Setter Property="DrawArrow" Value="true" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="External Reference" ValueLabel="External Reference">
+      <Condition Expression="HasCategory('CodeMap_ExternalReference')" />
+      <Setter Property="Stroke" Value="#9A9A9A" />
+      <Setter Property="StrokeDashArray" Value="2 2" />
+      <Setter Property="DrawArrow" Value="true" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Comment" ValueLabel="Has comment">
+      <Condition Expression="HasCategory('Comment')" />
+      <Setter Property="Background" Value="#FFFFFACD" />
+      <Setter Property="Stroke" Value="#FFE5C365" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="NodeRadius" Value="2" />
+      <Setter Property="MaxWidth" Value="250" />
+    </Style>
+  </Styles>
+  <Paths>
+    <Path Id="229376ae-f476-43bf-8a6f-f4ee57f87ac7.OutputPathUri" Value="file:///C:/mycode/rudine/RudineTests/bin/Debug/Rudine.Tests.dll" />
+    <Path Id="25dfa9b7-ce29-4772-9e02-49e60192369f.OutputPathUri" Value="file:///C:/mycode/rudine/Rudine.Interpeter.pdf/bin/Debug/Rudine.Interpreters.Pdf.dll" />
+    <Path Id="9abdeb76-2d97-4809-9390-f4690f003667.OutputPathUri" Value="file:///C:/mycode/rudine/Rudine.Interpreters.PdfTests/bin/Debug/Rudine.Interpreters.PdfTests.dll" />
+    <Path Id="c9065636-b397-4fb3-b9de-8fe5a754210a.OutputPathUri" Value="file:///C:/mycode/rudine/Rudine/bin/Rudine.dll" />
+    <Path Id="FxReferenceAssembliesUri" Value="file:///C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework" />
+  </Paths>
+</DirectedGraph>

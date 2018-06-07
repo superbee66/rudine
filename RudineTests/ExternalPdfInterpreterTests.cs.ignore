@@ -1,0 +1,64 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using NUnit.Framework;
+using Rudine.Interpreters.Pdf;
+using Rudine.Tests.Properties;
+using Rudine.Web;
+
+namespace Rudine.Tests
+{
+    [TestFixture]
+    public class ExternalPdfInterpreterTests : DocExchangeTests
+    {
+        private static readonly ExternalPdfInterpreter ExternalPdfInterpreter = new ExternalPdfInterpreter();
+
+        [Test]
+        public void WritePITest()
+        {
+            byte[] _ZipFileBytes = ExternalPdfInterpreter.WritePI(
+                Resources.BaseLineOpenOffice4,
+                new DocProcessingInstructions
+                {
+                    DocTypeName = DocRev.MyOnlyDocName,
+                    solutionVersion = DocRev.MyOnlyDocVersion,
+                    DocKeys = new Dictionary<string, string> { { "ok", "lala" } }
+                });
+
+            BaseDoc _BaseDoc = DocExchange.Instance.ReadBytes(_ZipFileBytes);
+            Assert.IsTrue(_BaseDoc is DocRev);
+
+
+            for (int i = 0; i < 10; i++)
+            {
+                Dictionary<string, string> _DocKeys = new Dictionary<string, string>
+                {
+                    {"VendorId", i.ToString()},
+                    {"ContractId", (-1).ToString()}
+                };
+
+                LightDoc _LightDoc = DocExchange.Instance.SubmitBytes(
+                    Resources.BaseLineOpenOffice4,
+                    "lala@azdes.gov",
+                    DocKeys: _DocKeys);
+
+                Debug.WriteLine(_LightDoc.DocSrc);
+
+                List<LightDoc> _List = DocExchange.Instance.List(new List<string> { _LightDoc.DocTypeName });
+
+                Assert.IsTrue(_List.Count == i + 1);
+
+                Array.ForEach(
+                    new[]
+                    {
+                        DocExchange.Instance.List(new List<string>(), new Dictionary<string, List<string>> {{"VendorId", new List<string> {_DocKeys["VendorId"]}}}),
+                        DocExchange.Instance.List(new List<string>(), new Dictionary<string, List<string>> {{"ContractId", new List<string> {_DocKeys["ContractId"]}}}),
+                        DocExchange.Instance.List(new List<string>(), null, null, "Decimal"),
+                        DocExchange.Instance.List(new List<string>(), null, null, "field_DateTime")
+                    },
+                    lightDocs =>
+                        Assert.IsTrue(_List.EquelText(lightDocs)));
+            }
+        }
+    }
+}

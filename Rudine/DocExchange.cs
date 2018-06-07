@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using dCForm.Core.Storage.Sql;
 using Rudine.Exceptions;
 using Rudine.Interpreters;
 using Rudine.Storage.Docdb;
@@ -15,6 +16,7 @@ namespace Rudine
 {
     public class DocExchange : BaseDocController, IDocKnownTypes
     {
+        private SqlController SqlController = new SqlController();
         internal static readonly LuceneController LuceneController = new LuceneController();
         internal static readonly Lazy<DocExchange> _Instance = new Lazy<DocExchange>(() => new DocExchange());
 
@@ -168,14 +170,17 @@ namespace Rudine
             Version existingVersion;
             // DOCREVs are only submitted via Text, there is no need to worry about them enter the system in another fusion. 
             if (_LightDoc.DocTypeName == DocRev.MyOnlyDocName)
-                // if the DocRev submitted supersedes the current or this is no current..
-                if (!Version.TryParse(TemplateController.Instance.TopDocRev(TargetDocName), out existingVersion) || Version.Parse(TargetDocVer) >= existingVersion)
-                    // if there is no representation of this DocRev as a directory in the file system (as this trumps the submitted one no matter what
-                    // notice the true parameter value to clear the cache as well as assert we have the correct DocRev in the system now
-                    if (Directory.Exists(FilesystemTemplateController.GetDocDirectoryPath(TargetDocName))
-                        ||
-                        TemplateController.Instance.TopDocRev(TargetDocName, true) != TargetDocVer)
-                        throw new PocosImportException();
+                if (!string.IsNullOrWhiteSpace(TargetDocVer))
+                    // if the DocRev submitted supersedes the current or this is no current..
+                    if (!Version.TryParse(TemplateController.Instance.TopDocRev(TargetDocName), out existingVersion) || Version.Parse(TargetDocVer) >= existingVersion)
+                        // if there is no representation of this DocRev as a directory in the file system (as this trumps the submitted one no matter what
+                        // notice the true parameter value to clear the cache as well as assert we have the correct DocRev in the system now
+                        if (Directory.Exists(FilesystemTemplateController.GetDocDirectoryPath(TargetDocName))
+                            ||
+                            TemplateController.Instance.TopDocRev(TargetDocName, true) != TargetDocVer)
+                            throw new PocosImportException();
+
+            SqlController.Submit(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
             return _LightDoc;
         }

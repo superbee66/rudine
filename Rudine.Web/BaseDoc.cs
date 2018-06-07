@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Rudine.Web.Util;
@@ -17,7 +18,6 @@ namespace Rudine.Web
     [Serializable]
     public class BaseDoc : DocProcessingInstructions, IBaseDoc
     {
-
         /// <summary>
         ///     User may want to title there own document?
         /// </summary>
@@ -64,6 +64,56 @@ namespace Rudine.Web
                 .Union(new List<Type> { o })
                 .Distinct()
                 .ToList();
+        }
+
+           /// <summary>
+        ///     Further filters GetFormObjectMappedProperties stripping IgnoreDataMember,XmlIgnoreAttribute,ScriptIgnoreAttribute &
+        ///     NotMapped properties
+        /// </summary>
+        /// <param name="filled">when true, ensures the properties have been explicitly set</param>
+        /// <returns></returns>
+        public PropertyInfo[] GetFormObjectNavProperties(bool filled = false)
+        {
+            PropertyInfo[] p = CacheMan.Cache(() => GetFormObjectMappedProperties(false)
+                    .Where(m =>
+                        m.DeclaringType != typeof(BaseDoc) &&
+                        m.DeclaringType != typeof(BaseAutoIdent)
+                    )
+                    .ToArray(),
+                false,
+                "GetFormObjectNavProperties",
+                GetType().FullName,
+                "GetFormObjectNavProperties");
+
+
+            return p.Where(m => !filled || !this.IsDefaultValue(m)).ToArray();
+        }
+        /// <summary>
+        ///     serialize-able, settable properties
+        /// </summary>
+        /// <param name="filled">when true, ensures the properties have been explicitly set</param>
+        /// <returns></returns>
+        public PropertyInfo[] GetFormObjectMappedProperties(bool filled = false)
+        {
+            PropertyInfo[] p = CacheMan.Cache(() =>
+                {
+                    return GetType().GetProperties(
+                        BindingFlags.IgnoreCase
+                        | BindingFlags.Public
+                        | BindingFlags.Instance
+                        | BindingFlags.SetProperty).Where(m =>
+                        m.CanWrite
+                        && m.PropertyType.IsPublic
+                        && m.PropertyType.IsSerializable
+                        && !m.PropertyType.IsArray
+                        && !ExpressionParser.GetNonNullableType(m.PropertyType).IsAbstract
+                        && !ExpressionParser.GetNonNullableType(m.PropertyType).IsGenericType).ToArray();
+                },
+                false,
+                GetType().FullName,
+                "GetFormObjectMappedProperties");
+
+            return p.Where(m => !filled || !this.IsDefaultValue(m)).ToArray();
         }
     }
 }

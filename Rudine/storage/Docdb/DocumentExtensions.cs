@@ -71,27 +71,40 @@ namespace Rudine.Storage.Docdb
                         _LightDoc.ToBytes(),
                         Field.Store.YES));
 
-                _MemoryStream.Position = 0;
-                FileTypeFileInfo _FileTypeFileInfo = FileTypeSelector.GetFileTypeFileInfo(_MemoryStream.AsBytes());
-                _MemoryStream.Position = 0;
-                string _Text;
 
-                if (_FileTypeFileInfo != null)
-                    using (FilterReader _FilterReader = new FilterReader(
-                        _MemoryStream,
-                        _FileTypeFileInfo.Extension,
-                        false,
-                        true))
-                        _Text = _FilterReader.ReadToEnd();
-                else
-                    _Text = JsonConvert.SerializeObject(
-                        _BaseDoc,
-                        Formatting.Indented,
-                        new JsonSerializerSettings
+                string _Text = string.Empty;
+                foreach (MemoryStream _IFilterSourceMemoryStream in _BaseDoc.IsDocRev()
+                    ? ((DocRev) _BaseDoc).DocFiles.Select(docFile => new MemoryStream(docFile.Bytes))
+                    : new[] {_MemoryStream})
+                {
+                    _IFilterSourceMemoryStream.Position = 0;
+                    FileTypeFileInfo _FileTypeFileInfo = FileTypeSelector.GetFileTypeFileInfo(_IFilterSourceMemoryStream.AsBytes());
+                    _IFilterSourceMemoryStream.Position = 0;
+
+
+                    if (_FileTypeFileInfo != null)
+                        using (FilterReader _FilterReader = new FilterReader(
+                            _IFilterSourceMemoryStream,
+                            _FileTypeFileInfo.Extension,
+                            false,
+                            true))
                         {
-                            ContractResolver = ShouldSerializeContractResolver.Instance,
-                            DefaultValueHandling = DefaultValueHandling.Ignore
-                        });
+                            _Text += _FilterReader.ReadToEnd();
+                        }
+                    else
+                        _Text += JsonConvert.SerializeObject(
+                            _BaseDoc,
+                            Formatting.Indented,
+                            new JsonSerializerSettings
+                            {
+                                ContractResolver = ShouldSerializeContractResolver.Instance,
+                                DefaultValueHandling = DefaultValueHandling.Ignore
+                            });
+
+                    _IFilterSourceMemoryStream.Close();
+                    _IFilterSourceMemoryStream.Dispose();
+                }
+
 
                 //TODO:Find a more elegant way of making the documents DocKeys search-able. Currently they are simply concatenated to the DocData
                 _Document.Add(
