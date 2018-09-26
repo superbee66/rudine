@@ -81,7 +81,7 @@ namespace Rudine.Util.Xsds {
             XmlSchemaExporter xmlSchemaExporter = new XmlSchemaExporter(xmlSchemas);
 
             try {
-                Type[] types = assembly.GetTypes();
+                Type[] types = assembly.GetExportedTypes();
                 foreach (Type type in types.Where(type =>
                                                       typeNames.Count == 0
                                                       ||

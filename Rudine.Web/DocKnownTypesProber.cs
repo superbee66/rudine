@@ -16,7 +16,7 @@ namespace Rudine.Web
         private static readonly IDocKnownTypes[] _IDocRevKnownTypesImpl = AppDomain
             .CurrentDomain
             .GetAssemblies()
-            .SelectMany(_Assembly => _Assembly.GetTypes(), (_Assembly, _Type) => new
+            .SelectMany(_Assembly => _Assembly.GetExportedTypes(), (_Assembly, _Type) => new
             {
                 _Assembly, _Type
             })

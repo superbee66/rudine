@@ -464,7 +464,7 @@ this is applied to all classes.
 
         public static Type FindBaseDocType(Assembly BaseDocAssembly, string DocTypeName)
         {
-            return BaseDocAssembly.GetTypes()
+            return BaseDocAssembly.GetExportedTypes()
                                   .First(m => m.Name == DocTypeName);
         }
 

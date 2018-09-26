@@ -41,7 +41,7 @@ namespace Rudine.Util
                     ? null
                     : AppDomain.CurrentDomain.GetAssemblies()
                                .Where(m => (m.FullName) == assemblyName)
-                               .SelectMany(a => a.GetTypes())
+                               .SelectMany(a => a.GetExportedTypes())
                                .ToArray());
 
             return t == null && !noCache
@@ -62,7 +62,7 @@ namespace Rudine.Util
             string weakName = UNQUALIFY_TYPE_NAMES.Replace(typeNameOrFullname, string.Empty);
 
             Type t = null;
-            foreach (Type type in (searchScope ?? AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())))
+            foreach (Type type in (searchScope ?? AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetExportedTypes())))
                 if (type != null)
                     if (t == null)
                         t = type.Name == typeNameOrFullname

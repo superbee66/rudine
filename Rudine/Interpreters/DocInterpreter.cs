@@ -25,9 +25,9 @@ namespace Rudine.Interpreters
 
         static DocInterpreter()
         {
-            ContentInterpreterInstances=Reflection
+            ContentInterpreterInstances = Reflection
                 .LoadBinDlls()
-                .SelectMany(a => a.GetTypes())
+                .SelectMany(a => a.GetExportedTypes())
                 .Where(type => !type.IsAbstract)
                 .Where(type => !type.IsInterface)
                 .Where(type => type.IsSubclassOf(typeof(DocTextInterpreter)) || type.IsSubclassOf(typeof(DocByteInterpreter)))
