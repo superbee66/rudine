@@ -1,6 +1,8 @@
 using System.Data.Entity;
 
-namespace dCForm.Core.Storage.Sql
+namespace Rudine.Storage.Sql
 {
-    public class ModelConfiguration : DbConfiguration{}
+    public class ModelConfiguration : DbConfiguration
+    {
+    }
 }

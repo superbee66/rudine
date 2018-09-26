@@ -1,6 +1,6 @@
 using System;
 
-namespace dCForm.Core.Storage.Sql.Merge
+namespace Rudine.Storage.Sql.Merge
 {
     public class ClassProperty
     {

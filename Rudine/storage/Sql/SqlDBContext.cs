@@ -1,19 +1,16 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Configuration;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Reflection;
-using Rudine;
 using Rudine.Web;
 
-namespace dCForm.Core.Storage.Sql
+namespace Rudine.Storage.Sql
 {
     [DbConfigurationType(typeof(ModelConfiguration))]
     public abstract class SqlDbContext : DbContext
     {
-
         public const string CONTEXT_NAME = "SqlDbContext";
 
         public SqlDbContext()
@@ -25,26 +22,38 @@ namespace dCForm.Core.Storage.Sql
             Configuration.ValidateOnSaveEnabled = true;
         }
 
-        public static string GetConnectionString()
+        public static SqlDbContext CreateInstance(BaseDoc _BaseDoc)
         {
-            return ConfigurationManager.ConnectionStrings[CONTEXT_NAME].ConnectionString;
+            Type _BaseDocType = _BaseDoc.GetType();
+            string _DbContextTypeName = dCFormDBContextTypeName(_BaseDoc);
+
+            string cSharpCode = string.Format(@"
+            namespace {0} {{
+                public class {1} : {2}.{3} {{
+                    public {1}() : base( ) {{
+                        System.Data.Entity.Database.SetInitializer(new System.Data.Entity.MigrateDatabaseToLatestVersion<{0}.{1}, {2}.SqlDbMigrationsConfiguration<{0}.{1}>>());
+                    }}
+                }}
+            }}",
+                _BaseDocType.Namespace,
+                _DbContextTypeName,
+                typeof(SqlDbContext).Namespace,
+                nameof(SqlDbContext));
+
+            // add using statements to beginning to top of the document
+            cSharpCode = string.Join("", Runtime.USING_NAMESPACES.Keys.OrderBy(ns => ns).Select(ns => string.Format("using {0};\n", ns))) + cSharpCode;
+
+            //TODO:Separate the dCFormDBContextTypeName from the BaseDoc assembly/code-gen. Runtime-compiled BaseDocs & SqlDbContext code placement organization needs to be rethought thru better. 
+            return (SqlDbContext) Activator
+                .CreateInstance(Runtime
+                    .CompileCSharpCode(() => cSharpCode, string.Format("{0}.{1}.{2}", typeof(SqlDbContext).Namespace, _BaseDoc.DocTypeName, _BaseDoc.solutionVersion))
+                    .GetExportedTypes()
+                    .First(m => m.Name == _DbContextTypeName));
         }
 
-        /// <summary>
-        /// Setting the table name & schema up front (not waiting to set in conventions) seem to be the only wau to get get EF CF to consistently apply our schemas. When this was performed at the conventions method it did not allways seem to take; our tables would then get the default "dbo" schema even when they were told not too.
-        /// </summary>
-        /// <param name="dbModelBuilder"></param>
-        /// <param name="entityType"></param>
-        /// <param name="schemaName"></param>
-        private static void ToTable(DbModelBuilder dbModelBuilder, Type entityType, string schemaName)
-        {
-            // add each entity that has a TableName attribute connected to the BaseDoc to the model
-            MethodInfo entityMethod = ((object)dbModelBuilder).GetType().GetMethod("Entity");
-            object o = entityMethod.MakeGenericMethod(entityType).Invoke(dbModelBuilder, new object[] { });
+        private static string dCFormDBContextTypeName(BaseDoc baseDoc) => string.Format("{0}_Db", baseDoc.DocTypeName);
 
-            // call the ToTable method via reflection as EntityFramework designed it with an accessor level private
-            o.GetType().GetMethods().First(m => m.Name == "ToTable" && m.GetParameters().Count() == 2).Invoke(o, new object[] { entityType.Name, schemaName });
-        }
+        public static string GetConnectionString() => ConfigurationManager.ConnectionStrings[CONTEXT_NAME].ConnectionString;
 
 
         /// <summary>
@@ -59,18 +68,18 @@ namespace dCForm.Core.Storage.Sql
             if (_BaseDocType == null)
                 throw new Exception(string.Format("{0} can't resolve it's own {1}.[*:BaseDoc]", GetType().FullName, myNamespace));
 
-            BaseDoc _BaseDoc = (BaseDoc)Activator.CreateInstance(_BaseDocType);
+            BaseDoc _BaseDoc = (BaseDoc) Activator.CreateInstance(_BaseDocType);
 
             ToTable(modelBuilder, typeof(DocKey), _BaseDocType.Name);
 
             foreach (var t in _BaseDoc
-                       .ListRelatedEntities()
-                       .Select(m => new
-                       {
-                           TablePocoType = m,
-                           TableName = m.Name.ToLower()
-                       }).OrderBy(m => m.TableName)
-                       .ToArray())
+                    .ListRelatedEntities()
+                    .Select(m => new
+                    {
+                        TablePocoType = m,
+                        TableName = m.Name.ToLower()
+                    }).OrderBy(m => m.TableName)
+                    .ToArray())
                 // ensure the type has some other property to translate to database columns other then the "Id" property
                 //if (t.TablePocoType.GetProperties().Where(p => !p.GetCustomAttributes(true).Any(a => a.GetType() == typeof(NotMapped)) && !p.PropertyType.IsClass).Count() > 1)
                 ToTable(modelBuilder, t.TablePocoType, _BaseDocType.Name);
@@ -95,33 +104,22 @@ namespace dCForm.Core.Storage.Sql
             base.OnModelCreating(modelBuilder);
         }
 
-        private static string dCFormDBContextTypeName(BaseDoc baseDoc) { return String.Format("{0}_Db", baseDoc.DocTypeName); }
-
-        public const string CREATE_INSTANCE_TEMPLATE = @"
-            namespace {0} {{
-                public class {1} : dCForm.Core.Storage.Sql.SqlDbContext {{
-                    public {1}() : base( ) {{
-                        System.Data.Entity.Database.SetInitializer(new System.Data.Entity.MigrateDatabaseToLatestVersion<{0}.{1}, dCForm.Core.Storage.Sql.SqlDbMigrationsConfiguration<{0}.{1}>>());
-                    }}
-                }}
-            }}";
-
-        public static SqlDbContext CreateInstance(BaseDoc _BaseDoc)
+        /// <summary>
+        ///     Setting the table name & schema up front (not waiting to set in conventions) seem to be the only wau to get get EF
+        ///     CF to consistently apply our schemas. When this was performed at the conventions method it did not allways seem to
+        ///     take; our tables would then get the default "dbo" schema even when they were told not too.
+        /// </summary>
+        /// <param name="dbModelBuilder"></param>
+        /// <param name="entityType"></param>
+        /// <param name="schemaName"></param>
+        private static void ToTable(DbModelBuilder dbModelBuilder, Type entityType, string schemaName)
         {
-            Type _BaseDocType = _BaseDoc.GetType();
-            string _DbContextTypeName = dCFormDBContextTypeName(_BaseDoc);
+            // add each entity that has a TableName attribute connected to the BaseDoc to the model
+            MethodInfo entityMethod = ((object) dbModelBuilder).GetType().GetMethod("Entity");
+            object o = entityMethod.MakeGenericMethod(entityType).Invoke(dbModelBuilder, new object[] { });
 
-            string cSharpCode = string.Format(CREATE_INSTANCE_TEMPLATE, _BaseDocType.Namespace, _DbContextTypeName);
-
-            // add using statements to beginning to top of the document
-            cSharpCode = string.Join("", Runtime.USING_NAMESPACES.Keys.OrderBy(ns => ns).Select(ns => string.Format("using {0};\n", ns))) + cSharpCode;
-
-            //TODO:Separate the dCFormDBContextTypeName from the BaseDoc assembly/code-gen. Runtime-compiled BaseDocs & SqlDbContext code placement organization needs to be rethought thru better. 
-            return (SqlDbContext)Activator
-                                      .CreateInstance(Runtime
-                                      .CompileCSharpCode(() => cSharpCode, string.Format("{0}.{1}.{2}", typeof(SqlDbContext).Namespace, _BaseDoc.DocTypeName, _BaseDoc.solutionVersion))
-                                      .GetTypes()
-                                      .First(m => m.Name == _DbContextTypeName));
+            // call the ToTable method via reflection as EntityFramework designed it with an accessor level private
+            o.GetType().GetMethods().First(m => m.Name == "ToTable" && m.GetParameters().Count() == 2).Invoke(o, new object[] {entityType.Name, schemaName});
         }
     }
 }

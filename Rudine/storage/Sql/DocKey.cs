@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace dCForm.Core.Storage.Sql
+namespace Rudine.Storage.Sql
 {
     /// <summary>
     ///     Summary description for DocumentKey
@@ -11,28 +11,16 @@ namespace dCForm.Core.Storage.Sql
     {
         [Key]
         [Column(Order = 1)]
-        public int Id
-        {
-            get;
-            set;
-        }
+        public int Id { get; set; }
 
         [Key]
         [MaxLength(50)]
         [Column(Order = 2)]
-        public string KeyName
-        {
-            get;
-            set;
-        }
+        public string KeyName { get; set; }
 
         [MaxLength(50)]
         [Column(Order = 3)]
         [Required]
-        public string KeyVal
-        {
-            get;
-            set;
-        }
+        public string KeyVal { get; set; }
     }
 }

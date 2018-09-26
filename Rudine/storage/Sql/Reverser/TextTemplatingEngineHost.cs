@@ -12,10 +12,10 @@ using System.Xml;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.TextTemplating;
 
-namespace dCForm.Core.Storage.Sql.Reverser
+namespace Rudine.Storage.Sql.Reverser
 {
     /// <summary>
-    /// EFCF = Entity Framework Code First
+    ///     EFCF = Entity Framework Code First
     /// </summary>
     internal class TextTemplatingEngineHost : ITextTemplatingEngineHost
     {
@@ -44,42 +44,40 @@ namespace dCForm.Core.Storage.Sql.Reverser
             try
             {
                 // TODO: This is failing to resolve partial assembly names (e.g. "System.Xml")
-                var assembly = Assembly.Load(assemblyReference);
+                Assembly assembly = Assembly.Load(assemblyReference);
 
                 if (assembly != null)
                     return assembly.Location;
             }
-            catch (FileNotFoundException) { }
-            catch (FileLoadException) { }
-            catch (BadImageFormatException) { }
+            catch (FileNotFoundException)
+            {
+            }
+            catch (FileLoadException)
+            {
+            }
+            catch (BadImageFormatException)
+            {
+            }
 
             return string.Empty;
         }
 
-        IList<string> ITextTemplatingEngineHost.StandardAssemblyReferences {
-            get {
-                return new[]
-                {
-                    Assembly.GetExecutingAssembly().Location,
-                    typeof (Uri).Assembly.Location,
-                    typeof (Enumerable).Assembly.Location,
-                    typeof (AcceptRejectRule).Assembly.Location,
-                    typeof (EdmToObjectNamespaceMap).Assembly.Location,
-                    typeof (ConformanceLevel).Assembly.Location,
-                    typeof (Extensions).Assembly.Location
-                };
-            }
-        }
+        IList<string> ITextTemplatingEngineHost.StandardAssemblyReferences => new[]
+        {
+            Assembly.GetExecutingAssembly().Location,
+            typeof(Uri).Assembly.Location,
+            typeof(Enumerable).Assembly.Location,
+            typeof(AcceptRejectRule).Assembly.Location,
+            typeof(EdmToObjectNamespaceMap).Assembly.Location,
+            typeof(ConformanceLevel).Assembly.Location,
+            typeof(Extensions).Assembly.Location
+        };
 
-        IList<string> ITextTemplatingEngineHost.StandardImports {
-            get {
-                return new[]
-                {
-                    "System",
-                    "Microsoft.DbContextPackage.Utilities"
-                };
-            }
-        }
+        IList<string> ITextTemplatingEngineHost.StandardImports => new[]
+        {
+            "System",
+            "Microsoft.DbContextPackage.Utilities"
+        };
 
         object ITextTemplatingEngineHost.GetHostOption(string optionName)
         {
@@ -97,13 +95,19 @@ namespace dCForm.Core.Storage.Sql.Reverser
             return false;
         }
 
-        void ITextTemplatingEngineHost.LogErrors(CompilerErrorCollection errors) { Errors = errors; }
+        void ITextTemplatingEngineHost.LogErrors(CompilerErrorCollection errors)
+        {
+            Errors = errors;
+        }
 
-        AppDomain ITextTemplatingEngineHost.ProvideTemplatingAppDomain(string content) { return AppDomain.CurrentDomain; }
+        AppDomain ITextTemplatingEngineHost.ProvideTemplatingAppDomain(string content) => AppDomain.CurrentDomain;
 
-        Type ITextTemplatingEngineHost.ResolveDirectiveProcessor(string processorName) { throw new Exception("Error.UnknownDirectiveProcessor(processorName)"); }
+        Type ITextTemplatingEngineHost.ResolveDirectiveProcessor(string processorName)
+        {
+            throw new Exception("Error.UnknownDirectiveProcessor(processorName)");
+        }
 
-        string ITextTemplatingEngineHost.ResolveParameterValue(string directiveId, string processorName, string parameterName) { return string.Empty; }
+        string ITextTemplatingEngineHost.ResolveParameterValue(string directiveId, string processorName, string parameterName) => string.Empty;
 
         string ITextTemplatingEngineHost.ResolvePath(string path)
         {
@@ -113,9 +117,15 @@ namespace dCForm.Core.Storage.Sql.Reverser
             return path;
         }
 
-        void ITextTemplatingEngineHost.SetFileExtension(string extension) { FileExtension = extension; }
+        void ITextTemplatingEngineHost.SetFileExtension(string extension)
+        {
+            FileExtension = extension;
+        }
 
-        void ITextTemplatingEngineHost.SetOutputEncoding(Encoding encoding, bool fromOutputDirective) { OutputEncoding = encoding; }
+        void ITextTemplatingEngineHost.SetOutputEncoding(Encoding encoding, bool fromOutputDirective)
+        {
+            OutputEncoding = encoding;
+        }
 
         #endregion
     }

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 
-namespace dCForm.Core.Storage.Sql.Reverser
+namespace Rudine.Storage.Sql.Reverser
 {
     /// <summary>
     ///     EFCF = Entity Framework Code First
@@ -32,8 +32,8 @@ namespace dCForm.Core.Storage.Sql.Reverser
             {
                 GenerateForeignKeyProperties = true
             };
-            
-            _EntityStoreSchemaGenerator.GenerateStoreMetadata(new[] { new EntityStoreSchemaFilterEntry(null, schema, null, EntityStoreSchemaFilterObjectTypes.Table, EntityStoreSchemaFilterEffect.Allow) });
+
+            _EntityStoreSchemaGenerator.GenerateStoreMetadata(new[] {new EntityStoreSchemaFilterEntry(null, schema, null, EntityStoreSchemaFilterObjectTypes.Table, EntityStoreSchemaFilterEffect.Allow)});
 
 
             // Generate default mapping
@@ -44,10 +44,10 @@ namespace dCForm.Core.Storage.Sql.Reverser
 
             EntityModelSchemaGenerator _EntityModelSchemaGenerator =
                 new EntityModelSchemaGenerator(
-                    _EntityStoreSchemaGenerator.EntityContainer,
-                    modelsNamespace,
-                    contextName)
-                { GenerateForeignKeyProperties = false };
+                        _EntityStoreSchemaGenerator.EntityContainer,
+                        modelsNamespace,
+                        contextName)
+                    {GenerateForeignKeyProperties = false};
 
             _EntityModelSchemaGenerator.GenerateMetadata();
 
@@ -58,20 +58,20 @@ namespace dCForm.Core.Storage.Sql.Reverser
             string result = string.Empty;
             foreach (EntityType type in _EntityTypes)
                 result = result + new Entity
-                {
-                    Host = new TextTemplatingEngineHost
-                    {
-                        EntityType = type,
-                        EntityContainer = _EntityModelSchemaGenerator.EntityContainer,
-                        Namespace = modelsNamespace,
-                        TableSet = _EdmMapping.EntityMappings[type].Item1,
-                        PropertyToColumnMappings = _EdmMapping.EntityMappings[type].Item2,
-                        ManyToManyMappings = _EdmMapping.ManyToManyMappings
-                    }
-                }
-                                      .TransformText()
-                                      // remove existing using statements as all csharp class code blocks will concat to form one string of code
-                                      .Replace(USING_STATEMENTS, string.Empty);
+                             {
+                                 Host = new TextTemplatingEngineHost
+                                 {
+                                     EntityType = type,
+                                     EntityContainer = _EntityModelSchemaGenerator.EntityContainer,
+                                     Namespace = modelsNamespace,
+                                     TableSet = _EdmMapping.EntityMappings[type].Item1,
+                                     PropertyToColumnMappings = _EdmMapping.EntityMappings[type].Item2,
+                                     ManyToManyMappings = _EdmMapping.ManyToManyMappings
+                                 }
+                             }
+                             .TransformText()
+                             // remove existing using statements as all csharp class code blocks will concat to form one string of code
+                             .Replace(USING_STATEMENTS, string.Empty);
 
             return string.IsNullOrWhiteSpace(result)
                 ? string.Empty
@@ -113,8 +113,8 @@ namespace dCForm.Core.Storage.Sql.Reverser
                 {
                     // Post VS2010 builds use a different structure for mapping
                     XmlNode setMapping = mappingDoc.ChildNodes[0].NamespaceURI == "http://schemas.microsoft.com/ado/2009/11/mapping/cs"
-                                             ? mappingDoc.SelectSingleNode(string.Format("//ef:EntitySetMapping[@Name=\"{0}\"]/ef:EntityTypeMapping/ef:MappingFragment", entitySet.Name), namespaceManager)
-                                             : mappingDoc.SelectSingleNode(string.Format("//ef:EntitySetMapping[@Name=\"{0}\"]", entitySet.Name), namespaceManager);
+                        ? mappingDoc.SelectSingleNode(string.Format("//ef:EntitySetMapping[@Name=\"{0}\"]/ef:EntityTypeMapping/ef:MappingFragment", entitySet.Name), namespaceManager)
+                        : mappingDoc.SelectSingleNode(string.Format("//ef:EntitySetMapping[@Name=\"{0}\"]", entitySet.Name), namespaceManager);
 
                     string tableName = setMapping.Attributes["StoreEntitySet"].Value;
                     EntitySet tableSet = tableSets.Single(s => s.Name == tableName);
