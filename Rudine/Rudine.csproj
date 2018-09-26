@@ -181,6 +181,7 @@
     <Compile Include="Interpreters\Embeded\ExternalDocByteInterpreter.cs" />
     <Compile Include="Storage\Sql\BaseAutoIdentExtensions.cs" />
     <Compile Include="Storage\Sql\BaseDocExtensions.cs" />
+    <Compile Include="Storage\Sql\DictionaryExtensions.cs" />
     <Compile Include="Storage\Sql\DocKey.cs" />
     <Compile Include="Storage\Sql\Merge\ClassMerger.cs" />
     <Compile Include="Storage\Sql\Merge\ClassProperty.cs" />
