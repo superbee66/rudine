@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Rudine.Web.Util
 {
@@ -98,17 +99,27 @@ namespace Rudine.Web.Util
         /// <param name="directory"></param>
         public static void rmdir(this DirectoryInfo directory)
         {
-            if (directory.Exists)
-            {
-                foreach (DirectoryInfo _DirectoryInfo in directory.EnumerateDirectories())
-                    _DirectoryInfo.rmdir();
+            int trys = 0;
+            while (trys++ < 10)
+                try
+                {
+                    if (directory.Exists)
+                    {
+                        foreach (DirectoryInfo _DirectoryInfo in directory.EnumerateDirectories())
+                            _DirectoryInfo.rmdir();
 
-                foreach (FileInfo _FileInfo in directory.EnumerateFiles())
-                    if (_FileInfo.Exists)
-                        _FileInfo.Delete();
+                        foreach (FileInfo _FileInfo in directory.EnumerateFiles())
+                            if (_FileInfo.Exists)
+                                _FileInfo.Delete();
 
-                directory.Delete(true);
-            }
+                        directory.Delete(true);
+                    }
+                    else break;
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(1000);
+                }
         }
 
         /// <summary>
