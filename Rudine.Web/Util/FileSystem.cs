@@ -47,7 +47,8 @@ namespace Rudine.Web.Util
         /// <returns></returns>
         public static bool canwrite(this DirectoryInfo directory, bool exceptionSuppressed = false)
         {
-            try { Directory.GetAccessControl(directory.FullName); } catch (Exception ex)
+            try { Directory.GetAccessControl(directory.FullName); }
+            catch (Exception ex)
             {
                 if (exceptionSuppressed)
                     return false;
@@ -103,13 +104,13 @@ namespace Rudine.Web.Util
             while (trys++ < 10)
                 try
                 {
-                    if (directory.Exists)
+                    if (Directory.Exists(directory.FullName))
                     {
                         foreach (DirectoryInfo _DirectoryInfo in directory.EnumerateDirectories())
                             _DirectoryInfo.rmdir();
 
                         foreach (FileInfo _FileInfo in directory.EnumerateFiles())
-                            if (_FileInfo.Exists)
+                            if (File.Exists(_FileInfo.FullName))
                                 _FileInfo.Delete();
 
                         directory.Delete(true);
@@ -180,10 +181,10 @@ namespace Rudine.Web.Util
 
         private static class Chars
         {
-            public static readonly char NUL = (char) 0; // Null char
-            public static readonly char BS = (char) 8; // Back Space
-            public static readonly char CR = (char) 13; // Carriage Return
-            public static readonly char SUB = (char) 26; // Substitute
+            public static readonly char NUL = (char)0; // Null char
+            public static readonly char BS = (char)8; // Back Space
+            public static readonly char CR = (char)13; // Carriage Return
+            public static readonly char SUB = (char)26; // Substitute
         }
 
         public static MemoryStream AsMemoryStream(this FileStream _FileStream)
