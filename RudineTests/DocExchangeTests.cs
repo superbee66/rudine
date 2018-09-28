@@ -167,7 +167,7 @@ namespace Rudine.Tests
         [Test]
         public void InterpretersTest()
         {
-            Assert.IsTrue(DocExchange.Instance.Interpreters().Count() == 3);
+            Assert.IsTrue(DocExchange.Instance.Interpreters().Count() == 4);
         }
 
         [Test, Combinatorial]
@@ -199,7 +199,7 @@ namespace Rudine.Tests
         [Sequential]
         public void TemplateSourcesTest()
         {
-            Assert.IsTrue(DocExchange.Instance.TemplateSources().Count() == 3);
+            Assert.IsTrue(DocExchange.Instance.TemplateSources().Count() == 4);
         }
     }
 }

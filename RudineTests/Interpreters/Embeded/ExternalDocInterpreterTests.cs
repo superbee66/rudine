@@ -25,16 +25,18 @@ namespace Rudine.Interpreters.Embeded.Tests
             //BaseDoc _BaseDoc = _ExternalDocInterpreter.Create(nameof(TestExternalDoc));
             //Assert.IsTrue(_BaseDoc is TestExternalDoc);
 
-            LightDoc _LightDoc = DocExchange.Instance.SubmitDoc(
-                new TestExternalDoc
-                {
-                    DocKeys = new Dictionary<string, string> {{"ok", "lala"}},
-                    DocTypeName = nameof(TestExternalDoc),
-                    solutionVersion = ExternalDoc.MyOnlyDocRev,
-                    FirstName = "Gary",
-                    LastName = "Bruno",
-                    RawBytes = Resources.BaseLineOpenOffice4
-                }, "test@ok.com");
+            LightDoc _LightDoc;
+
+            _LightDoc = DocExchange.Instance.SubmitDoc(
+               new TestExternalDoc
+               {
+                   DocKeys = new Dictionary<string, string> { { "ok", "lala" } },
+                   DocTypeName = nameof(TestExternalDoc),
+                   solutionVersion = ExternalDoc.MyOnlyDocRev,
+                   FirstName = "Gary",
+                   LastName = "Bruno",
+                   RawBytes = Resources.BaseLineOpenOffice4
+               }, "test@ok.com");
 
 
             Assert.IsTrue(_LightDoc.DocTypeName == nameof(TestExternalDoc));

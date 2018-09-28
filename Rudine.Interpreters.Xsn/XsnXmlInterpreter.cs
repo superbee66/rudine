@@ -26,8 +26,8 @@ namespace Rudine.Interpreters.Xsn
         public const string mso_infoPathSolution = "solutionVersion=\"{0}\" productVersion=\"14.0.0\" PIVersion=\"1.0.0.0\" href=\"{1}\" name=\"{2}\""; //TASK: Code stub the solution version so the InfoPath UI does not complain
         public const string mso_application = "progid=\"InfoPath.Document\" versionProgid=\"InfoPath.Document.3\"";
         public const string ipb_application = "DocId=\"{0}\" DocTitle=\"{1}\" DocTypeName=\"{2}\" DocChecksum=\"{3}\" DocStatus=\"{4}\"";
-       private const string XmlProcessingInstructionMatch = @"<\?.*\?>";
-      internal const string XmlRootAttributeNamespaces = @"(?:xmlns:)(\w+)(?:="")([^""]+)";
+        private const string XmlProcessingInstructionMatch = @"<\?.*\?>";
+        internal const string XmlRootAttributeNamespaces = @"(?:xmlns:)(\w+)(?:="")([^""]+)";
 
         /// <summary>
         ///     "One XML processing instruction tag named mso-infoPathSolution MUST be specified as part of the form file. This XML
@@ -201,7 +201,10 @@ namespace Rudine.Interpreters.Xsn
 
             using (CompressionEngine compressionEngine = new CabEngine { CompressionLevel = CompressionLevel.Max })
             using (MemoryStream xsnFileInMemoryStream = TemplateController.Instance.OpenRead(docTypeName, docTypeVer, AutoFileName(docTypeName, InfoPathDesignerPackageFileExtension)))
-                compressionEngine.Unpack(xsnFileInMemoryStream, filename).CopyTo(fileMemoryStream);
+                if (xsnFileInMemoryStream == null)
+                    fileMemoryStream = null;
+                else
+                    compressionEngine.Unpack(xsnFileInMemoryStream, filename).CopyTo(fileMemoryStream);
 
             return fileMemoryStream;
         }
@@ -218,7 +221,7 @@ namespace Rudine.Interpreters.Xsn
         private static string OpenText(string docTypeName, string docTypeVer, string filename)
         {
             using (Stream _Stream = OpenRead(docTypeName, docTypeVer, filename))
-                return _Stream.AsString();
+                return _Stream?.AsString();
         }
 
         private string OpenText(HttpContext context, out string filename)

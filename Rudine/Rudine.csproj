@@ -129,6 +129,9 @@
     <Compile Include="..\Rudine.Web\rProxHttpHandler.cs">
       <Link>Web\rProxHttpHandler.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\Util\AssemblyExtensions.cs">
+      <Link>Web\Util\AssemblyExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\Util\CacheMan.cs">
       <Link>Web\Util\CacheMan.cs</Link>
     </Compile>
@@ -192,6 +195,7 @@
     <Compile Include="Storage\Sql\Reverser\EntityBase.cs" />
     <Compile Include="Storage\Sql\Reverser\Handler.cs" />
     <Compile Include="Storage\Sql\Reverser\TextTemplatingEngineHost.cs" />
+    <Compile Include="Storage\Sql\SqlBaseDoc.cs" />
     <Compile Include="Storage\Sql\SqlController.cs" />
     <Compile Include="Storage\Sql\SqlDB.cs" />
     <Compile Include="Storage\Sql\SqlDBContext.cs" />

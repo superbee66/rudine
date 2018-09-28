@@ -23,7 +23,6 @@ namespace Rudine.Web
         private bool? docStatus;
 
         [XmlIgnore]
-        [ScriptIgnore]
         [DataMember]
         public virtual int DocChecksum { get; set; }
 

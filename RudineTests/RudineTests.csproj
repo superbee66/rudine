@@ -63,6 +63,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="..\Rudine.Web\Util\AssemblyExtensions.cs">
+      <Link>AssemblyExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
       <Link>help\FileSystem.cs</Link>
     </Compile>

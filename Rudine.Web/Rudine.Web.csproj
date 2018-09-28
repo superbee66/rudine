@@ -108,6 +108,7 @@
     <Compile Include="MagicNumbers.cs" />
     <Compile Include="Parm.cs" />
     <Compile Include="SignatureVerifier.cs" />
+    <Compile Include="Util\AssemblyExtensions.cs" />
     <Compile Include="Util\CompositeProperty.cs" />
     <Compile Include="Util\CompositeSignature.cs" />
     <Compile Include="Util\CompositeType.cs" />

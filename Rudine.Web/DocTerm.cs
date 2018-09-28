@@ -27,6 +27,7 @@ namespace Rudine.Web
         [DataMember]
         public virtual string DocTypeName
         {
+            //TODO:This should be calculated
             get { return _docTypeName; }
             set { _docTypeName = value; }
         }

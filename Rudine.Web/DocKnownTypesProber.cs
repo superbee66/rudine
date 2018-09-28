@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Rudine.Web.Util;
 
 namespace Rudine.Web
 {
@@ -16,7 +17,7 @@ namespace Rudine.Web
         private static readonly IDocKnownTypes[] _IDocRevKnownTypesImpl = AppDomain
             .CurrentDomain
             .GetAssemblies()
-            .SelectMany(_Assembly => _Assembly.GetExportedTypes(), (_Assembly, _Type) => new
+            .SelectMany(_Assembly => _Assembly.GetExportedTypes2(), (_Assembly, _Type) => new
             {
                 _Assembly, _Type
             })

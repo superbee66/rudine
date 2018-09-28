@@ -19,9 +19,7 @@ namespace Rudine.Template.Docdb
                     DocRev.MyOnlyDocName,
                     new Dictionary<string, string> { { DocRev.KeyPart2, DocTypeVer }, { DocRev.KeyPart1, DocTypeName } });
 
-            byte[] bytes = o.DocFiles == null
-                ? null
-                : o.DocFiles.FirstOrDefault(f => f.Name.Equals(filename, StringComparison.InvariantCultureIgnoreCase))?.Bytes;
+            byte[] bytes = o?.DocFiles?.FirstOrDefault(f => f.Name.Equals(filename, StringComparison.InvariantCultureIgnoreCase))?.Bytes;
 
             return bytes == null
                        ? null
