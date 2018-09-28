@@ -5,13 +5,14 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Reflection;
 using Rudine.Web;
+using Rudine.Web.Util;
 
 namespace Rudine.Storage.Sql
 {
     [DbConfigurationType(typeof(ModelConfiguration))]
     public abstract class SqlDbContext : DbContext
     {
-        public const string CONTEXT_NAME = "SqlDbContext";
+        public const string CONTEXT_NAME = nameof(SqlDbContext);
 
         public SqlDbContext()
             : base(CONTEXT_NAME)
@@ -25,7 +26,7 @@ namespace Rudine.Storage.Sql
         public static SqlDbContext CreateInstance(BaseDoc _BaseDoc)
         {
             Type _BaseDocType = _BaseDoc.GetType();
-            string _DbContextTypeName = dCFormDBContextTypeName(_BaseDoc);
+            string _DbContextTypeName = MakeDBContextTypeName(_BaseDoc);
 
             string cSharpCode = string.Format(@"
             namespace {0} {{
@@ -47,11 +48,11 @@ namespace Rudine.Storage.Sql
             return (SqlDbContext) Activator
                 .CreateInstance(Runtime
                     .CompileCSharpCode(() => cSharpCode, string.Format("{0}.{1}.{2}", typeof(SqlDbContext).Namespace, _BaseDoc.DocTypeName, _BaseDoc.solutionVersion))
-                    .GetExportedTypes()
+                    .GetTypes()
                     .First(m => m.Name == _DbContextTypeName));
         }
 
-        private static string dCFormDBContextTypeName(BaseDoc baseDoc) => string.Format("{0}_Db", baseDoc.DocTypeName);
+        private static string MakeDBContextTypeName(BaseDoc baseDoc) => string.Format("{0}_Db", baseDoc.DocTypeName);
 
         public static string GetConnectionString() => ConfigurationManager.ConnectionStrings[CONTEXT_NAME].ConnectionString;
 
@@ -63,14 +64,14 @@ namespace Rudine.Storage.Sql
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             string myNamespace = GetType().Namespace;
-            Type _BaseDocType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes().Where(t => t.Namespace == myNamespace && t.BaseType == typeof(BaseDoc))).FirstOrDefault();
+            Type _BaseDocType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes().Where(t => t.Namespace == myNamespace && t.BaseType == typeof(SqlBaseDoc))).FirstOrDefault();
 
             if (_BaseDocType == null)
                 throw new Exception(string.Format("{0} can't resolve it's own {1}.[*:BaseDoc]", GetType().FullName, myNamespace));
 
-            BaseDoc _BaseDoc = (BaseDoc) Activator.CreateInstance(_BaseDocType);
+            //ToTable(modelBuilder, typeof(DocKey), _BaseDocType.Name);
 
-            ToTable(modelBuilder, typeof(DocKey), _BaseDocType.Name);
+            SqlBaseDoc _BaseDoc = (SqlBaseDoc) Activator.CreateInstance(_BaseDocType);
 
             foreach (var t in _BaseDoc
                     .ListRelatedEntities()

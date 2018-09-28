@@ -152,7 +152,7 @@ namespace Rudine.Storage.Sql
 
         private IEnumerable ListInternal(Type filter, NameValueCollection docKeyFilters = null, int PageSize = 150, int PageIndex = 0)
         {
-            BaseDoc _BaseDoc = (BaseDoc) Activator.CreateInstance(filter);
+            SqlBaseDoc _BaseDoc = (SqlBaseDoc)Activator.CreateInstance(filter);
             _BaseDoc.DocTypeName = filter.Name;
 
             NameValueCollection _DocKeyFilters = docKeyFilters;
@@ -207,10 +207,11 @@ namespace Rudine.Storage.Sql
             // locate the keys 
             object[] keyValues = !string.IsNullOrWhiteSpace(docKeyMatchSQL)
                 ? SqlDB.GetInstance(_BaseDoc).UnderlyingDbContext.Database.SqlQuery<int>(docKeyMatchSQL).Cast<object>().ToArray()
-                : new object[]
-                    { };
+                : new object[] { };
 
-            return new List<object> {SqlDB.GetInstance(_BaseDoc).UnderlyingDbContext.Set(_table.EntityType).Find(keyValues)};
+            return keyValues.Length == 0
+                ? new List<object>()
+                : new List<object> { SqlDB.GetInstance(_BaseDoc).UnderlyingDbContext.Set(_table.EntityType).Find(keyValues) };
         }
 
         #endregion private
@@ -247,16 +248,17 @@ namespace Rudine.Storage.Sql
             BaseDoc _SubmittedBaseDoc = DocInterpreter.Instance.Read(DocData, true);
             Type _SqlBaseDocType = ReverseEngineerCodeFirst(_SubmittedBaseDoc);
 
-            BaseDoc _SqlBaseDoc = (BaseDoc) Activator.CreateInstance(_SqlBaseDocType);
+            SqlBaseDoc _SqlBaseDoc = (SqlBaseDoc)Activator.CreateInstance(_SqlBaseDocType);
             _SqlBaseDoc.DocTypeName = _SubmittedBaseDoc.DocTypeName;
             _SqlBaseDoc.solutionVersion = _SubmittedBaseDoc.solutionVersion;
+            _SqlBaseDoc.DocKey = _SubmittedBaseDoc.DocKeys.Select(m => new DocKey { KeyName = m.Key, KeyVal = m.Value }).ToList();
 
             IQueryable _SqlList = ListInternal(_SqlBaseDocType, _SubmittedBaseDoc.DocKeys.ToNameValueCollection()).AsQueryable();
 
             if (_SqlList.Any())
                 foreach (object o in _SqlList)
                     if (o != null)
-                        _SqlBaseDoc = (BaseDoc) o;
+                        _SqlBaseDoc = (SqlBaseDoc)o;
 
             if (_SqlBaseDoc.DocChecksum != _SubmittedBaseDoc.DocChecksum)
             {
@@ -273,7 +275,7 @@ namespace Rudine.Storage.Sql
                     // in order to make a clean up to the SQL database
                     _SubmittedJObject.Merge(_SqlJObject, _JsonMergeSettings);
 
-                    _SqlBaseDoc = (BaseDoc) JsonConvert.DeserializeObject(
+                    _SqlBaseDoc = (SqlBaseDoc)JsonConvert.DeserializeObject(
                         _SubmittedJObject.ToString(),
                         _SqlBaseDoc.GetType(),
                         TextualShouldSerializeContractResolver.MyJsonSerializerSettings);
@@ -285,7 +287,7 @@ namespace Rudine.Storage.Sql
                 }
                 else
                 {
-                    _SqlBaseDoc = (BaseDoc) JsonConvert.DeserializeObject(
+                    _SqlBaseDoc = (SqlBaseDoc)JsonConvert.DeserializeObject(
                         _SubmittedJObject.ToString(),
                         _SqlBaseDoc.GetType(),
                         TextualShouldSerializeContractResolver.MyJsonSerializerSettings);
@@ -293,7 +295,7 @@ namespace Rudine.Storage.Sql
                     MetaTable _docKeyTable = GetDocKeyTable(_SqlBaseDoc);
                     foreach (KeyValuePair<string, string> _Item in _SubmittedBaseDoc.DocKeys)
                     {
-                        DocKey _DocKeyEntry = (DocKey) Activator.CreateInstance(_docKeyTable.EntityType, null);
+                        DocKey _DocKeyEntry = (DocKey)Activator.CreateInstance(_docKeyTable.EntityType, null);
                         _DocKeyEntry.Id = _SqlBaseDoc.Id;
                         _DocKeyEntry.KeyName = _Item.Key;
                         _DocKeyEntry.KeyVal = _Item.Value;
@@ -316,7 +318,7 @@ namespace Rudine.Storage.Sql
         /// <summary>
         /// </summary>
         /// <param name="_SubmittedBaseDoc"></param>
-        /// <returns>Something that Entity Framework Code First would contract the same SQL objects read to create this type</returns>
+        /// <returns>Something that Entity Framework Code First would contract the same SQL objects read to create this type. This will always be a type descended from an SqlBaseDoc</returns>
         private static Type ReverseEngineerCodeFirst(BaseDoc _SubmittedBaseDoc)
         {
             if (!ReverseEngineerCodeFirstDic.ContainsKey(_SubmittedBaseDoc.DocTypeName))
@@ -347,12 +349,12 @@ namespace Rudine.Storage.Sql
                                 : Runtime.CompileCSharpCode(
                                     () => sqlAsCharp,
                                     string.Format("{0}." + "0.0.0.0" + "." + "PostMergeTo" + ".{1}", _SubmittedBaseDoc.DocTypeName, _SubmittedBaseDoc.solutionVersion)
-                                ).GetExportedTypes().First(t => t.Name == _SubmittedBaseDoc.DocTypeName)
+                                ).GetTypes().First(t => t.Name == _SubmittedBaseDoc.DocTypeName)
                         },
                         _SubmittedBaseDoc.DocTypeName,
-                        new[] {"Any", "Xml_Element"}, // ignore XmlElement Any properties
+                        new[] { "Any", "Xml_Element" }, // ignore XmlElement Any properties
                         true,
-                        typeof(BaseDoc));
+                        typeof(SqlBaseDoc));
             }
 
             return ReverseEngineerCodeFirstDic[_SubmittedBaseDoc.DocTypeName];
@@ -367,7 +369,7 @@ namespace Rudine.Storage.Sql
 
             // has any DocRev of the given DocTypeName been submitted to the database previously? 
             if (!SqlKnownDocTypes.ContainsKey(_SubmittedBaseDoc.DocTypeName))
-                SqlKnownDocTypes[_SubmittedBaseDoc.DocTypeName] = new List<Type> {_SubmittedBaseDoc.GetType(), ReverseEngineerCodeFirst(_SubmittedBaseDoc)}.Distinct().ToList();
+                SqlKnownDocTypes[_SubmittedBaseDoc.DocTypeName] = new List<Type> { _SubmittedBaseDoc.GetType(), ReverseEngineerCodeFirst(_SubmittedBaseDoc) }.Distinct().ToList();
             else if (!SqlKnownDocTypes[_SubmittedBaseDoc.DocTypeName].Contains(_SubmittedBaseDoc.GetType()))
             {
                 // when this new DocType is added, does it bring any new properties that would force a migration?
