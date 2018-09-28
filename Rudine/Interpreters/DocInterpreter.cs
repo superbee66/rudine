@@ -7,6 +7,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 using Rudine.Exceptions;
+using Rudine.Interpreters.Embeded;
 using Rudine.Template;
 using Rudine.Util;
 using Rudine.Util.Zips;
@@ -21,16 +22,21 @@ namespace Rudine.Interpreters
     /// </summary>
     internal sealed class DocInterpreter : IDocTextInterpreter, IDocByteInterpreter
     {
+        /// <summary>
+        ///     DocInterpreter instances defined in the Rudine assembly (built-in ones) are order last in the list to ensure they
+        ///     are the last to be called by the numorious enumeration logic through out this class.
+        /// </summary>
         internal static readonly DocBaseInterpreter[] ContentInterpreterInstances;
 
         static DocInterpreter()
         {
             ContentInterpreterInstances = Reflection
                 .LoadBinDlls()
-                .SelectMany(a => a.GetExportedTypes())
+                .SelectMany(a => a.GetTypes())
                 .Where(type => !type.IsAbstract)
                 .Where(type => !type.IsInterface)
                 .Where(type => type.IsSubclassOf(typeof(DocTextInterpreter)) || type.IsSubclassOf(typeof(DocByteInterpreter)))
+                .OrderBy(type => type.Name == nameof(ExternalDocInterpreter))
                 .Select(type => (DocBaseInterpreter)Activator.CreateInstance(type))
                 .ToArray();
         }

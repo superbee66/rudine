@@ -47,7 +47,7 @@ namespace Rudine.Interpreters.Embeded
         {
             Type _BaseDocType = Reflection
                 .LoadBinDlls()
-                .SelectMany(a => a.GetExportedTypes())
+                .SelectMany(a => a.GetTypes())
                 .Distinct()
                 .FirstOrDefault(typ =>
                     !(typ == typeof(DocRev))

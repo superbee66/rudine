@@ -14,6 +14,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Microsoft.CSharp;
+using Rudine.Web.Util;
 
 namespace Rudine.Util.Xsds {
     [Obsolete("use Xsd")]
@@ -81,7 +82,7 @@ namespace Rudine.Util.Xsds {
             XmlSchemaExporter xmlSchemaExporter = new XmlSchemaExporter(xmlSchemas);
 
             try {
-                Type[] types = assembly.GetExportedTypes();
+                Type[] types = assembly.GetExportedTypes2();
                 foreach (Type type in types.Where(type =>
                                                       typeNames.Count == 0
                                                       ||

@@ -41,7 +41,7 @@ namespace Rudine.Util
                     ? null
                     : AppDomain.CurrentDomain.GetAssemblies()
                                .Where(m => (m.FullName) == assemblyName)
-                               .SelectMany(a => a.GetExportedTypes())
+                               .SelectMany(a => a.GetTypes())
                                .ToArray());
 
             return t == null && !noCache
@@ -58,11 +58,11 @@ namespace Rudine.Util
         /// <returns>null if nothing can be found</returns>
         public static Type GetType(string typeNameOrFullname, Type[] searchScope = null)
         {
-            //TODO:reorganize code as it's not clear what this GetType is acctually doing. Something needs to make it clear that the weak match is being performed
+            //TODO:reorganize code as it's not clear what this GetType is actually something needs to make it clear that the weak match is being performed
             string weakName = UNQUALIFY_TYPE_NAMES.Replace(typeNameOrFullname, string.Empty);
 
             Type t = null;
-            foreach (Type type in (searchScope ?? AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetExportedTypes())))
+            foreach (Type type in (searchScope ?? AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetExportedTypes2())))
                 if (type != null)
                     if (t == null)
                         t = type.Name == typeNameOrFullname
