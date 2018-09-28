@@ -116,7 +116,7 @@ namespace Rudine.Interpreters.Embeded
                     }
             }
 
-            return _DOCREV.DocURN != null && !string.IsNullOrWhiteSpace(_DOCREV.DocSchema)
+            return _DOCREV?.DocURN != null && !string.IsNullOrWhiteSpace(_DOCREV.DocSchema)
                 ? _DOCREV
                 : null;
         }
