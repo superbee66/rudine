@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Rudine.Web;
 
 namespace Rudine.Storage.Sql
 {
@@ -7,11 +8,15 @@ namespace Rudine.Storage.Sql
     ///     Summary description for DocumentKey
     /// </summary>
     [Table("DocKey")]
-    public class DocKey
+    public class DocKey : BaseAutoIdent
     {
         [Key]
         [Column(Order = 1)]
-        public int Id { get; set; }
+        public override int Id
+        {
+            get { return base.Id; }
+            set { base.Id = value; }
+        }
 
         [Key]
         [MaxLength(50)]
