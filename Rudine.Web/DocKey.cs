@@ -1,22 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Rudine.Web;
 
-namespace Rudine.Storage.Sql
+namespace Rudine.Web
 {
     /// <summary>
     ///     Summary description for DocumentKey
     /// </summary>
     [Table("DocKey")]
-    public class DocKey : BaseAutoIdent
+    public class DocKey
     {
         [Key]
         [Column(Order = 1)]
-        public override int Id
-        {
-            get { return base.Id; }
-            set { base.Id = value; }
-        }
+        public int Id { get; set; }
 
         [Key]
         [MaxLength(50)]

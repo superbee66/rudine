@@ -9,11 +9,11 @@ namespace Rudine
     /// </summary>
     public static class DocProcessingInstructionsExtensions
     {
-        public static string GetDocId(this DocProcessingInstructions o) => DocKeyEncrypter.DocIdFromKeys(o.DocKeys);
+        public static string GetDocId(this DocProcessingInstructions o) => DocKeyEncrypter.DocIdFromKeys(o.DocIdKeys);
 
         public static void SetDocId(this DocProcessingInstructions o, string DocId)
         {
-            o.DocKeys = DocKeyEncrypter.DocIdToKeys(DocId);
+            o.DocIdKeys = DocKeyEncrypter.DocIdToKeys(DocId);
         }
     }
 }

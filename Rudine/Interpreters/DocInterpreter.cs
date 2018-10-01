@@ -172,7 +172,7 @@ namespace Rudine.Interpreters
         {
             _DocProcessingInstructions.DocStatus = DocStatus ?? _DocProcessingInstructions.DocStatus;
             _DocProcessingInstructions.DocTitle = DocTitle ?? _DocProcessingInstructions.DocTitle;
-            _DocProcessingInstructions.DocKeys = DocKeys ?? _DocProcessingInstructions.DocKeys;
+            _DocProcessingInstructions.DocIdKeys = DocKeys ?? _DocProcessingInstructions.DocIdKeys;
             _DocProcessingInstructions.DocChecksum = DocChecksum ?? _DocProcessingInstructions.DocChecksum;
             _DocProcessingInstructions.href = href ?? _DocProcessingInstructions.href;
 

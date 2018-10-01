@@ -115,7 +115,7 @@ namespace Rudine.Storage.Docdb
                         Field.TermVector.WITH_POSITIONS_OFFSETS));
 
                 // Add individual doc keys
-                foreach (KeyValuePair<string, string> _DocKey in _BaseDoc.DocKeys)
+                foreach (KeyValuePair<string, string> _DocKey in _BaseDoc.DocIdKeys)
                     _Document.Add(new Field(_DocKey.Key,
                         _DocKey.Value,
                         Field.Store.NO,

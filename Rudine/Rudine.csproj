@@ -69,6 +69,9 @@
     <Compile Include="..\Rudine.Web\ContentInfo.cs">
       <Link>Web\ContentInfo.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\DocKey.cs">
+      <Link>Web\DocKey.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\DocProcessingInstructions.cs">
       <Link>Web\DocProcessingInstructions.cs</Link>
     </Compile>
@@ -185,7 +188,6 @@
     <Compile Include="Storage\Sql\BaseAutoIdentExtensions.cs" />
     <Compile Include="Storage\Sql\BaseDocExtensions.cs" />
     <Compile Include="Storage\Sql\DictionaryExtensions.cs" />
-    <Compile Include="Storage\Sql\DocKey.cs" />
     <Compile Include="Storage\Sql\Merge\ClassMerger.cs" />
     <Compile Include="Storage\Sql\Merge\ClassProperty.cs" />
     <Compile Include="Storage\Sql\Merge\ClassSignature.cs" />
@@ -195,7 +197,6 @@
     <Compile Include="Storage\Sql\Reverser\EntityBase.cs" />
     <Compile Include="Storage\Sql\Reverser\Handler.cs" />
     <Compile Include="Storage\Sql\Reverser\TextTemplatingEngineHost.cs" />
-    <Compile Include="Storage\Sql\SqlBaseDoc.cs" />
     <Compile Include="Storage\Sql\SqlController.cs" />
     <Compile Include="Storage\Sql\SqlDB.cs" />
     <Compile Include="Storage\Sql\SqlDBContext.cs" />

@@ -559,7 +559,7 @@ namespace Rudine.Interpreters.Xsn
             /// <param name="xml"></param>
             internal void Validate(string DocData, BaseDoc _BaseDoc)
             {
-                if (_BaseDoc.DocKeys.Count == 0)
+                if (_BaseDoc.DocIdKeys.Count == 0)
                     throw new Exception("No DocKeys have been defined");
 
                 Type t = _BaseDoc.GetType();

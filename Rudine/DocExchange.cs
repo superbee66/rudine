@@ -169,7 +169,10 @@ namespace Rudine
             //#if !FAST
             Version existingVersion;
             // DOCREVs are only submitted via Text, there is no need to worry about them enter the system in another fusion. 
-            if (_LightDoc.DocTypeName == DocRev.MyOnlyDocName)
+            if (_LightDoc.DocTypeName != DocRev.MyOnlyDocName)
+                SqlController.SubmitBytes(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
+            else
+            {
                 if (!string.IsNullOrWhiteSpace(TargetDocVer))
                     // if the DocRev submitted supersedes the current or this is no current..
                     if (!Version.TryParse(TemplateController.Instance.TopDocRev(TargetDocName), out existingVersion) || Version.Parse(TargetDocVer) >= existingVersion)
@@ -179,8 +182,7 @@ namespace Rudine
                             ||
                             TemplateController.Instance.TopDocRev(TargetDocName, true) != TargetDocVer)
                             throw new PocosImportException();
-
-            SqlController.Submit(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
+            }
 
             return _LightDoc;
         }
@@ -195,6 +197,9 @@ namespace Rudine
             DocInterpreter.Instance.Validate(DocData);
             DocData = ProcessPI(DocData, SubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle);
             LightDoc _LightDoc = LuceneController.SubmitText(DocData);
+
+            if (_LightDoc.DocTypeName != DocRev.MyOnlyDocName)
+                SqlController.SubmitText(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
             return _LightDoc;
         }

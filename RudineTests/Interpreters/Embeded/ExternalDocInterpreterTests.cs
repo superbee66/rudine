@@ -30,7 +30,7 @@ namespace Rudine.Interpreters.Embeded.Tests
             _LightDoc = DocExchange.Instance.SubmitDoc(
                new TestExternalDoc
                {
-                   DocKeys = new Dictionary<string, string> { { "ok", "lala" } },
+                   DocIdKeys = new Dictionary<string, string> { { "ok", "lala" } },
                    DocTypeName = nameof(TestExternalDoc),
                    solutionVersion = ExternalDoc.MyOnlyDocRev,
                    FirstName = "Gary",

@@ -124,7 +124,7 @@ namespace Rudine.Interpreters
                 DocFiles = docFiles,
                 DocSchema = schemaXml,
                 DocURN = _DocURN,
-                DocKeys = DocRev.MakeDocKeys(_DocURN),
+                DocIdKeys = DocRev.MakeDocKeys(_DocURN),
                 solutionVersion = DocRev.MyOnlyDocVersion,
                 DocTypeName = DocRev.MyOnlyDocName
             };

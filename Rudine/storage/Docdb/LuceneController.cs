@@ -130,7 +130,7 @@ namespace Rudine.Storage.Docdb
                                ? DocInterpreter.Instance.Read((byte[])_Document.AsDocSubmissions().Last().Value, true)
                                : DocInterpreter.Instance.Read((string)_Document.AsDocSubmissions().Last().Value, true);
 
-                if (_BaseDoc.DocKeys.Count == DocKeys.Count)
+                if (_BaseDoc.DocIdKeys.Count == DocKeys.Count)
                 {
                     _BaseDoc.DocSrc = Nav.ToUrl(DocTypeName, DocId, RelayUrl);
                     // there is a chance the DocStatus may not be set when it comes to items like DocRev BaseDocType(s)
@@ -379,7 +379,7 @@ namespace Rudine.Storage.Docdb
                         new[] { "doc_db", _BaseDoc.DocTypeName }
                             .Union(
                         _BaseDoc
-                            .DocKeys
+                            .DocIdKeys
                             .OrderBy(m => m.Key)
                             .Select(m => StringTransform.PrettyMsSqlIdent(string.Format("{0} {1}", FileSystem.CleanFileName(m.Key), FileSystem.CleanFileName(m.Value))))
                             ).ToArray()

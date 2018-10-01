@@ -92,12 +92,12 @@ namespace Rudine.Tests
                 docTypeName,
                 TemplateController.Instance.TopDocRev(docTypeName),
                 DocExchange.Instance);
-            baseDoc.DocKeys = DocKeys;
+            baseDoc.DocIdKeys = DocKeys;
             baseDoc.DocTypeName = docTypeName;
 
             BaseDoc createdBaseDoc = DocExchange.Instance.Create(baseDoc);
 
-            Assert.AreEqual(baseDoc.DocKeys, createdBaseDoc.DocKeys);
+            Assert.AreEqual(baseDoc.DocIdKeys, createdBaseDoc.DocIdKeys);
 
             return createdBaseDoc;
         }
@@ -109,7 +109,7 @@ namespace Rudine.Tests
             BaseDoc randdoc = new Rand().obj(basedoc.Clone());
 
             randdoc.DocChecksum = basedoc.DocChecksum;
-            randdoc.DocKeys = basedoc.DocKeys;
+            randdoc.DocIdKeys = basedoc.DocIdKeys;
             randdoc.DocStatus = DocStatus;
             randdoc.DocTitle = basedoc.DocTitle;
             randdoc.DocTypeName = basedoc.DocTypeName;

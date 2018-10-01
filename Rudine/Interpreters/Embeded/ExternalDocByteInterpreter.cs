@@ -152,7 +152,7 @@ namespace Rudine.Interpreters.Embeded
                                     new DocProcessingInstructions
                                     {
                                         DocChecksum = source.DocChecksum,
-                                        DocKeys = source.DocKeys,
+                                        DocIdKeys = source.DocIdKeys,
                                         DocSrc = source.DocSrc,
                                         DocStatus = source.DocStatus,
                                         DocTitle = source.DocTitle,

@@ -55,16 +55,16 @@ namespace Rudine.Web
         ///     system reserved value management
         /// </summary>
         [XmlIgnore]
-        public override Dictionary<string, string> DocKeys
+        public override Dictionary<string, string> DocIdKeys
         {
-            get { return base.DocKeys; }
+            get { return base.DocIdKeys; }
             set
             {
                 if (value != default(Dictionary<string, string>))
                     if (String.Join(",", value.Keys.OrderBy(key => key)) != String.Join(",", MakeDocKeys(DocURN).Keys.OrderBy(key => key)))
-                        throw PropertyValueException(nameof(DocKeys));
+                        throw PropertyValueException(nameof(DocIdKeys));
 
-                base.DocKeys = value;
+                base.DocIdKeys = value;
             }
         }
 

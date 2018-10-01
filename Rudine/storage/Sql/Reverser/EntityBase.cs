@@ -13,12 +13,13 @@ namespace Rudine.Storage.Sql.Reverser
     internal class EntityBase
     {
         #region Fields
-
         //
         private StringBuilder generationEnvironmentField;
         private CompilerErrorCollection errorsField;
         private List<int> indentLengthsField;
+        private string currentIndentField = "";
         private bool endsWithNewline;
+        private IDictionary<string, object> sessionField;
 
         #endregion
 
@@ -31,7 +32,7 @@ namespace Rudine.Storage.Sql.Reverser
         {
             get
             {
-                if (generationEnvironmentField == null)
+                if ((generationEnvironmentField == null))
                     generationEnvironmentField = new StringBuilder();
                 return generationEnvironmentField;
             }
@@ -45,7 +46,7 @@ namespace Rudine.Storage.Sql.Reverser
         {
             get
             {
-                if (errorsField == null)
+                if ((errorsField == null))
                     errorsField = new CompilerErrorCollection();
                 return errorsField;
             }
@@ -58,7 +59,7 @@ namespace Rudine.Storage.Sql.Reverser
         {
             get
             {
-                if (indentLengthsField == null)
+                if ((indentLengthsField == null))
                     indentLengthsField = new List<int>();
                 return indentLengthsField;
             }
@@ -67,12 +68,19 @@ namespace Rudine.Storage.Sql.Reverser
         /// <summary>
         ///     Gets the current indent we use when adding lines to the output
         /// </summary>
-        public string CurrentIndent { get; private set; } = "";
+        public string CurrentIndent
+        {
+            get { return currentIndentField; }
+        }
 
         /// <summary>
         ///     Current transformation session
         /// </summary>
-        public virtual IDictionary<string, object> Session { get; set; }
+        public virtual IDictionary<string, object> Session
+        {
+            get { return sessionField; }
+            set { sessionField = value; }
+        }
 
         #endregion
 
@@ -87,30 +95,28 @@ namespace Rudine.Storage.Sql.Reverser
                 return;
             // If we're starting off, or if the previous text ended with a newline,
             // we have to append the current indent first.
-            if (GenerationEnvironment.Length == 0
-                || endsWithNewline)
+            if (((GenerationEnvironment.Length == 0)
+                 || endsWithNewline))
             {
-                GenerationEnvironment.Append(CurrentIndent);
+                GenerationEnvironment.Append(currentIndentField);
                 endsWithNewline = false;
             }
-
             // Check if the current text ends with a newline
             if (textToAppend.EndsWith(Environment.NewLine, StringComparison.CurrentCulture))
                 endsWithNewline = true;
             // This is an optimization. If the current indent is "", then we don't have to do any
             // of the more complex stuff further down.
-            if (CurrentIndent.Length == 0)
+            if ((currentIndentField.Length == 0))
             {
                 GenerationEnvironment.Append(textToAppend);
                 return;
             }
-
             // Everywhere there is a newline in the text, add an indent after it
-            textToAppend = textToAppend.Replace(Environment.NewLine, Environment.NewLine + CurrentIndent);
+            textToAppend = textToAppend.Replace(Environment.NewLine, (Environment.NewLine + currentIndentField));
             // If the text ends with a newline, then we should strip off the indent added at the very end
             // because the appropriate indent will be added when the next time Write() is called
             if (endsWithNewline)
-                GenerationEnvironment.Append(textToAppend, 0, textToAppend.Length - CurrentIndent.Length);
+                GenerationEnvironment.Append(textToAppend, 0, (textToAppend.Length - currentIndentField.Length));
             else
                 GenerationEnvironment.Append(textToAppend);
         }
@@ -128,18 +134,12 @@ namespace Rudine.Storage.Sql.Reverser
         /// <summary>
         ///     Write formatted text directly into the generated output
         /// </summary>
-        public void Write(string format, params object[] args)
-        {
-            Write(string.Format(CultureInfo.CurrentCulture, format, args));
-        }
+        public void Write(string format, params object[] args) { Write(string.Format(CultureInfo.CurrentCulture, format, args)); }
 
         /// <summary>
         ///     Write formatted text directly into the generated output
         /// </summary>
-        public void WriteLine(string format, params object[] args)
-        {
-            WriteLine(string.Format(CultureInfo.CurrentCulture, format, args));
-        }
+        public void WriteLine(string format, params object[] args) { WriteLine(string.Format(CultureInfo.CurrentCulture, format, args)); }
 
         /// <summary>
         ///     Raise an error
@@ -167,9 +167,9 @@ namespace Rudine.Storage.Sql.Reverser
         /// </summary>
         public void PushIndent(string indent)
         {
-            if (indent == null)
+            if ((indent == null))
                 throw new ArgumentNullException("indent");
-            CurrentIndent = CurrentIndent + indent;
+            currentIndentField = (currentIndentField + indent);
             indentLengths.Add(indent.Length);
         }
 
@@ -179,17 +179,16 @@ namespace Rudine.Storage.Sql.Reverser
         public string PopIndent()
         {
             string returnValue = "";
-            if (indentLengths.Count > 0)
+            if ((indentLengths.Count > 0))
             {
-                int indentLength = indentLengths[indentLengths.Count - 1];
-                indentLengths.RemoveAt(indentLengths.Count - 1);
-                if (indentLength > 0)
+                int indentLength = indentLengths[(indentLengths.Count - 1)];
+                indentLengths.RemoveAt((indentLengths.Count - 1));
+                if ((indentLength > 0))
                 {
-                    returnValue = CurrentIndent.Substring(CurrentIndent.Length - indentLength);
-                    CurrentIndent = CurrentIndent.Remove(CurrentIndent.Length - indentLength);
+                    returnValue = currentIndentField.Substring((currentIndentField.Length - indentLength));
+                    currentIndentField = currentIndentField.Remove((currentIndentField.Length - indentLength));
                 }
             }
-
             return returnValue;
         }
 
@@ -199,7 +198,7 @@ namespace Rudine.Storage.Sql.Reverser
         public void ClearIndent()
         {
             indentLengths.Clear();
-            CurrentIndent = "";
+            currentIndentField = "";
         }
 
         #endregion
@@ -221,7 +220,7 @@ namespace Rudine.Storage.Sql.Reverser
                 get { return formatProviderField; }
                 set
                 {
-                    if (value != null)
+                    if ((value != null))
                         formatProviderField = value;
                 }
             }
@@ -231,26 +230,31 @@ namespace Rudine.Storage.Sql.Reverser
             /// </summary>
             public string ToStringWithCulture(object objectToConvert)
             {
-                if (objectToConvert == null)
+                if ((objectToConvert == null))
                     throw new ArgumentNullException("objectToConvert");
                 Type t = objectToConvert.GetType();
                 MethodInfo method = t.GetMethod("ToString", new[]
                 {
-                    typeof(IFormatProvider)
+                    typeof (IFormatProvider)
                 });
-                if (method == null)
+                if ((method == null))
                     return objectToConvert.ToString();
-                return (string) method.Invoke(objectToConvert, new object[]
+                return ((string) (method.Invoke(objectToConvert, new object[]
                 {
                     formatProviderField
-                });
+                })));
             }
         }
+
+        private readonly ToStringInstanceHelper toStringHelperField = new ToStringInstanceHelper();
 
         /// <summary>
         ///     Helper to produce culture-oriented representation of an object as a string
         /// </summary>
-        public ToStringInstanceHelper ToStringHelper { get; } = new ToStringInstanceHelper();
+        public ToStringInstanceHelper ToStringHelper
+        {
+            get { return toStringHelperField; }
+        }
 
         #endregion
     }

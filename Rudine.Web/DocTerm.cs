@@ -18,7 +18,7 @@ namespace Rudine.Web
 
         [XmlIgnore]
         [DataMember]
-        public virtual Dictionary<string, string> DocKeys { get; set; }
+        public virtual Dictionary<string, string> DocIdKeys { get; set; }
 
         /// <summary>
         ///     The reflected GetType().Name of this object
@@ -38,7 +38,7 @@ namespace Rudine.Web
             {
                 //TODO:sort dictionary before serializing
                 DocTypeName,
-                DocKeys
+                DocIdKeys
             });
         }
     }

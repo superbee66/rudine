@@ -66,7 +66,7 @@ namespace Rudine.Web
                 .ToList();
         }
 
-           /// <summary>
+        /// <summary>
         ///     Further filters GetFormObjectMappedProperties stripping IgnoreDataMember,XmlIgnoreAttribute,ScriptIgnoreAttribute &
         ///     NotMapped properties
         /// </summary>
@@ -115,5 +115,10 @@ namespace Rudine.Web
 
             return p.Where(m => !filled || !this.IsDefaultValue(m)).ToArray();
         }
+
+        [XmlIgnore]
+        [IgnoreDataMember]
+        public virtual List<DocKey> DocKey { get; set; }
+
     }
 }
