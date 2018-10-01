@@ -20,7 +20,9 @@ namespace Rudine.Tests
         [SetUp]
         public void TestFixtureSetup()
         {
-            string[] DirectoriesToDelete = Directory.EnumerateDirectories(RequestPaths.GetPhysicalApplicationPath(""))
+            string[] DirectoriesToDelete = Directory
+                .EnumerateDirectories(RequestPaths.GetPhysicalApplicationPath(""))
+                .Where(dir => !dir.EndsWith("\\doc", StringComparison.InvariantCultureIgnoreCase))
                                                     .ToArray();
 
             // remove directories that can be created at runtime

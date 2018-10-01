@@ -25,6 +25,11 @@ namespace Rudine
             Reflection.LoadBinDlls();
         }
 
+        /// <summary>
+        /// All known interpreters are queried for the extensions they serve
+        /// </summary>
+        /// <param name="baseDocController"></param>
+        /// <returns></returns>
         private static string[] AllTemplateExtensions(BaseDocController baseDocController) =>
             CacheMan.Cache(() => baseDocController
                                .TemplateSources()
