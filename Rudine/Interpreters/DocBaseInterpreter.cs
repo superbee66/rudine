@@ -69,7 +69,21 @@ namespace Rudine.Interpreters
             return href;
         }
 
-        public abstract BaseDoc Create(string DocTypeName);
+        /// <summary>
+        /// Creates poco of the most current DocRev for the given docTypeName 
+        /// </summary>
+        /// <param name="docTypeName"></param>
+        /// <returns></returns>
+        public virtual BaseDoc Create(string docTypeName)
+        {
+            string _TopDocRev = TemplateController.Instance.TopDocRev(docTypeName);
+
+            BaseDoc _BaseDoc = Runtime.ActivateBaseDoc(docTypeName, _TopDocRev, DocExchange.Instance);
+            _BaseDoc.DocTypeName = docTypeName;
+            _BaseDoc.solutionVersion = _TopDocRev;
+
+            return _BaseDoc;
+        }
 
         /// <summary>
         /// </summary>
@@ -214,7 +228,7 @@ namespace Rudine.Interpreters
             dstBaseDoc = (BaseDoc)PropertyOverlay.Overlay(pi, dstBaseDoc);
             dstBaseDoc.DocTypeName = DocTypeName ?? pi.DocTypeName;
             dstBaseDoc.solutionVersion = DocRev ?? pi.solutionVersion;
-            dstBaseDoc.DocStatus = pi.DocStatus??dstBaseDoc.DocStatus;
+            dstBaseDoc.DocStatus = pi.DocStatus ?? dstBaseDoc.DocStatus;
             return dstBaseDoc;
         }
 

@@ -22,9 +22,6 @@ namespace Rudine.Interpreters.Embeded.Tests
         [Test]
         public void ExternalDocSubmitTest()
         {
-            //BaseDoc _BaseDoc = _ExternalDocInterpreter.Create(nameof(TestExternalDoc));
-            //Assert.IsTrue(_BaseDoc is TestExternalDoc);
-
             LightDoc _LightDoc;
 
             _LightDoc = DocExchange.Instance.SubmitDoc(

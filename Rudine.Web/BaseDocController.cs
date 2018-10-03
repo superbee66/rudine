@@ -11,6 +11,11 @@ namespace Rudine.Web
 {
     public abstract class BaseDocController : IBaseDocController, IBaseDocTemplateBuilder
     {
+        protected BaseDocController()
+        {
+            ImporterController.SyncTemplates(this);
+        }
+
         public abstract List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null);
         public abstract BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null);
         public abstract DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null);

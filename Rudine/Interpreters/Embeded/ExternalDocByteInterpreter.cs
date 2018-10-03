@@ -6,8 +6,8 @@ using System.Text;
 using System.Web.Script.Serialization;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
+using Newtonsoft.Json;
 using Rudine.Template;
-using Rudine.Util;
 using Rudine.Web;
 using Rudine.Web.Util;
 
@@ -37,36 +37,35 @@ namespace Rudine.Interpreters.Embeded
             }
         };
 
-        public static ExternalDocInterpreter Instance =>
+        private static ExternalDocInterpreter Instance =>
             _Instance.Value;
 
-        public override BaseDoc Create(string docTypeName) =>
-            Create(docTypeName, TemplateController.Instance.TopDocRev(docTypeName));
-
-        private static BaseDoc Create(string DocTypeName, string DocRev)
+        private static BaseDoc CreateInternal(string docTypeName, string docRev = null)
         {
-            Type _BaseDocType = Reflection
-                .LoadBinDlls()
-                .SelectMany(a => a.GetTypes())
-                .Distinct()
-                .FirstOrDefault(typ =>
-                    !(typ == typeof(DocRev))
-                    &&
-                    typ.IsSubclassOf(typeof(ExternalDoc))
-                    &&
-                    typ.Name == DocTypeName);
+            if (docRev == null)
+                return Instance.Create(docTypeName);
 
-            BaseDoc _BaseDoc = null;
-            if (_BaseDocType != null)
-            {
-                _BaseDoc = (BaseDoc)Activator.CreateInstance(_BaseDocType);
-                //TODO:Complete DocRev creations from ExternalDoc types in memory so there schemas can be persisted
-                //BaseDoc _BaseDoc = Runtime.ActivateBaseDoc(DocTypeName, DocRev, DocExchange.Instance);
-                _BaseDoc.DocTypeName = DocTypeName;
-                _BaseDoc.solutionVersion = ExternalDoc.MyOnlyDocRev;
-            }
+            BaseDoc _BaseDoc = Runtime.ActivateBaseDoc(docTypeName, docRev, DocExchange.Instance);
+            _BaseDoc.DocTypeName = docTypeName;
+            _BaseDoc.solutionVersion = docRev;
 
             return _BaseDoc;
+        }
+
+        public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
+        {
+            DocRevEntry _SchemaFieldsJsonFile = docFiles.FirstOrDefault(docFile => Path.GetFileName(docFile.Name).Equals(ImporterController.EXTERNET_DOC_PROPERTIES_FILE_NAME, StringComparison.InvariantCultureIgnoreCase));
+
+            if (_SchemaFieldsJsonFile != null)
+                using (MemoryStream _MemoryStream = new MemoryStream(_SchemaFieldsJsonFile.Bytes))
+                    schemaFields = JsonConvert.DeserializeObject<List<CompositeProperty>>(_MemoryStream.AsString());
+
+            return base.CreateTemplate(
+                docFiles,
+                docTypeName,
+                docRev,
+                schemaXml,
+                schemaFields);
         }
 
         public override string GetDescription(string DocTypeName) =>
@@ -75,10 +74,10 @@ namespace Rudine.Interpreters.Embeded
         public override string HrefVirtualFilename(string DocTypeName, string ExternalDoc) =>
             null;
 
-        public override bool Processable(string docTypeName, string docRev)
+        public override bool Processable(string DocTypeName, string DocRev)
         {
-            object o = Create(docTypeName, docRev);
-            return !(o is DocRev) && o is ExternalDoc;
+            using (MemoryStream _MemoryStream = TemplateController.Instance.OpenRead(DocTypeName, DocRev, ImporterController.EXTERNET_DOC_PROPERTIES_FILE_NAME))
+                return _MemoryStream != null;
         }
 
         /// <summary>
@@ -92,30 +91,28 @@ namespace Rudine.Interpreters.Embeded
             DocProcessingInstructions _DocProcessingInstructions = new DocProcessingInstructions();
 
             using (MemoryStream _MemoryStream = new MemoryStream(DocData))
+            using (ZipFile _ZipFile = new ZipFile(_MemoryStream))
             {
-                using (ZipFile _ZipFile = new ZipFile(_MemoryStream))
-                {
-                    foreach (ZipEntry _ZipEntry in _ZipFile)
-                        if (_ZipEntry.Name.Equals(ExternalDoc.PIFileName, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            _DocProcessingInstructions = _JavaScriptSerializer.Deserialize<DocProcessingInstructions>(Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry).AsBytes()));
-                            _DocProcessingInstructions.solutionVersion = ExternalDoc.MyOnlyDocRev;
-                        }
+                foreach (ZipEntry _ZipEntry in _ZipFile)
+                    if (_ZipEntry.Name.Equals(ExternalDoc.PIFileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        _DocProcessingInstructions = _JavaScriptSerializer.Deserialize<DocProcessingInstructions>(Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry).AsBytes()));
+                        _DocProcessingInstructions.solutionVersion = ExternalDoc.MyOnlyDocRev;
+                    }
 
-                    BaseDoc _IExternalDoc = Create(
-                        _DocProcessingInstructions.DocTypeName,
-                        _DocProcessingInstructions.solutionVersion);
+                BaseDoc _IExternalDoc = CreateInternal(
+                    _DocProcessingInstructions.DocTypeName,
+                    _DocProcessingInstructions.solutionVersion);
 
-                    foreach (ZipEntry _ZipEntry in _ZipFile)
-                        if (_ZipEntry.Name.Equals(ExternalDoc.PropertiesFileName, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            _IExternalDoc = (BaseDoc)_JavaScriptSerializer.Deserialize(Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry).AsBytes()), _IExternalDoc.GetType());
-                            _IExternalDoc.DocTypeName = _DocProcessingInstructions.DocTypeName;
-                            _IExternalDoc.solutionVersion = _DocProcessingInstructions.solutionVersion;
-                        }
+                foreach (ZipEntry _ZipEntry in _ZipFile)
+                    if (_ZipEntry.Name.Equals(ExternalDoc.PropertiesFileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        _IExternalDoc = (BaseDoc)_JavaScriptSerializer.Deserialize(Encoding.Default.GetString(_ZipFile.GetInputStream(_ZipEntry).AsBytes()), _IExternalDoc.GetType());
+                        _IExternalDoc.DocTypeName = _DocProcessingInstructions.DocTypeName;
+                        _IExternalDoc.solutionVersion = _DocProcessingInstructions.solutionVersion;
+                    }
 
-                    return _IExternalDoc;
-                }
+                return _IExternalDoc;
             }
         }
 

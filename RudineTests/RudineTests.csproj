@@ -63,20 +63,20 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="..\Rudine.Web\RuntimeTypeNamer.cs">
+      <Link>help\RuntimeTypeNamer.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\Util\AssemblyExtensions.cs">
       <Link>AssemblyExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Rudine.Web\Util\FileSystem.cs">
       <Link>help\FileSystem.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\Util\Reflection.cs">
+      <Link>help\Reflection.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\Util\TypeExtensions.cs">
       <Link>help\TypeExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\Rudine\RuntimeTypeNamer.cs">
-      <Link>help\RuntimeTypeNamer.cs</Link>
-    </Compile>
-    <Compile Include="..\Rudine\Util\Reflection.cs">
-      <Link>help\Reflection.cs</Link>
     </Compile>
     <Compile Include="..\Rudine\Util\Zips\RuntimeBinaryFormatter.cs">
       <Link>help\RuntimeBinaryFormatter.cs</Link>

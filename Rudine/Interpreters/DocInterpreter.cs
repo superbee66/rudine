@@ -120,16 +120,15 @@ namespace Rudine.Interpreters
         /// <returns></returns>
         public DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null)
         {
-            foreach (string Extension in docFiles.Select(_ => Path.GetExtension(_.Name).Trim('.')).Distinct())
+            foreach (string _Extension in docFiles.Select(docRevEntry => Path.GetExtension(docRevEntry.Name).Trim('.')).Distinct())
                 foreach (DocBaseInterpreter _IDocDataInterpreter in ContentInterpreterInstances)
                     if (_IDocDataInterpreter.TemplateSources()
                                             .Any(templateSource =>
                                                 templateSource
                                                 .ContentFileExtension
                                                 .Trim('.')
-                                                .Equals(Extension, StringComparison.CurrentCultureIgnoreCase)))
+                                                .Equals(_Extension, StringComparison.CurrentCultureIgnoreCase)))
                         return _IDocDataInterpreter.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields);
-
             return null;
         }
 

@@ -178,7 +178,7 @@ namespace Rudine
                     if (!Version.TryParse(TemplateController.Instance.TopDocRev(TargetDocName), out existingVersion) || Version.Parse(TargetDocVer) >= existingVersion)
                         // if there is no representation of this DocRev as a directory in the file system (as this trumps the submitted one no matter what
                         // notice the true parameter value to clear the cache as well as assert we have the correct DocRev in the system now
-                        if (Directory.Exists(FilesystemTemplateController.GetDocDirectoryPath(TargetDocName))
+                        if (Directory.Exists(ImporterController.GetDocDirectoryPath(TargetDocName))
                             ||
                             TemplateController.Instance.TopDocRev(TargetDocName, true) != TargetDocVer)
                             throw new PocosImportException();

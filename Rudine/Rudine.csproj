@@ -78,6 +78,9 @@
     <Compile Include="..\Rudine.Web\DocRev.cs">
       <Link>Web\DocRev.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\DocRevDateTimeExtension.cs">
+      <Link>Web\DocRevDateTimeExtension.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\DocRevEntry.cs">
       <Link>Web\DocRevEntry.cs</Link>
     </Compile>
@@ -120,6 +123,9 @@
     <Compile Include="..\Rudine.Web\IExternalDoc.cs">
       <Link>Web\IExternalDoc.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\ImporterController.cs">
+      <Link>Web\ImporterController.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\LightDoc.cs">
       <Link>Web\LightDoc.cs</Link>
     </Compile>
@@ -129,8 +135,17 @@
     <Compile Include="..\Rudine.Web\Parm.cs">
       <Link>Web\Parm.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\Properties\Settings.Designer.cs">
+      <Link>Web\Properties\Settings.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="..\Rudine.Web\rProxHttpHandler.cs">
       <Link>Web\rProxHttpHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Rudine.Web\RuntimeTypeNamer.cs">
+      <Link>Web\RuntimeTypeNamer.cs</Link>
     </Compile>
     <Compile Include="..\Rudine.Web\Util\AssemblyExtensions.cs">
       <Link>Web\Util\AssemblyExtensions.cs</Link>
@@ -162,6 +177,9 @@
     <Compile Include="..\Rudine.Web\Util\PropertyDefaultValue.cs">
       <Link>Web\Util\PropertyDefaultValue.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\Util\Reflection.cs">
+      <Link>Web\Util\Reflection.cs</Link>
+    </Compile>
     <Compile Include="..\Rudine.Web\Util\RequestPaths.cs">
       <Link>Web\Util\RequestPaths.cs</Link>
     </Compile>
@@ -177,12 +195,14 @@
     <Compile Include="..\Rudine.Web\Util\TypeExtensions.cs">
       <Link>Web\Util\TypeExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Rudine.Web\Util\Xsd.cs">
+      <Link>Web\Util\Xsd.cs</Link>
+    </Compile>
     <Compile Include="BaseDocExtensions.cs" />
     <Compile Include="DocExchangeServiceHostFactory.cs" />
     <Compile Include="DocExchangeWsdlExporter.cs" />
     <Compile Include="DocKeyEncrypter.cs" />
     <Compile Include="DocProcessingInstructionsExtensions.cs" />
-    <Compile Include="ImporterController.cs" />
     <Compile Include="Interpreters\Embeded\DocRevInterpreter.cs" />
     <Compile Include="Interpreters\Embeded\ExternalDocByteInterpreter.cs" />
     <Compile Include="Storage\Sql\BaseAutoIdentExtensions.cs" />
@@ -202,8 +222,12 @@
     <Compile Include="Storage\Sql\SqlDBContext.cs" />
     <Compile Include="Storage\Sql\SqlDbMigrationsConfiguration.cs" />
     <Compile Include="Storage\Sql\SqlTableAttributeConvention.cs" />
+    <None Include="..\Rudine.Web\Properties\Settings.settings">
+      <Link>Web\Properties\Settings.settings</Link>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="App.config" />
-    <None Include="Interpreters\Embeded\ExternalInterpreterFactory.cs.ignore" />
     <Compile Include="Interpreters\IDocBaseInterpreter.cs" />
     <Compile Include="Interpreters\IDocByteInterpreter.cs" />
     <Compile Include="Interpreters\IDocTextInterpreter.cs" />
@@ -213,7 +237,6 @@
     <Compile Include="Exceptions\NoChangesSinceRenderedException.cs" />
     <Compile Include="Exceptions\NoOverwriteOfPreviouslyApproveException.cs" />
     <Compile Include="Exceptions\PocosImportException.cs" />
-    <Compile Include="DocRevDateTimeExtension.cs" />
     <Compile Include="Interpreters\DocInterpreter.cs" />
     <Compile Include="Interpreters\DocByteInterpreter.cs" />
     <Compile Include="Interpreters\DocBaseInterpreter.cs" />
@@ -221,7 +244,6 @@
     <Compile Include="DocExchange.cs" />
     <Compile Include="LightDocExtensions.cs" />
     <Compile Include="Runtime.cs" />
-    <Compile Include="RuntimeTypeNamer.cs" />
     <Compile Include="Storage\Docdb\BaseDocExtensions.cs" />
     <Compile Include="Storage\Docdb\DocumentExtensions.cs" />
     <Compile Include="Storage\Docdb\LuceneControllerExtension.cs" />
@@ -236,7 +258,6 @@
     <Compile Include="Template\TemplateFileInfo.cs" />
     <Compile Include="Util\Base36.cs" />
     <Compile Include="Util\ExceptionExtrensions.cs" />
-    <Compile Include="Util\Reflection.cs" />
     <Compile Include="Util\SelfMarshalByRefObject.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\MimeExtensionHelper.cs" />
@@ -244,7 +265,6 @@
     <Compile Include="Nav.cs" />
     <Compile Include="FormsMigrationsCode\*.cs" />
     <Compile Include="IDocFormatting.cs" />
-    <Compile Include="Util\Xsds\Xsd.cs" />
     <Compile Include="Util\Zips\BaseDocExtensions.cs" />
     <Compile Include="Util\Zips\Compressor.cs" />
     <Compile Include="Util\Zips\RuntimeBinaryFormatter.cs" />

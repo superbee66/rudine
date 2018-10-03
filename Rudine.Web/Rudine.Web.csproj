@@ -70,10 +70,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -89,6 +94,7 @@
     <Compile Include="DocKnownTypesProber.cs" />
     <Compile Include="DocProcessingInstructions.cs" />
     <Compile Include="DocRev.cs" />
+    <Compile Include="DocRevDateTimeExtension.cs" />
     <Compile Include="DocRevEntry.cs" />
     <Compile Include="DocURN.cs" />
     <Compile Include="ExternalDoc.cs" />
@@ -101,13 +107,19 @@
     <Compile Include="DocTypeInfo.cs" />
     <Compile Include="IBaseDoc.cs" />
     <Compile Include="IDocIdentifiers.cs" />
-    <Compile Include="IDocModel.cs" />
     <Compile Include="IDocURN.cs" />
     <Compile Include="ContentInfo.cs" />
     <Compile Include="IExternalDoc.cs" />
+    <Compile Include="ImporterController.cs" />
     <Compile Include="LightDoc.cs" />
     <Compile Include="MagicNumbers.cs" />
     <Compile Include="Parm.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="RuntimeTypeNamer.cs" />
     <Compile Include="SignatureVerifier.cs" />
     <Compile Include="Util\AssemblyExtensions.cs" />
     <Compile Include="Util\CompositeProperty.cs" />
@@ -134,6 +146,7 @@
     <Compile Include="Util\PropertyDefaultValue.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Util\Reflection.cs" />
     <Compile Include="Util\RequestPaths.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -145,6 +158,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Util\TypeExtensions.cs" />
+    <Compile Include="Util\Xsd.cs" />
     <Compile Include="Util\ZipStorer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -164,6 +178,10 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

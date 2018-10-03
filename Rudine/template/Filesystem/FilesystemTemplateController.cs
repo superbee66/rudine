@@ -15,13 +15,7 @@ namespace Rudine.Template.Filesystem
         /// </summary>
         static FilesystemTemplateController()
         {
-            DirectoryPath = RequestPaths.GetPhysicalApplicationPath("doc");
-            //Task.Factory.StartNew(() =>
-            //                      {
-            new DirectoryInfo(DirectoryPath)
-                .mkdir()
-                .rAttrib(FileAttributes.NotContentIndexed);
-            //});
+
         }
 
         public static string DirectoryName
@@ -29,11 +23,11 @@ namespace Rudine.Template.Filesystem
             get { return new DirectoryInfo(DirectoryPath).Name.ToLower(); }
         }
 
-        public static string DirectoryPath { get; }
+        public static string DirectoryPath => ImporterController.DirectoryPath;
 
         public MemoryStream OpenRead(string DocTypeName, string DocRev, string filename)
         {
-            string filepath = GetDocDirectoryPath(DocTypeName, filename);
+            string filepath = ImporterController.GetDocDirectoryPath(DocTypeName, filename);
             return File.Exists(filepath) && TopDocRev(DocTypeName) == DocRev
                        ? File.OpenRead(filepath).AsMemoryStream()
                        : null;
@@ -42,24 +36,13 @@ namespace Rudine.Template.Filesystem
         public string TopDocRev(string DocTypeName)
         {
             string DocMd5 = null, DocRev = null;
-            DirectoryInfo _DirectoryInfo = new DirectoryInfo(GetDocDirectoryPath(DocTypeName));
+            DirectoryInfo _DirectoryInfo = new DirectoryInfo(ImporterController.GetDocDirectoryPath(DocTypeName));
 
             // try the file system first
             if (_DirectoryInfo.Exists)
                 ScanContentFolder(_DirectoryInfo, out DocRev, out DocMd5);
 
             return DocRev;
-        }
-
-        public static string GetDocDirectoryPath(string DocTypeName, params string[] subfoldersAndOrFilename)
-        {
-            return string.Format(
-                @"{0}\{1}\{2}",
-                DirectoryPath,
-                DocTypeName,
-                subfoldersAndOrFilename == null
-                    ? string.Empty
-                    : string.Join(@"\", subfoldersAndOrFilename));
         }
 
         /// <summary>
@@ -89,7 +72,8 @@ namespace Rudine.Template.Filesystem
                         TargetDocTypeName = isBinary
                                                 ? DocInterpreter.Instance.ReadDocTypeName(File.ReadAllBytes(filepath.FullName))
                                                 : DocInterpreter.Instance.ReadDocTypeName(File.ReadAllText(filepath.FullName));
-                } catch (Exception) {}
+                }
+                catch (Exception) { }
 
                 if (!string.IsNullOrWhiteSpace(TargetDocTypeName) && !string.IsNullOrWhiteSpace(TargetDocTypeVer))
                     break;

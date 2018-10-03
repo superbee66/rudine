@@ -27,10 +27,6 @@ namespace Rudine.Interpreters.Pdf
                 Offset = 0
             }
         };
-
-        public override BaseDoc Create(string docTypeName) =>
-            Create(docTypeName, TemplateController.Instance.TopDocRev(docTypeName));
-
         private static BaseDoc Create(string DocTypeName, string DocRev)
         {
             BaseDoc _BaseDoc = Runtime.ActivateBaseDoc(DocTypeName, DocRev, DocExchange.Instance);
