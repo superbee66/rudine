@@ -10,35 +10,45 @@ namespace Rudine.Template.Docdb
     {
         public MemoryStream OpenRead(string DocTypeName, string DocTypeVer, string filename)
         {
-            IDocRev o = (IDocRev) DocExchange.LuceneController.Get(
+            IDocRev o = (IDocRev)DocExchange.LuceneController.Get(
                 DocRev.MyOnlyDocName,
                 new Dictionary<string, string> { { DocRev.KeyPart2, DocTypeVer }, { DocRev.KeyPart1, DocTypeName } });
 
             if (o == null)
-                o = (IDocRev) DocExchange.LuceneController.Get(
+                o = (IDocRev)DocExchange.LuceneController.Get(
                     DocRev.MyOnlyDocName,
                     new Dictionary<string, string> { { DocRev.KeyPart2, DocTypeVer }, { DocRev.KeyPart1, DocTypeName } });
 
             byte[] bytes = o?.DocFiles?.FirstOrDefault(f => f.Name.Equals(filename, StringComparison.InvariantCultureIgnoreCase))?.Bytes;
 
             return bytes == null
-                       ? null
-                       : new MemoryStream(bytes);
+                ? null
+                : new MemoryStream(bytes);
         }
 
         public string TopDocRev(string DocTypeName)
         {
             return DocExchange.LuceneController.List(
-                                  new List<string> { DocRev.MyOnlyDocName },
-                                  new Dictionary<string, List<string>>
-                                  {
-                                      {
-                                          DocRev.KeyPart1, new List<string> { DocTypeName }
-                                      }
-                                  })
-                              .Select(_LightDoc => _LightDoc.GetTargetDocVer())
-                              .OrderByDescending(s => new Version(s))
-                              .FirstOrDefault();
+                    new List<string> { DocRev.MyOnlyDocName },
+                    new Dictionary<string, List<string>>
+                    {
+                        {
+                            DocRev.KeyPart1, new List<string> {DocTypeName}
+                        }
+                    })
+                .Select(_LightDoc => _LightDoc.GetTargetDocVer())
+                .OrderByDescending(s => new Version(s))
+                .FirstOrDefault();
+        }
+
+        public Dictionary<string, Version> TopDocRevs()
+        {
+            Dictionary<string, Version> _Dictionary = new Dictionary<string, Version>();
+            foreach (var _Doc in DocExchange.LuceneController.List(new List<string> { DocRev.MyOnlyDocName })
+                .Select(lightDoc => new { TargetDocName = lightDoc.GetTargetDocName(), TargetDocVer = new Version(lightDoc.GetTargetDocVer()) })
+                .OrderBy(arg => arg.TargetDocVer))
+                _Dictionary[_Doc.TargetDocName] = _Doc.TargetDocVer;
+            return _Dictionary;
         }
     }
 }

@@ -58,7 +58,10 @@ namespace Rudine.Interpreters.Embeded
 
             if (_SchemaFieldsJsonFile != null)
                 using (MemoryStream _MemoryStream = new MemoryStream(_SchemaFieldsJsonFile.Bytes))
-                    schemaFields = JsonConvert.DeserializeObject<List<CompositeProperty>>(_MemoryStream.AsString());
+                {
+                    string _AsString = _MemoryStream.AsString();
+                    schemaFields = JsonConvert.DeserializeObject<List<CompositeProperty>>(_AsString);
+                }
 
             return base.CreateTemplate(
                 docFiles,

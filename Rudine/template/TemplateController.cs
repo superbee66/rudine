@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
-using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Web;
 using Rudine.Web.Util;
@@ -24,11 +24,6 @@ namespace Rudine.Template
         public const string FOLDER_CONTENTS_VIRTUAL_CAB_FILE = "mycontents.cab";
 
         private static readonly Lazy<TemplateController> _Instance = new Lazy<TemplateController>(() => new TemplateController());
-
-        /// <summary>
-        ///     the default controller that will be queried first for the TopDoc
-        /// </summary>
-        private static readonly FilesystemTemplateController _DefaultTopDocFilesystemTemplateController = new FilesystemTemplateController();
 
         private static ITemplateController[] _OtherIDocResourceControllers;
 
@@ -55,7 +50,7 @@ namespace Rudine.Template
                 .Where(t => t._Type != GetType())
                 .Where(t => !t._Type.IsInterface)
                 .Where(t => t._Type.GetInterfaces().Any(i => i == typeof(ITemplateController)))
-                .Select(t => ((ITemplateController) Activator.CreateInstance(t._Type)))
+                .Select(t => (ITemplateController)Activator.CreateInstance(t._Type))
                 .ToArray();
         }
 
@@ -88,6 +83,22 @@ namespace Rudine.Template
         public string TopDocRev(string DocTypeName) =>
             TopDocRev(DocTypeName, false);
 
+        public Dictionary<string, Version> TopDocRevs()
+        {
+            return CacheMan.Cache(() =>
+            {
+                Dictionary<string, Version> _Dictionary = new Dictionary<string, Version>();
+
+                foreach (ITemplateController _TemplateController in _OtherIDocResourceControllers)
+                    foreach (KeyValuePair<string, Version> _KeyValuePair in _TemplateController.TopDocRevs())
+                        if (!_Dictionary.ContainsKey(_KeyValuePair.Key) || _Dictionary[_KeyValuePair.Key] < _KeyValuePair.Value)
+                            _Dictionary[_KeyValuePair.Key] = _KeyValuePair.Value;
+
+                return _Dictionary;
+
+            }, false, nameof(TemplateController), nameof(TopDocRevs));
+        }
+
         public static string GetHttpContextFileName(HttpContext context) =>
             context.Request.Url.Segments[context.Request.Url.Segments.Length - 1].Trim('/');
 
@@ -107,14 +118,6 @@ namespace Rudine.Template
             return OpenRead(templatefileinfo.DocTypeName, templatefileinfo.solutionVersion, templatefileinfo.FileName);
         }
 
-        public TemplateFileInfo ParseTemplateFileInfo(HttpContext context) =>
-            new TemplateFileInfo
-            {
-                FileName = GetHttpContextFileName(context),
-                solutionVersion = context.Request.Url.Segments[context.Request.Url.Segments.Length - 2].Trim('/'),
-                DocTypeName = context.Request.Url.Segments[context.Request.Url.Segments.Length - 3].Trim('/')
-            };
-
         public string OpenText(string DocTypeName, string filename) =>
             OpenText(
                 DocTypeName,
@@ -123,21 +126,29 @@ namespace Rudine.Template
 
         public string OpenText(string DocTypeName, string DocTypeVer, string filename) =>
             CacheMan.Cache(() =>
-                           {
-                               using (MemoryStream _MemoryStream = OpenRead(DocTypeName, DocTypeVer, filename))
-                                   return _MemoryStream.AsString();
-                           }, false, "OpenText", DocTypeName, DocTypeVer, filename);
+            {
+                using (MemoryStream _MemoryStream = OpenRead(DocTypeName, DocTypeVer, filename))
+                    return _MemoryStream.AsString();
+            }, false, "OpenText", DocTypeName, DocTypeVer, filename);
 
         public string OpenText(HttpContext context, out string filename)
         {
             filename = GetHttpContextFileName(context);
             return CacheMan.Cache(() =>
-                                  {
-                                      TemplateFileInfo r;
-                                      using (MemoryStream _MemoryStream = OpenRead(context, out r))
-                                          return _MemoryStream.AsString();
-                                  }, false, "OpenText", context.Request.Url.ToString());
+            {
+                TemplateFileInfo r;
+                using (MemoryStream _MemoryStream = OpenRead(context, out r))
+                    return _MemoryStream.AsString();
+            }, false, "OpenText", context.Request.Url.ToString());
         }
+
+        public TemplateFileInfo ParseTemplateFileInfo(HttpContext context) =>
+            new TemplateFileInfo
+            {
+                FileName = GetHttpContextFileName(context),
+                solutionVersion = context.Request.Url.Segments[context.Request.Url.Segments.Length - 2].Trim('/'),
+                DocTypeName = context.Request.Url.Segments[context.Request.Url.Segments.Length - 3].Trim('/')
+            };
 
         /// <summary>
         ///     Reads the DocRev from the local AppDomain working_folder\form\*. When nothing is found the Docdb store for the most
@@ -147,16 +158,15 @@ namespace Rudine.Template
         /// <returns>string.Empty if nothing is found</returns>
         public string TopDocRev(string DocTypeName, bool forceRefresh) =>
             CacheMan.Cache(() =>
-                               DocTypeName.Equals(DocRev.MyOnlyDocName, StringComparison.CurrentCultureIgnoreCase)
-                                   ? DocRev.MyOnlyDocVersion.ToString()
-                                   : _DefaultTopDocFilesystemTemplateController.TopDocRev(DocTypeName)
-                                     ?? _OtherIDocResourceControllers
-                                         //DOCREVs should always come from the embedded controller
-                                         .Select(m => m.TopDocRev(DocTypeName))
-                                         .Where(DocRev => !string.IsNullOrWhiteSpace(DocRev))
-                                         .OrderByDescending(DocRev => new Version(DocRev))
-                                         .ToArray()
-                                         .FirstOrDefault(),
+                    DocTypeName.Equals(DocRev.MyOnlyDocName, StringComparison.CurrentCultureIgnoreCase)
+                        ? DocRev.MyOnlyDocVersion
+                        : _OtherIDocResourceControllers
+                            //DOCREVs should always come from the embedded controller
+                            .Select(m => m.TopDocRev(DocTypeName))
+                            .Where(DocRev => !string.IsNullOrWhiteSpace(DocRev))
+                            .OrderByDescending(DocRev => new Version(DocRev))
+                            .ToArray()
+                            .FirstOrDefault(),
                 forceRefresh,
                 "TopDocRev",
                 DocTypeName);

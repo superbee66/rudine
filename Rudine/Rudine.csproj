@@ -222,6 +222,7 @@
     <Compile Include="Storage\Sql\SqlDBContext.cs" />
     <Compile Include="Storage\Sql\SqlDbMigrationsConfiguration.cs" />
     <Compile Include="Storage\Sql\SqlTableAttributeConvention.cs" />
+    <Compile Include="Web\SubmissionReceivedEventArgs.cs" />
     <None Include="..\Rudine.Web\Properties\Settings.settings">
       <Link>Web\Properties\Settings.settings</Link>
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -250,7 +251,6 @@
     <Compile Include="Storage\Docdb\ShouldSerializeContractResolver.cs" />
     <Compile Include="Exceptions\SubmissionException.cs" />
     <Compile Include="Exceptions\SubmitDeniedException.cs" />
-    <Compile Include="Template\Filesystem\FilesystemTemplateController.cs" />
     <Compile Include="Template\Docdb\DocdbTemplateController.cs" />
     <Compile Include="Template\TemplateController.cs" />
     <Compile Include="Template\ITemplateController.cs" />
@@ -350,6 +350,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Template\Filesystem\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

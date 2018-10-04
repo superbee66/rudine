@@ -6,10 +6,11 @@ namespace Rudine.Web.Util
     public class CompositeProperty
     {
         private static readonly CodeDomProvider codeDomProvider = CodeDomProvider.CreateProvider("C#");
+
         public CompositeProperty(string name, Type type)
         {
             if (!codeDomProvider.IsValidIdentifier(name))
-                throw new ArgumentNullException(nameof(name),"invalid C# identifier");
+                throw new ArgumentNullException(nameof(name), "invalid C# identifier");
 
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -19,7 +20,11 @@ namespace Rudine.Web.Util
             PropertyType = type;
         }
 
-        public string Name { get; private set; }
+        public CompositeProperty()
+        {
+        }
+
+        public string Name { get; set; }
 
         public Type PropertyType { get; set; }
     }

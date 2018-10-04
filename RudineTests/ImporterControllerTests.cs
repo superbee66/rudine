@@ -3,7 +3,6 @@ using Rudine.Web;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Rudine.Template.Filesystem;
 using Rudine.Web.Util;
 
 namespace Rudine.Tests
@@ -21,8 +20,8 @@ namespace Rudine.Tests
 
             Assert.AreEqual(0, DocExchange.Instance.List(new List<string> { nameof(DocRev) }).Count());
 
-            new DirectoryInfo(FilesystemTemplateController.DirectoryPath).rmdir();
-            var dir = new DirectoryInfo(FilesystemTemplateController.DirectoryPath).mkdir();
+            new DirectoryInfo(ImporterController.DirectoryPath).rmdir();
+            var dir = new DirectoryInfo(ImporterController.DirectoryPath).mkdir();
 
             File.WriteAllBytes(dir.FullName + "\\" + nameof(Properties.Resources.BaseLineInfoPath2013) + "." + Properties.Resources.BaseLineInfoPath2013_Extension, Properties.Resources.BaseLineInfoPath2013);
 

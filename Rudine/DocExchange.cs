@@ -7,7 +7,6 @@ using Rudine.Interpreters;
 using Rudine.Storage.Docdb;
 using Rudine.Storage.Sql;
 using Rudine.Template;
-using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Web;
 using Rudine.Web.Util;
@@ -16,19 +15,53 @@ namespace Rudine
 {
     public class DocExchange : BaseDocController, IDocKnownTypes
     {
-        private SqlController SqlController = new SqlController();
-        internal static readonly LuceneController LuceneController = new LuceneController();
         internal static readonly Lazy<DocExchange> _Instance = new Lazy<DocExchange>(() => new DocExchange());
+        internal static readonly LuceneController LuceneController = new LuceneController();
+        private readonly SqlController SqlController = new SqlController();
 
         /// <summary>
         ///     singleton instance safe for multithreading
         /// </summary>
         public static DocExchange Instance => _Instance.Value;
 
+        /// <summary>
+        ///     string of Types that template (DocRev sources) presents in ~/doc/*
+        /// </summary>
+        /// <returns>current DocTypeNames known to this system</returns>
+        public List<string> DocTypeNames() =>
+            DocTypeServedItems()
+                .Select(typ => typ.Name)
+                .ToList();
+
+        /// <summary>
+        ///     Types that can be actively served via WCF as "new" documents. There types must have a folder representation in the
+        ///     file system. This list is cached internally. Before the list is constructed models and other contents are processed
+        ///     & imported to the docdb database.
+        /// </summary>
+        /// <returns>current DocTypeNames known to this system</returns>
+        public List<Type> DocTypeServedItems()
+        {
+            ImporterController.SyncTemplates(this);
+            Dictionary<string, Type> doctypeserveddic = new Dictionary<string, Type>();
+
+            foreach (LightDoc lightdoc in List(
+                    new List<string> {DocRev.MyOnlyDocName})
+                .OrderByDescending(lightDoc => new Version(lightDoc.GetTargetDocVer())))
+                if (!doctypeserveddic.ContainsKey(lightdoc.GetTargetDocName()))
+                    doctypeserveddic[lightdoc.GetTargetDocName()] = Runtime.ActivateBaseDocType(lightdoc.GetTargetDocName(), lightdoc.GetTargetDocVer(), this);
+
+            return doctypeserveddic.Values.ToList();
+        }
+
+        /// <summary>
+        /// Consumed by WSDL factory to force a restart when a DocRev is submitted
+        /// </summary>
+        internal static event EventHandler<SubmissionReceivedEventArgs> AfterSubmit;
+
         public override List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null) =>
             LuceneController.Audit(DocTypeName, DocId, RelayUrl);
 
-        public override BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null) { return Create(Doc, RelayUrl, true); }
+        public override BaseDoc Create(BaseDoc Doc, Dictionary<string, string> DocKeys, string RelayUrl = null) => Create(Doc, RelayUrl, true);
 
         /// <summary>
         ///     Creates a new instance of the Doc parameter's type passed; merged/automapped/overlayed with another instance of
@@ -57,60 +90,25 @@ namespace Rudine
         }
 
         public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null) =>
-            (DocRev)Create(DocInterpreter.Instance.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields), null, false);
-
-        /// <summary>
-        ///     string of Types that template (DocRev sources) presents in ~/doc/*
-        /// </summary>
-        /// <returns>current DocTypeNames known to this system</returns>
-        public List<string> DocTypeNames() =>
-            DocTypeServedItems()
-                .Select(typ => typ.Name)
-                .ToList();
-
-        /// <summary>
-        ///     Types that can be actively served via WCF as "new" documents. There types must have a folder representation in the
-        ///     file system. This list is cached internally. Before the list is constructed models and other contents are processed
-        ///     & imported to the docdb database.
-        /// </summary>
-        /// <returns>current DocTypeNames known to this system</returns>
-        public List<Type> DocTypeServedItems()
-        {
-            ImporterController.SyncTemplates(this);
-            Dictionary<string, Type> doctypeserveddic = new Dictionary<string, Type>();
-
-            foreach (LightDoc lightdoc in List(
-                    new List<string> { DocRev.MyOnlyDocName })
-                .OrderByDescending(lightDoc => new Version(lightDoc.GetTargetDocVer())))
-                if (!doctypeserveddic.ContainsKey(lightdoc.GetTargetDocName()))
-                    doctypeserveddic[lightdoc.GetTargetDocName()] = Runtime.ActivateBaseDocType(lightdoc.GetTargetDocName(), lightdoc.GetTargetDocVer(), this);
-
-            return doctypeserveddic.Values.ToList();
-        }
+            (DocRev) Create(DocInterpreter.Instance.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields), null, false);
 
         public override BaseDoc Get(string DocTypeName, Dictionary<string, string> DocKeys = null, string DocId = null, string RelayUrl = null) =>
             LuceneController.Get(DocTypeName, DocKeys, DocId, RelayUrl);
 
-        public override DocTypeInfo Info(string DocTypeName)
+        public override DocTypeInfo Info(string DocTypeName) => new DocTypeInfo
         {
-            return new DocTypeInfo
-            {
-                //   DocTypeName = DocTypeName,
-                // DocTypeVer = TemplateController.Instance.TopDocRev(DocTypeName),
-                Description = DocInterpreter.Instance.GetDescription(DocTypeName)
-                //TODO:source IsSignable from DocDataInterpreter.Instance
-                //IsSignable = DocInterpreter.Instance.Create(DocTypeName).IsSignable()
-            };
-        }
+            //   DocTypeName = DocTypeName,
+            // DocTypeVer = TemplateController.Instance.TopDocRev(DocTypeName),
+            Description = DocInterpreter.Instance.GetDescription(DocTypeName)
+            //TODO:source IsSignable from DocDataInterpreter.Instance
+            //IsSignable = DocInterpreter.Instance.Create(DocTypeName).IsSignable()
+        };
 
         public override List<ContentInfo> Interpreters() =>
             DocInterpreter.ContentInterpreterInstances.Select(m => m.ContentInfo).ToList();
 
-        public override List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null)
-        {
-            return List_With_DocSrc(DocTypeNames, DocKeys, DocProperties, KeyWord, PageSize, PageIndex, RelayUrl)
-                .ToList();
-        }
+        public override List<LightDoc> List(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null) => List_With_DocSrc(DocTypeNames, DocKeys, DocProperties, KeyWord, PageSize, PageIndex, RelayUrl)
+            .ToList();
 
         private static IEnumerable<LightDoc> List_With_DocSrc(List<string> DocTypeNames, Dictionary<string, List<string>> DocKeys = null, Dictionary<string, List<string>> DocProperties = null, string KeyWord = null, int PageSize = 150, int PageIndex = 0, string RelayUrl = null)
         {
@@ -171,24 +169,17 @@ namespace Rudine
             // DOCREVs are only submitted via Text, there is no need to worry about them enter the system in another fusion. 
             if (_LightDoc.DocTypeName != DocRev.MyOnlyDocName)
                 SqlController.SubmitBytes(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(TargetDocVer))
-                    // if the DocRev submitted supersedes the current or this is no current..
-                    if (!Version.TryParse(TemplateController.Instance.TopDocRev(TargetDocName), out existingVersion) || Version.Parse(TargetDocVer) >= existingVersion)
-                        // if there is no representation of this DocRev as a directory in the file system (as this trumps the submitted one no matter what
-                        // notice the true parameter value to clear the cache as well as assert we have the correct DocRev in the system now
-                        if (Directory.Exists(ImporterController.GetDocDirectoryPath(TargetDocName))
-                            ||
-                            TemplateController.Instance.TopDocRev(TargetDocName, true) != TargetDocVer)
-                            throw new PocosImportException();
-            }
 
+            AfterSubmit?.Invoke(this, new SubmissionReceivedEventArgs(_LightDoc));
             return _LightDoc;
         }
 
-        public override LightDoc SubmitDoc(BaseDoc DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null) =>
-            SubmitStream(DocInterpreter.Instance.WriteStream(DocData, true), SubmittedByEmail, SubmittedDate, RelayUrl, DocStatus, DocKeys, DocTitle);
+        public override LightDoc SubmitDoc(BaseDoc DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
+        {
+            LightDoc _LightDoc = SubmitStream(DocInterpreter.Instance.WriteStream(DocData, true), SubmittedByEmail, SubmittedDate, RelayUrl, DocStatus, DocKeys, DocTitle);
+            AfterSubmit?.Invoke(this, new SubmissionReceivedEventArgs(_LightDoc));
+            return _LightDoc;
+        }
 
         public override LightDoc SubmitText(string DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
         {
@@ -201,6 +192,7 @@ namespace Rudine
             if (_LightDoc.DocTypeName != DocRev.MyOnlyDocName)
                 SqlController.SubmitText(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
+            AfterSubmit?.Invoke(this, new SubmissionReceivedEventArgs(_LightDoc));
             return _LightDoc;
         }
 

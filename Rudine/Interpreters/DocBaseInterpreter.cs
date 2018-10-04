@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using Rudine.Template;
-using Rudine.Template.Filesystem;
 using Rudine.Util;
 using Rudine.Util.Xsds;
 using Rudine.Web;
@@ -62,7 +61,7 @@ namespace Rudine.Interpreters
                         .Replace(basePath, "")
                         .TrimEnd('/')
                     : _uri.AbsoluteUri,
-                FilesystemTemplateController.DirectoryName,
+                new DirectoryInfo(ImporterController.DirectoryPath).Name.ToLower(),
                 DocTypeName,
                 solutionVersion,
                 DocInterpreter.Instance.HrefVirtualFilename(DocTypeName, solutionVersion))).ToString();

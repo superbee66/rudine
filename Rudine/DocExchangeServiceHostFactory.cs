@@ -4,14 +4,16 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Description;
-using Rudine.Template.Filesystem;
+using Rudine.Exceptions;
+using Rudine.Template;
+using Rudine.Web;
 using Rudine.Web.Util;
 
 namespace Rudine
 {
     /// <summary>
     ///     Closes the DocExchange ServiceHost & clears all MemoryCache when any changes occur in the
-    ///     FilesystemTemplateController.DirectoryPath. The files within that directory influence  This is similar behavior at
+    ///     ImporterController.DirectoryPath. The files within that directory influence  This is similar behavior at
     ///     someone editing files in the IIS App_Code directory triggering IIS to recompile. the ServiceKnownType list for our
     ///     ServiceHost.
     /// </summary>
@@ -23,7 +25,7 @@ namespace Rudine
         private static readonly FileSystemWatcher[] _FileSystemWatchers =
             new[]
                 {
-                    FilesystemTemplateController.DirectoryPath,
+                    ImporterController.DirectoryPath,
                     Directory.Exists(RequestPaths.GetPhysicalApplicationPath("App_Code"))
                         ? RequestPaths.GetPhysicalApplicationPath("App_Code")
                         : string.Empty
@@ -61,6 +63,13 @@ namespace Rudine
                 _FileSystemWatcher.Created += (o, args) => Reset(_ServiceHost);
                 _FileSystemWatcher.Deleted += (o, args) => Reset(_ServiceHost);
                 _FileSystemWatcher.Renamed += (o, args) => Reset(_ServiceHost);
+                // reset when new DocRev(s) are submitted also
+                DocExchange.AfterSubmit += (o, args) =>
+                {
+                    if (!string.IsNullOrEmpty(args.LightDoc.GetTargetDocVer()) 
+                        && TemplateController.Instance.TopDocRev(args.LightDoc.GetTargetDocName(), true) == args.LightDoc.GetTargetDocVer())
+                        Reset(_ServiceHost);
+                };
 
                 _FileSystemWatcher.EnableRaisingEvents = true;
             }

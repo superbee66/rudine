@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 
 namespace Rudine.Template
@@ -7,5 +8,7 @@ namespace Rudine.Template
         MemoryStream OpenRead(string DocTypeName, string DocRev, string filename);
 
         string TopDocRev(string DocTypeName);
+
+        Dictionary<string, System.Version> TopDocRevs();
     }
 }
