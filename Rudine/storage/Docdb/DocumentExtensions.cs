@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +5,6 @@ using System.Reflection;
 using IFilterTextReader;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using Newtonsoft.Json;
 using Rudine.Interpreters;
 using Rudine.Util;
 using Rudine.Util.Zips;
@@ -22,7 +20,7 @@ namespace Rudine.Storage.Docdb
 
         /// <summary>
         ///     Utilizes IFilterTextReader to extract text from document when possible. If this can't be achieved the BaseDoc is
-        ///     simply serialized to json and that is used for the full text indexing. IFilter capabilities 
+        ///     simply serialized to json and that is used for the full text indexing. IFilter capabilities
         /// </summary>
         /// <param name="_DocSubmissions"></param>
         /// <returns></returns>
@@ -59,8 +57,7 @@ namespace Rudine.Storage.Docdb
 
                 // searches items returned will in reverse chronological order
                 _Document.Add(new Field(Parm.LogSequenceNumber,
-                    string.Format("{0}",
-                        _LightDoc.LogSequenceNumber),
+                    string.Format("{0}", _LightDoc.LogSequenceNumber),
                     Field.Store.YES,
                     Field.Index.NOT_ANALYZED));
 
@@ -88,18 +85,9 @@ namespace Rudine.Storage.Docdb
                             _FileTypeFileInfo.Extension,
                             false,
                             true))
-                        {
                             _Text += _FilterReader.ReadToEnd();
-                        }
                     else
-                        _Text += JsonConvert.SerializeObject(
-                            _BaseDoc,
-                            Formatting.Indented,
-                            new JsonSerializerSettings
-                            {
-                                ContractResolver = ShouldSerializeContractResolver.Instance,
-                                DefaultValueHandling = DefaultValueHandling.Ignore
-                            });
+                        _Text += Serialize.Json.Serialize(_BaseDoc);
 
                     _IFilterSourceMemoryStream.Close();
                     _IFilterSourceMemoryStream.Dispose();

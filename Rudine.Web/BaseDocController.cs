@@ -13,7 +13,6 @@ namespace Rudine.Web
     {
         protected BaseDocController()
         {
-            ImporterController.SyncTemplates(this);
         }
 
         public abstract List<LightDoc> Audit(string DocTypeName, string DocId, string RelayUrl = null);

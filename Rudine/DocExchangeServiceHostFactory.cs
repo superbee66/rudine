@@ -4,7 +4,6 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Description;
-using Rudine.Exceptions;
 using Rudine.Template;
 using Rudine.Web;
 using Rudine.Web.Util;
@@ -32,17 +31,17 @@ namespace Rudine
                 }
                 .Where(Directory.Exists)
                 .Select(path =>
-                            new FileSystemWatcher(new DirectoryInfo(path).mkdir().FullName)
-                            {
-                                EnableRaisingEvents = false,
-                                IncludeSubdirectories = true,
-                                NotifyFilter = NotifyFilters.CreationTime |
-                                               NotifyFilters.DirectoryName |
-                                               NotifyFilters.FileName |
-                                               NotifyFilters.LastWrite |
-                                               NotifyFilters.Size,
-                                Filter = "*.*"
-                            }).ToArray();
+                    new FileSystemWatcher(new DirectoryInfo(path).mkdir().FullName)
+                    {
+                        EnableRaisingEvents = false,
+                        IncludeSubdirectories = true,
+                        NotifyFilter = NotifyFilters.CreationTime |
+                                       NotifyFilters.DirectoryName |
+                                       NotifyFilters.FileName |
+                                       NotifyFilters.LastWrite |
+                                       NotifyFilters.Size,
+                        Filter = "*.*"
+                    }).ToArray();
 
         /// <summary>
         ///     tell filesystemwatcher to start monitoring & adds the Reset event listener in order to react to those events
@@ -54,8 +53,8 @@ namespace Rudine
         {
             ServiceHost _ServiceHost = base.CreateServiceHost(serviceType, baseAddresses);
 
-            foreach (ServiceMetadataBehavior behavior in _ServiceHost.Description.Behaviors.OfType<ServiceMetadataBehavior>())
-                behavior.MetadataExporter = new DocExchangeWsdlExporter();
+            foreach (ServiceMetadataBehavior _ServiceMetadataBehavior in _ServiceHost.Description.Behaviors.OfType<ServiceMetadataBehavior>())
+                _ServiceMetadataBehavior.MetadataExporter = new DocExchangeWsdlExporter();
 
             foreach (FileSystemWatcher _FileSystemWatcher in _FileSystemWatchers)
             {
@@ -63,16 +62,18 @@ namespace Rudine
                 _FileSystemWatcher.Created += (o, args) => Reset(_ServiceHost);
                 _FileSystemWatcher.Deleted += (o, args) => Reset(_ServiceHost);
                 _FileSystemWatcher.Renamed += (o, args) => Reset(_ServiceHost);
-                // reset when new DocRev(s) are submitted also
-                DocExchange.AfterSubmit += (o, args) =>
-                {
-                    if (!string.IsNullOrEmpty(args.LightDoc.GetTargetDocVer()) 
-                        && TemplateController.Instance.TopDocRev(args.LightDoc.GetTargetDocName(), true) == args.LightDoc.GetTargetDocVer())
-                        Reset(_ServiceHost);
-                };
-
                 _FileSystemWatcher.EnableRaisingEvents = true;
             }
+
+            // reset when new DocRev(s) are submitted also
+            DocExchange.AfterSubmit += (o, args) =>
+            {
+                // utilize fileSystemWatcher.EnableRaisingEvents as the flag for this event also as it keep Reset() from being called repetitively
+                if (_FileSystemWatchers.Any(fileSystemWatcher => fileSystemWatcher.EnableRaisingEvents)
+                    && !string.IsNullOrEmpty(args.LightDoc.GetTargetDocVer())
+                    && TemplateController.Instance.TopDocRev(args.LightDoc.GetTargetDocName(), true) == args.LightDoc.GetTargetDocVer())
+                    Reset(_ServiceHost);
+            };
 
             return _ServiceHost;
         }
@@ -81,19 +82,18 @@ namespace Rudine
         ///     force servicehost to rebuild & clear out all caches when something changes on the filesystem
         /// </summary>
         /// <param name="_FileSystemWatcher">Disposes of</param>
-        /// <param name="_ServiceHost">Closes</param>
-        private static void Reset(ICommunicationObject _ServiceHost)
+        /// <param name="serviceHost">Closes</param>
+        private static void Reset(ICommunicationObject serviceHost)
         {
-            // don't need to listen to events now that it's known something has changed, this will be Enabled again with someone taps the CreateServiceHost
-            foreach (FileSystemWatcher _FileSystemWatcher in _FileSystemWatchers)
-                _FileSystemWatcher.EnableRaisingEvents = false;
+            if (serviceHost.State != CommunicationState.Closed && serviceHost.State != CommunicationState.Closing && serviceHost.State != CommunicationState.Faulted)
+            {
+                // don't need to listen to events now that it's known something has changed, this will be Enabled again with someone taps the CreateServiceHost
+                foreach (FileSystemWatcher _FileSystemWatcher in _FileSystemWatchers)
+                    _FileSystemWatcher.EnableRaisingEvents = false;
 
-            if (_ServiceHost.State != CommunicationState.Closed)
-                if (_ServiceHost.State != CommunicationState.Closing)
-                    if (_ServiceHost.State != CommunicationState.Faulted)
-                        _ServiceHost.Close();
-
-            CacheMan.Clear();
+                serviceHost.Close();
+                CacheMan.Clear();
+            }
         }
     }
 }

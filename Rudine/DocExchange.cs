@@ -41,16 +41,13 @@ namespace Rudine
         /// <returns>current DocTypeNames known to this system</returns>
         public List<Type> DocTypeServedItems()
         {
-            ImporterController.SyncTemplates(this);
-            Dictionary<string, Type> doctypeserveddic = new Dictionary<string, Type>();
+            Dictionary<string, Type> _DocTypeServedDictionary = new Dictionary<string, Type>();
 
-            foreach (LightDoc lightdoc in List(
-                    new List<string> {DocRev.MyOnlyDocName})
-                .OrderByDescending(lightDoc => new Version(lightDoc.GetTargetDocVer())))
-                if (!doctypeserveddic.ContainsKey(lightdoc.GetTargetDocName()))
-                    doctypeserveddic[lightdoc.GetTargetDocName()] = Runtime.ActivateBaseDocType(lightdoc.GetTargetDocName(), lightdoc.GetTargetDocVer(), this);
+            foreach (LightDoc _LightDoc in List(new List<string> { DocRev.MyOnlyDocName }).OrderByDescending(lightDoc => new Version(lightDoc.GetTargetDocVer())))
+                if (!_DocTypeServedDictionary.ContainsKey(_LightDoc.GetTargetDocName()))
+                    _DocTypeServedDictionary[_LightDoc.GetTargetDocName()] = Runtime.ActivateBaseDocType(_LightDoc.GetTargetDocName(), _LightDoc.GetTargetDocVer(), this);
 
-            return doctypeserveddic.Values.ToList();
+            return _DocTypeServedDictionary.Values.ToList();
         }
 
         /// <summary>
@@ -90,7 +87,7 @@ namespace Rudine
         }
 
         public override DocRev CreateTemplate(List<DocRevEntry> docFiles, string docTypeName = null, string docRev = null, string schemaXml = null, List<CompositeProperty> schemaFields = null) =>
-            (DocRev) Create(DocInterpreter.Instance.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields), null, false);
+            (DocRev)Create(DocInterpreter.Instance.CreateTemplate(docFiles, docTypeName, docRev, schemaXml, schemaFields), null, false);
 
         public override BaseDoc Get(string DocTypeName, Dictionary<string, string> DocKeys = null, string DocId = null, string RelayUrl = null) =>
             LuceneController.Get(DocTypeName, DocKeys, DocId, RelayUrl);
@@ -154,18 +151,12 @@ namespace Rudine
         public override LightDoc SubmitBytes(byte[] DocData, string SubmittedByEmail, DateTime? SubmittedDate = null, string RelayUrl = null, bool? DocStatus = null, Dictionary<string, string> DocKeys = null, string DocTitle = null)
         {
             // validate the content against it's XSD if it's being "approved" as good captured information for the organization
-            // now is a good time to do this as the exception we want the user to see first would have hacazd there chance
+            // now is a good time to do this as the exception we want the user to see first would have hazard there chance
             DocInterpreter.Instance.Validate(DocData);
             DocData = ProcessPI(DocData, SubmittedByEmail, DocStatus, SubmittedDate, DocKeys, DocTitle);
 
             LightDoc _LightDoc = LuceneController.SubmitBytes(DocData);
 
-            string
-                TargetDocName = _LightDoc.GetTargetDocName(),
-                TargetDocVer = _LightDoc.GetTargetDocVer();
-
-            //#if !FAST
-            Version existingVersion;
             // DOCREVs are only submitted via Text, there is no need to worry about them enter the system in another fusion. 
             if (_LightDoc.DocTypeName != DocRev.MyOnlyDocName)
                 SqlController.SubmitBytes(DocData, SubmittedByEmail, RelayUrl, DocStatus, SubmittedDate, DocKeys, DocTitle);

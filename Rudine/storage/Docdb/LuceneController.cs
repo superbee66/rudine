@@ -268,16 +268,11 @@ namespace Rudine.Storage.Docdb
             Dictionary<string, List<string>> _RequiredDocKeys = new Dictionary<string, List<string>>();
 
             foreach (KeyValuePair<string, string> _Item in DocKeyEncrypter.DocIdToKeys(DocId))
-                _RequiredDocKeys[_Item.Key] = new List<string>
-                {
-                    _Item.Value
-                };
+                _RequiredDocKeys[_Item.Key] = new List<string> { _Item.Value };
 
             //TODO:GetDoc needs to query by the exact key, not that a subset of DocKeys exist
-            Document _Document = ListDocuments(new List<string>
-                {
-                    DocTypeName
-                },
+            Document _Document = ListDocuments(
+                new List<string> { DocTypeName },
                 _RequiredDocKeys,
                 null,
                 null,

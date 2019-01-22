@@ -33,7 +33,11 @@ namespace Rudine.Web
 
         public List<DocRevEntry> DocFiles { get; set; }
 
-        public string DocFilesMD5 => DocFilesMD5Calc(DocFiles);
+        public string DocFilesMD5
+        {
+            get { return DocFilesMD5Calc(DocFiles); }
+            set { }
+        }
 
         public static string DocFilesMD5Calc(List<DocRevEntry> docFiles)
         {

@@ -91,7 +91,6 @@
     <Compile Include="BaseDoc.cs" />
     <Compile Include="BaseDocController.cs" />
     <Compile Include="DocKey.cs" />
-    <Compile Include="DocKnownTypesProber.cs" />
     <Compile Include="DocProcessingInstructions.cs" />
     <Compile Include="DocRev.cs" />
     <Compile Include="DocRevDateTimeExtension.cs" />
