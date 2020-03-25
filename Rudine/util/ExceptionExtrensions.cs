@@ -15,7 +15,7 @@ namespace Rudine.Util
                     property.Name,
                     Value = property.GetValue(exception, null)
                 })
-                .Select(x => string.Format(
+                .Select(x => string.Format(System.Globalization.CultureInfo.InvariantCulture,
                             "{0} = {1}",
                             x.Name,
                             x.Value?.ToString() ?? string.Empty

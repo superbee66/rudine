@@ -103,7 +103,7 @@ namespace Rudine.Web.Util
                                                                 ^
                                                                 m.MergeFactors.IsArray.GetHashCode()
                     ).Distinct().Count())
-                    throw new Exception(String.Format("{0} as the target Name for a new PropertyType can't be created. Merging between collection, enum & primitive (vs non) Types is not supported", MergeName));
+                    throw new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0} as the target Name for a new PropertyType can't be created. Merging between collection, enum & primitive (vs non) Types is not supported", MergeName));
 
                 var MergeFactors = PropertiesByName[MergeName].Select(m => m.MergeFactors).First();
 

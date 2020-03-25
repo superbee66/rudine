@@ -537,7 +537,7 @@ namespace Rudine.Web.Util
 
         public override string ToString()
         {
-            return string.Format(Res.ParseExceptionFormat,
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture,Res.ParseExceptionFormat,
                 Message,
                 position);
         }
@@ -1704,7 +1704,7 @@ namespace Rudine.Web.Util
 
         private Exception ParseError(int pos, string format, params object[] args)
         {
-            return new ParseException(string.Format(CultureInfo.CurrentCulture,
+            return new ParseException(string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     format,
                     args),
                 pos);

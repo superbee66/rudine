@@ -84,7 +84,7 @@ namespace Rudine.Storage.Sql
         }
 
 
-        private static string DocModelMergeCountIdent(string DocTypeName) => string.Format(
+        private static string DocModelMergeCountIdent(string DocTypeName) => string.Format(System.Globalization.CultureInfo.InvariantCulture,
             "DocModelMergeCount_{0}",
             SqlKnownDocTypes.ContainsKey(DocTypeName)
                 ? SqlKnownDocTypes[DocTypeName].Count()
@@ -157,7 +157,7 @@ namespace Rudine.Storage.Sql
 
             docKeyMatchSQL = docKeyFilters.Count == 0
                 ? string.Empty
-                : string.Format(
+                : string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     @"        
                     SELECT TOP 1 Id
                     FROM   {0}.{1}

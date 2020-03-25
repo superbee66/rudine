@@ -36,7 +36,7 @@ namespace Rudine.Util
                 LoadBinDlls();
 
             Type t = GetType(
-                string.Format("{0}.{1}", typeNamespace, typeName).Trim('.'),
+                string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.{1}", typeNamespace, typeName).Trim('.'),
                 string.IsNullOrWhiteSpace(assemblyName)
                     ? null
                     : AppDomain.CurrentDomain.GetAssemblies()

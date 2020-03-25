@@ -300,12 +300,12 @@ namespace Rudine.Storage.Sql.Reverser
                     Type clrType = _ef.UnderlyingClrType(typeUsage.EdmType);
                     string typeName = typeUsage.EdmType is EnumType ? Escape(typeUsage.EdmType.Name) : Escape(clrType);
                     if (clrType.IsValueType && _ef.IsNullable(typeUsage))
-                        return String.Format(CultureInfo.InvariantCulture, "Nullable<{0}>", typeName);
+                        return string.Format(System.Globalization.CultureInfo.InvariantCulture, "Nullable<{0}>", typeName);
 
                     return typeName;
                 }
                 if (typeUsage.EdmType is CollectionType)
-                    return String.Format(CultureInfo.InvariantCulture, "ICollection<{0}>", Escape(((CollectionType) typeUsage.EdmType).TypeUsage));
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "ICollection<{0}>", Escape(((CollectionType) typeUsage.EdmType).TypeUsage));
 
                 throw new ArgumentException("typeUsage");
             }
@@ -540,7 +540,7 @@ namespace Rudine.Storage.Sql.Reverser
             ///     Returns false and shows an error if the supplied type names aren't case-insensitively unique,
             ///     otherwise returns true.
             /// </summary>
-            public bool VerifyCaseInsensitiveTypeUniqueness(IEnumerable<string> types, string sourceFile) { return VerifyCaseInsensitiveUniqueness(types, t => string.Format(CultureInfo.CurrentCulture, GetResourceString("Template_CaseInsensitiveTypeConflict"), t), sourceFile); }
+            public bool VerifyCaseInsensitiveTypeUniqueness(IEnumerable<string> types, string sourceFile) { return VerifyCaseInsensitiveUniqueness(types, t => string.Format(System.Globalization.CultureInfo.InvariantCulture, GetResourceString("Template_CaseInsensitiveTypeConflict"), t), sourceFile); }
 
             /// <summary>
             ///     Returns false and shows an error if the supplied strings aren't case-insensitively unique,
@@ -598,24 +598,24 @@ namespace Rudine.Storage.Sql.Reverser
                 if (type.IsEnum)
                     return type.FullName + "." + value;
                 if (type == typeof (Guid))
-                    return string.Format(CultureInfo.InvariantCulture, "new Guid(\"{0}\")",
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "new Guid(\"{0}\")",
                         ((Guid) value).ToString("D", CultureInfo.InvariantCulture));
                 if (type == typeof (DateTime))
-                    return string.Format(CultureInfo.InvariantCulture, "new DateTime({0}, DateTimeKind.Unspecified)",
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "new DateTime({0}, DateTimeKind.Unspecified)",
                         ((DateTime) value).Ticks);
                 if (type == typeof (byte[]))
                 {
                     string arrayInit = string.Join(", ", ((byte[]) value).Select(b => b.ToString(CultureInfo.InvariantCulture)).ToArray());
-                    return string.Format(CultureInfo.InvariantCulture, "new Byte[] {{{0}}}", arrayInit);
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "new Byte[] {{{0}}}", arrayInit);
                 }
                 if (type == typeof (DateTimeOffset))
                 {
                     DateTimeOffset dto = (DateTimeOffset) value;
-                    return string.Format(CultureInfo.InvariantCulture, "new DateTimeOffset({0}, new TimeSpan({1}))",
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "new DateTimeOffset({0}, new TimeSpan({1}))",
                         dto.Ticks, dto.Offset.Ticks);
                 }
                 if (type == typeof (TimeSpan))
-                    return string.Format(CultureInfo.InvariantCulture, "new TimeSpan({0})",
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "new TimeSpan({0})",
                         ((TimeSpan) value).Ticks);
 
                 CodePrimitiveExpression expression = new CodePrimitiveExpression(value);
@@ -714,7 +714,7 @@ namespace Rudine.Storage.Sql.Reverser
 
                 CollectionType collectionType = edmType as CollectionType;
                 if (collectionType != null)
-                    return String.Format(CultureInfo.InvariantCulture, "ICollection<{0}>", GetTypeName(collectionType.TypeUsage, modelNamespace));
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture, "ICollection<{0}>", GetTypeName(collectionType.TypeUsage, modelNamespace));
 
                 // Try to get an external type name, and if that is null, then try to get escape the name from metadata,
                 // possibly namespace-qualifying it.
@@ -737,7 +737,7 @@ namespace Rudine.Storage.Sql.Reverser
                         typeName = Escape(clrType);
 
                     return clrType.IsValueType && isNullable == true ?
-                               String.Format(CultureInfo.InvariantCulture, "Nullable<{0}>", typeName) :
+                               string.Format(System.Globalization.CultureInfo.InvariantCulture, "Nullable<{0}>", typeName) :
                                typeName;
                 }
 

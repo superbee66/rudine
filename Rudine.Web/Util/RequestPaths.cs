@@ -62,7 +62,7 @@ namespace Rudine.Web.Util
 
         public static string GetPhysicalApplicationPath(params string[] name)
         {
-            return string.Format(
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture,
                 @"{0}\{1}",
                 PhysicalApplicationPath.TrimEnd('\\'),
                 string.Join(@"\", name).TrimEnd('\\'));

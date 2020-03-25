@@ -38,7 +38,7 @@ namespace Rudine
                         ^ _BaseDocType.Namespace.GetHashCode()
                         ^ WindowsIdentity.GetCurrent().User.Value.GetHashCode()); // just in case the user changes due to an apppool change
 
-                    string tempDataContractXsdPath = string.Format("{0}\\{1}.xsd", Path.GetTempPath(), Base36.Encode(key));
+                    string tempDataContractXsdPath = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}\\{1}.xsd", Path.GetTempPath(), Base36.Encode(key));
 
                     if (!File.Exists(tempDataContractXsdPath))
                     {

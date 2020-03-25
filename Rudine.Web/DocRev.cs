@@ -21,9 +21,9 @@ namespace Rudine.Web
         public const string KeyPart1 = "TargetDocTypeName";
         public const string KeyPart2 = "TargetDocTypeVer";
 
-        public static readonly string ManifestFileName = String.Format("{0}.json", nameof(DocURN));
-        public static readonly string SchemaFileName = String.Format("{0}.xsd", nameof(DocSchema));
-        public static readonly string PIFileName = String.Format("{0}.json", nameof(DocProcessingInstructions));
+        public static readonly string ManifestFileName = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}.json", nameof(DocURN));
+        public static readonly string SchemaFileName = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.xsd", nameof(DocSchema));
+        public static readonly string PIFileName = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.json", nameof(DocProcessingInstructions));
 
         /// <summary>
         /// these files are not a factor when calculating DocFilesMD5 as they are system generated
@@ -118,7 +118,7 @@ namespace Rudine.Web
 
         private static Exception PropertyValueException(string propertyName)
         {
-            return new Exception(String.Format(
+            return new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,
                 @"{0} {1} values are system managed",
                 nameof(DocRev),
                 propertyName));

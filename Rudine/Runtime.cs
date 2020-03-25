@@ -143,16 +143,16 @@ namespace Rudine
                 // it was unknown at them time of this writing 
                 if (!string.IsNullOrWhiteSpace(CompileCSharpCodeDefaultOutDirectory))
                 {
-                    _CompilerParameters.OutputAssembly = string.Format(
+                    _CompilerParameters.OutputAssembly = string.Format(System.Globalization.CultureInfo.InvariantCulture,
                         "{0}\\{1}{2}.dll",
                         CompileCSharpCodeDefaultOutDirectory,
                         string.IsNullOrWhiteSpace(OutputName)
                             ? string.Empty
-                            : string.Format("{0}.", FileSystem.CleanFileName(OutputName)),
+                            : string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.", FileSystem.CleanFileName(OutputName)),
                         Base36.Encode(key));
 
                     if (_CompilerParameters.OutputAssembly.Length > 250)
-                        _CompilerParameters.OutputAssembly = string.Format("{0}\\{1}{2}.dll", CompileCSharpCodeDefaultOutDirectory, string.Empty, Base36.Encode(key));
+                        _CompilerParameters.OutputAssembly = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}\\{1}{2}.dll", CompileCSharpCodeDefaultOutDirectory, string.Empty, Base36.Encode(key));
                 }
 
                 if (File.Exists(_CompilerParameters.OutputAssembly))
@@ -187,7 +187,7 @@ namespace Rudine
                                     if (Directory.Exists(DirectoryName))
                                         foreach (FileInfo _FileInfo in USING_NAMESPACES
                                             .Values
-                                            .Select(FileName => String.Format(@"{0}\\{1}", DirectoryName, FileName))
+                                            .Select(FileName => string.Format(System.Globalization.CultureInfo.InvariantCulture,@"{0}\\{1}", DirectoryName, FileName))
                                             .Where(FilePath => File.Exists(FilePath))
                                             .Select(FilePath => new FileInfo(FilePath))
                                             .Where(_FileInfo => !ReferenceAssembliesDic.ContainsKey(_FileInfo.Name.ToLower())))
@@ -216,7 +216,7 @@ namespace Rudine
                             {
                                 _DirectoryInfo = new DirectoryInfo(
                                     RequestPaths
-                                        .GetPhysicalApplicationPath(FOLDER_FOR_COMPILE_TEMPORARY_FILES, string.Format("{0}_{1}", Base36.Encode(key), i++)));
+                                        .GetPhysicalApplicationPath(FOLDER_FOR_COMPILE_TEMPORARY_FILES, string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}_{1}", Base36.Encode(key), i++)));
 
                                 try
                                 {
@@ -235,7 +235,7 @@ namespace Rudine
 
                             CSharpCodeProvider.CompileAssemblyFromSource(_CompilerParameters, cSharpCode);
 
-                            throw new Exception(string.Format("\"{0}\" Contains runtime the intermediate files of a runtime build (compile) that failed.", _DirectoryInfo.FullName));
+                            throw new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,"\"{0}\" Contains runtime the intermediate files of a runtime build (compile) that failed.", _DirectoryInfo.FullName));
                         }
                     }
                 }
@@ -274,7 +274,7 @@ namespace Rudine
             if (PrimaryTypeAppliedInterfaces == null || PrimaryTypeAppliedInterfaces.Length == 0)
                 PrimaryTypeAppliedInterfaces = new[] { nameof(IDocIdentifiers) };
 
-            string ApplyToPrimaryClass = string.Format("{0}", string.Join(", ", new[]
+            string ApplyToPrimaryClass = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", string.Join(", ", new[]
             {
                 PrimaryTypeParentType.Name
             }.Union(PrimaryTypeAppliedInterfaces)));
@@ -286,7 +286,7 @@ namespace Rudine
                 SecondaryTypesAppliedInterfaces = new string[]
                     { };
 
-            string ApplyToSecondayClasses = string.Format("{0}", string.Join(", ", new[]
+            string ApplyToSecondayClasses = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", string.Join(", ", new[]
             {
                 SecondaryTypeParentType.Name
             }.Union(SecondaryTypesAppliedInterfaces)));
@@ -307,9 +307,9 @@ namespace Rudine
             // add a Nullable variable type for each of the IgnoreDataTypePropertiesMapped defined
             foreach (string type in IgnoreDataTypePropertiesMapped.ToArray())
             {
-                IgnoreDataTypePropertiesMapped.Add(string.Format("System.Nullable<{0}>", type));
-                IgnoreDataTypePropertiesMapped.Add(string.Format("System.Nullable<{0}>[]", type));
-                IgnoreDataTypePropertiesMapped.Add(string.Format("{0}[]", type));
+                IgnoreDataTypePropertiesMapped.Add(string.Format(System.Globalization.CultureInfo.InvariantCulture,"System.Nullable<{0}>", type));
+                IgnoreDataTypePropertiesMapped.Add(string.Format(System.Globalization.CultureInfo.InvariantCulture,"System.Nullable<{0}>[]", type));
+                IgnoreDataTypePropertiesMapped.Add(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}[]", type));
             }
 
             // convert aliases specifically for byte arrays as the DocRev interface will be looking for byte[]; not Byte90
@@ -323,7 +323,7 @@ namespace Rudine
             cSharpCode = Regex.Replace(
                 cSharpCode,
                 @"([\n\r\s]+)(public)(\s+[^\s]+\s+)(\w+)([\n\r\s]+)(\{)([\n\r\s]+)(get)([\n\r\s]+)(\{)",
-                match => string.Format(
+                match => string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     "{0}[DataMember(Name = \"{1}\", EmitDefaultValue = false)]{2}",
                     match.Groups[1].Value, /* 0 */
                     StringTransform.PrettyCSharpIdent(match.Groups[4].Value), /* 1 */
@@ -386,7 +386,7 @@ namespace Rudine
                 cSharpCode,
                 /**1******2***********************************************3*****************4*************5*******6***************************************7*********/
                 @"(\s+\[)(System\.Xml\.Serialization\.XmlRootAttribute\(|System\.Xml\.Serialization\.XmlTypeAttribute\()(\""[\w]+\"",\s+)?(Namespace="")([^""]*)([^\]]+\]\s+public\s+partial\s+class\s+)([\w_\d]+)",
-                match => string.Format(
+                match => string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     "{1}DataContract(Name = \"{3}\", Namespace = \"{2}\")]{0} : {4}",
                     /*the entire match undivided*/
                     match.Value,
@@ -418,7 +418,7 @@ this is applied to all classes.
             cSharpCode = Regex.Replace(
                 cSharpCode,
                 @"(?<LeadingWhitespace>\s+)(?<ClassModifiers>public\s+partial\s+class\s+)(?<ClassName>[\w_\d]+)(?<InheritanceAndOpenClassBodyCurlyBrace>[\w_\d \{:,]+)",
-                match => string.Format(
+                match => string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     "{0}\n{1}public {2}() {{}}",
                     match.Value,
                     match.Groups["LeadingWhitespace"].Value,
@@ -430,7 +430,7 @@ this is applied to all classes.
                 cSharpCode,
                 /**1****2***************3****4***********5*****6****7*****/
                 @"(\s+)(public|private)(\s+)([\.<>\w_]+)(\[\])(\s+)([^\s]+)",
-                match => string.Format(
+                match => string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     (IgnoreDataTypePropertiesMapped.Any(
                          m => m == match.Groups[4].Value || Regex.IsMatch(match.Groups[4].Value, @"signatures\d+"))
                          ? "{0}"
@@ -449,13 +449,13 @@ this is applied to all classes.
             cSharpCode = cSharpCode.Replace("private System.Xml.XmlElement[]", "[System.NonSerialized] private System.Xml.XmlElement[]");
 
             // add using statements to beginning to top of the document
-            cSharpCode = string.Format("{0}{1}",
+            cSharpCode = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}{1}",
                 string
                     .Join("",
                         USING_NAMESPACES
                             .Keys
                             .OrderBy(ns => ns)
-                            .Select(ns => string.Format("using {0};\n", ns))), cSharpCode);
+                            .Select(ns => string.Format(System.Globalization.CultureInfo.InvariantCulture,"using {0};\n", ns))), cSharpCode);
 
             return cSharpCode;
         }

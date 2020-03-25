@@ -95,14 +95,14 @@ namespace Rudine.Interpreters.Pdf
 
         private static string GetSetDocPIProperty(PdfDocument pdfDocument, string propertyName, object propertyValue = null)
         {
-            string propertyValueAsString = string.Format("{0}", propertyValue);
+            string propertyValueAsString = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", propertyValue);
 
             if (!string.IsNullOrWhiteSpace(propertyValueAsString))
                 pdfDocument.Info.Elements.SetString("/" + propertyName.ToLower(), propertyValueAsString);
 
             //TODO:Research if beta version of PDFSharp is suppose to be wrapping it's property values with ()
             return pdfDocument.Info.Elements.ContainsKey("/" + propertyName.ToLower())
-                       ? string.Format("{0}", pdfDocument.Info.Elements["/" + propertyName.ToLower()]).Trim('(', ')')
+                       ? string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", pdfDocument.Info.Elements["/" + propertyName.ToLower()]).Trim('(', ')')
                        : null;
         }
 
@@ -236,7 +236,7 @@ namespace Rudine.Interpreters.Pdf
                         if (baseDocType.GetProperty(field.NameofCSharpProperty()) != null)
                         {
                             field.Value = new PdfString(
-                                string.Format("{0}",
+                                string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}",
                                     baseDocType.GetProperty(field.NameofCSharpProperty())
                                                .GetValue(source, null)));
                         }

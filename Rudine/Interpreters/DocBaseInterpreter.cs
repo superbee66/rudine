@@ -18,7 +18,7 @@ namespace Rudine.Interpreters
 
         public bool IsReusable => false;
 
-        protected static string AutoFileName(string docTypeName, string fileExtension) { return string.Format("{0}.{1}", GetFilenameDocTypeName(docTypeName), fileExtension); }
+        protected static string AutoFileName(string docTypeName, string fileExtension) { return string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.{1}", GetFilenameDocTypeName(docTypeName), fileExtension); }
 
         protected static string AutoFileNameApply(string docTypeName, List<DocRevEntry> docFiles, string fileExtension)
         {
@@ -42,7 +42,7 @@ namespace Rudine.Interpreters
 
             return !string.IsNullOrWhiteSpace(context.Request.Params[Parm.RelayUrl])
                        ? // Is this request coming in from a "proxying listener"?
-                       string.Format("{0}{1}",
+                       string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}{1}",
                            context.Request.Params[Parm.RelayUrl],
                            href.Substring(href.IndexOf(context.Request.ApplicationPath, StringComparison.Ordinal) + context.Request.ApplicationPath.Length))
                        : href;
@@ -53,7 +53,7 @@ namespace Rudine.Interpreters
             string basePath = _uri.Query.Length > 0
                                   ? _uri.AbsoluteUri.Substring(_uri.AbsoluteUri.LastIndexOf('/') + 1).Replace(_uri.Query, "")
                                   : _uri.AbsoluteUri;
-            string href = new Uri(string.Format("{0}/{1}/{2}/{3}/{4}",
+            string href = new Uri(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/{1}/{2}/{3}/{4}",
                 _uri.Query.Length > 0
                     ? _uri
                         .AbsoluteUri
@@ -151,7 +151,7 @@ namespace Rudine.Interpreters
         public abstract string GetDescription(string DocTypeName);
 
         public static string GetFilename(DocProcessingInstructions _DocProcessingInstructions, string ContentFileExtension = null) =>
-            string.Format(
+            string.Format(System.Globalization.CultureInfo.InvariantCulture,
                 "{0}.{1}",
                 FileSystem.CleanFileName(_DocProcessingInstructions.DocTitle)
                           .Trim(),

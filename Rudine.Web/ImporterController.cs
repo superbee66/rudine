@@ -151,7 +151,7 @@ namespace Rudine.Web
             return _CreateTemplatesList;
         }
 
-        internal static string GetDocDirectoryPath(string DocTypeName, params string[] subfoldersAndOrFilename) => string.Format(
+        internal static string GetDocDirectoryPath(string DocTypeName, params string[] subfoldersAndOrFilename) => string.Format(System.Globalization.CultureInfo.InvariantCulture,
             @"{0}\{1}\{2}",
             DirectoryPath,
             DocTypeName,

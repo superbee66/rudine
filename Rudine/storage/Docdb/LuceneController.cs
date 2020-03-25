@@ -99,7 +99,7 @@ namespace Rudine.Storage.Docdb
                     DocId,
                     RelayUrl,
                     _LightDoc.LogSequenceNumber);
-                _LightDoc.DocTitle += string.Format(" (modified {0})",
+                _LightDoc.DocTitle += string.Format(System.Globalization.CultureInfo.InvariantCulture," (modified {0})",
                     _LightDoc.DocSubmitDate.ToString("g"));
                 _Audit.Add(_LightDoc);
             }
@@ -185,7 +185,7 @@ namespace Rudine.Storage.Docdb
             string _DocPropertyFields = KeysToPredicate(DocProperties);
             string _keywords = string.IsNullOrWhiteSpace(KeyWord)
                                    ? string.Empty
-                                   : string.Format("+{0}:{1}*",
+                                   : string.Format(System.Globalization.CultureInfo.InvariantCulture,"+{0}:{1}*",
                                        Parm.DocData,
                                        KeyWord.Trim(' ', '*'));
 
@@ -209,7 +209,7 @@ namespace Rudine.Storage.Docdb
                 _DocKeyFields,
                 _DocPropertyFields,
                 _keywords
-            }.Where(m => !string.IsNullOrWhiteSpace(m) && m != "+()").Select(m => string.Format("{0}", m)).ToArray());
+            }.Where(m => !string.IsNullOrWhiteSpace(m) && m != "+()").Select(m => string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", m)).ToArray());
 
             using (KeywordAnalyzer _KeywordAnalyzer = new KeywordAnalyzer())
             using (PerFieldAnalyzerWrapper _PerFieldAnalyzerWrapper = new PerFieldAnalyzerWrapper(_KeywordAnalyzer))
@@ -304,11 +304,11 @@ namespace Rudine.Storage.Docdb
         {
             return DocTypes == null && DocTypes.Count > 0
                        ? string.Empty
-                       : string.Format(DocTypes.Count == 1
+                       : string.Format(System.Globalization.CultureInfo.InvariantCulture,DocTypes.Count == 1
                                            ? "+{0}"
                                            : "+({0})",
                            string.Join(" OR ",
-                               DocTypes.Select(m => string.Format("{0}:\"{1}\"",
+                               DocTypes.Select(m => string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}:\"{1}\"",
                                                    FieldName,
                                                    m))));
         }
@@ -318,7 +318,7 @@ namespace Rudine.Storage.Docdb
             return Keys == null
                        ? string.Empty
                        : string.Join(" ",
-                           Keys.Keys.Cast<string>().Select(m => string.Format("{0}",
+                           Keys.Keys.Cast<string>().Select(m => string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}",
                                                                KeysToPredicate(m,
                                                                    Keys[m]))).ToArray());
         }
@@ -369,14 +369,14 @@ namespace Rudine.Storage.Docdb
             }
 
             FileInfo _FileInfo = new FileInfo(
-                string.Format("{0}.{1}", RequestPaths.GetPhysicalApplicationPath(
+                string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.{1}", RequestPaths.GetPhysicalApplicationPath(
 
                         new[] { "doc_db", _BaseDoc.DocTypeName }
                             .Union(
                         _BaseDoc
                             .DocIdKeys
                             .OrderBy(m => m.Key)
-                            .Select(m => StringTransform.PrettyMsSqlIdent(string.Format("{0} {1}", FileSystem.CleanFileName(m.Key), FileSystem.CleanFileName(m.Value))))
+                            .Select(m => StringTransform.PrettyMsSqlIdent(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0} {1}", FileSystem.CleanFileName(m.Key), FileSystem.CleanFileName(m.Value))))
                             ).ToArray()
 
                         ),

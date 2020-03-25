@@ -11,7 +11,7 @@ namespace Rudine.Tests
     public class InputTypeMapping
     {
         static string PropertyTypeNameEnd(Type t) =>
-           string.Format("_{0}", string.Join("_",
+           string.Format(System.Globalization.CultureInfo.InvariantCulture,"_{0}", string.Join("_",
                    new[]
                    {
                        (Nullable.GetUnderlyingType(t) ?? t).Name,

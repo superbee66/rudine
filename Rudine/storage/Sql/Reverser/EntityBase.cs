@@ -134,12 +134,12 @@ namespace Rudine.Storage.Sql.Reverser
         /// <summary>
         ///     Write formatted text directly into the generated output
         /// </summary>
-        public void Write(string format, params object[] args) { Write(string.Format(CultureInfo.CurrentCulture, format, args)); }
+        public void Write(string format, params object[] args) { Write(string.Format(System.Globalization.CultureInfo.InvariantCulture, format, args)); }
 
         /// <summary>
         ///     Write formatted text directly into the generated output
         /// </summary>
-        public void WriteLine(string format, params object[] args) { WriteLine(string.Format(CultureInfo.CurrentCulture, format, args)); }
+        public void WriteLine(string format, params object[] args) { WriteLine(string.Format(System.Globalization.CultureInfo.InvariantCulture, format, args)); }
 
         /// <summary>
         ///     Raise an error

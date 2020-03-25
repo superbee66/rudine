@@ -32,7 +32,7 @@ namespace Rudine
         ///     4yqztpwf, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]' in assembly 'mscorlib, Version=4.0.0.0,
         ///     Culture=neutral, PublicKeyToken=b77a5c561934e089'."
         /// </summary>
-        internal static readonly Regex VALID_CSHARP_NAMESPACE_PART_MATCH = new Regex(String.Format(@"({0}[A-Z0-9_]+\.)+(({1}[A-Z0-9_]+)\.*)+", DOCTYPENAME_NS_PREFIX, DOCREV_NS_PREFIX));
+        internal static readonly Regex VALID_CSHARP_NAMESPACE_PART_MATCH = new Regex(string.Format(System.Globalization.CultureInfo.InvariantCulture,@"({0}[A-Z0-9_]+\.)+(({1}[A-Z0-9_]+)\.*)+", DOCTYPENAME_NS_PREFIX, DOCREV_NS_PREFIX));
 
         /// <summary>
         ///     Anything not alpha-numeric, underscore or single period; double periods will also invalidate (match)
@@ -45,7 +45,7 @@ namespace Rudine
         /// <param name="DocRev"></param>
         /// <param name="AdditionalRootNames"></param>
         /// <returns>namespace & class dot notation</returns>
-        public static string CalcCSharpFullName(string DocTypeName, string DocRev, params string[] AdditionalRootNames) { return string.Format("{0}.{1}", CalcCSharpNamespace(DocTypeName, DocRev, AdditionalRootNames), DocTypeName); }
+        public static string CalcCSharpFullName(string DocTypeName, string DocRev, params string[] AdditionalRootNames) { return string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.{1}", CalcCSharpNamespace(DocTypeName, DocRev, AdditionalRootNames), DocTypeName); }
 
         /// <summary>
         ///     Creates a namespace (each DocType, DocRev & it's children reside in a dedicated namespace) that is suitable for
@@ -62,12 +62,12 @@ namespace Rudine
         {
             Validate(DocTypeName, DocRev, AdditionalRootNames);
 
-            string[] DocTypeNameParts = DocTypeName.Split('.').Select(s => String.Format("{0}{1}", DOCTYPENAME_NS_PREFIX, s)).ToArray();
-            string[] RevParts = DocRev.Split('.').Select(s => String.Format("{0}{1}", DOCREV_NS_PREFIX, s)).ToArray();
+            string[] DocTypeNameParts = DocTypeName.Split('.').Select(s => string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}{1}", DOCTYPENAME_NS_PREFIX, s)).ToArray();
+            string[] RevParts = DocRev.Split('.').Select(s => string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}{1}", DOCREV_NS_PREFIX, s)).ToArray();
             string[] OtherParts = AdditionalRootNames == null
                                       ? new string[]
                                           { }
-                                      : AdditionalRootNames.Where(s => !String.IsNullOrWhiteSpace(s)).Select(s => String.Format("{0}{1}", ADDITIONAL_NS_PREFIX, StringTransform.SafeIdentifier(s ?? "_"))).ToArray();
+                                      : AdditionalRootNames.Where(s => !String.IsNullOrWhiteSpace(s)).Select(s => string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}{1}", ADDITIONAL_NS_PREFIX, StringTransform.SafeIdentifier(s ?? "_"))).ToArray();
 
             return String.Join(".", DocTypeNameParts.Concat(RevParts).Concat(OtherParts));
         }
@@ -88,7 +88,7 @@ namespace Rudine
 
             Validate(DocTypeName, solutionVersion);
 
-            return string.Format("urn:{0}", CalcCSharpNamespace(DocTypeName, solutionVersion));
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture,"urn:{0}", CalcCSharpNamespace(DocTypeName, solutionVersion));
         }
 
         internal static bool TryParseDocNameAndRev(string NamespaceOrTypeFullname, out string DocTypeName, out string DocRev)
@@ -106,16 +106,16 @@ namespace Rudine
             Version _Version;
             // validate arguments
             if (INVALID_CSHARP_NAMESPACE_PART_MATCH.IsMatch(DocTypeName) | String.IsNullOrWhiteSpace(DocTypeName))
-                throw new ArgumentException(String.Format("\"{0}\" is not a valid DocTypeName for namespace code generation operations"), DocTypeName);
+                throw new ArgumentException(string.Format(System.Globalization.CultureInfo.InvariantCulture,"\"{0}\" is not a valid DocTypeName for namespace code generation operations"), DocTypeName);
 
             if (INVALID_CSHARP_NAMESPACE_PART_MATCH.IsMatch(DocRev) | !Version.TryParse(DocRev, out _Version))
-                throw new ArgumentException(String.Format("\"{0}\" is not a valid DocRev for namespace code generation operations"), DocRev);
+                throw new ArgumentException(string.Format(System.Globalization.CultureInfo.InvariantCulture,"\"{0}\" is not a valid DocRev for namespace code generation operations"), DocRev);
 
             if (AdditionalRootNames != null)
                 foreach (string test in AdditionalRootNames)
                     if (!String.IsNullOrWhiteSpace(test))
                         if (INVALID_CSHARP_NAMESPACE_PART_MATCH.IsMatch(test))
-                            throw new ArgumentException(String.Format("\"{0}\" is not valid for namespace code generation operations"), test);
+                            throw new ArgumentException(string.Format(System.Globalization.CultureInfo.InvariantCulture,"\"{0}\" is not valid for namespace code generation operations"), test);
         }
     }
 }

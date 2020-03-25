@@ -55,7 +55,7 @@ namespace Rudine.Web.Util
         public static string PrettyCSharpIdent(string original, int characters = int.MaxValue) =>
             CollapseUnderscores(PrettyMsSqlIdent(
                 Regex.IsMatch(original[0].ToString(), "[^a-z_]", RegexOptions.IgnoreCase)
-                    ? string.Format("var{0}", original)
+                    ? string.Format(System.Globalization.CultureInfo.InvariantCulture,"var{0}", original)
                     : original, characters));
 
         /// <summary>

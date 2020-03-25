@@ -45,7 +45,7 @@ namespace Rudine.Web.Util
         public static T Cache<T>(Func<T> itemFactory, bool forcedRefresh = false, string cacheKey = null) where T : class
         {
             if (string.IsNullOrWhiteSpace(cacheKey))
-                cacheKey = string.Format("{0}", typeof(T));
+                cacheKey = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", typeof(T));
 
             if (!_MemoryCache.Contains(cacheKey) || forcedRefresh)
                 _MemoryCache[cacheKey] = itemFactory.Invoke() ?? _MemoryCacheNullEntry;
@@ -70,7 +70,7 @@ namespace Rudine.Web.Util
             string.Join(
                 "__",
                 cacheKeyParts.Select(o =>
-                    string.Format("{0}",
+                    string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}",
                         o.GetType().IsArray && ((object[]) o).Length > 0
                             ? MakeKey(((Array) o).Cast<object>())
                             : o)));

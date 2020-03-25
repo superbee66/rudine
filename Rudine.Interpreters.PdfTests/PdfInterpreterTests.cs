@@ -29,7 +29,7 @@ namespace Rudine.Interpreters.PdfTests
                     {
                         Bytes = _PdfInterpreter.WritePI( Resources.BaseLineOpenOffice4, pi  ),
                         ModDate = DateTime.Now,
-                        Name = string.Format("{0}.pdf", nameof(Resources.BaseLineOpenOffice4))
+                        Name = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.pdf", nameof(Resources.BaseLineOpenOffice4))
                     }
                 });
 

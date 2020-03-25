@@ -56,7 +56,7 @@ namespace Rudine.Storage.Sql
             Type _BaseDocType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes().Where(t => t.Namespace == myNamespace && t.BaseType == typeof(BaseDoc))).FirstOrDefault();
 
             if (_BaseDocType == null)
-                throw new Exception(string.Format("{0} can't resolve it's own {1}.[*:BaseDoc]", GetType().FullName, myNamespace));
+                throw new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0} can't resolve it's own {1}.[*:BaseDoc]", GetType().FullName, myNamespace));
 
             BaseDoc _BaseDoc = (BaseDoc)Activator.CreateInstance(_BaseDocType);
 
@@ -94,14 +94,14 @@ namespace Rudine.Storage.Sql
             base.OnModelCreating(modelBuilder);
         }
 
-        private static string dCFormDBContextTypeName(BaseDoc baseDoc) { return String.Format("{0}_Db", baseDoc.DocTypeName); }
+        private static string dCFormDBContextTypeName(BaseDoc baseDoc) { return string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}_Db", baseDoc.DocTypeName); }
 
         public static SqlDbContext CreateInstance(BaseDoc _BaseDoc)
         {
             Type _BaseDocType = _BaseDoc.GetType();
             string _DbContextTypeName = dCFormDBContextTypeName(_BaseDoc);
 
-            string cSharpCode = string.Format(@"
+            string cSharpCode = string.Format(System.Globalization.CultureInfo.InvariantCulture,@"
             namespace {0} {{
                 public class {1} : {2}.{3} {{
                     public {1}() : base( ) {{
@@ -117,7 +117,7 @@ namespace Rudine.Storage.Sql
                 typeof(SqlDbMigrationsConfiguration<DbContext>).Namespace);
 
             // add using statements to beginning to top of the document
-            cSharpCode = string.Join("", Runtime.USING_NAMESPACES.Keys.OrderBy(ns => ns).Select(ns => string.Format("using {0};\n", ns))) + cSharpCode;
+            cSharpCode = string.Join("", Runtime.USING_NAMESPACES.Keys.OrderBy(ns => ns).Select(ns => string.Format(System.Globalization.CultureInfo.InvariantCulture,"using {0};\n", ns))) + cSharpCode;
 
             //TODO:Separate the dCFormDBContextTypeName from the BaseDoc assembly/code-gen. Runtime-compiled BaseDocs & SqlDbContext code placement organization needs to be rethought thru better. 
             return (SqlDbContext)Activator

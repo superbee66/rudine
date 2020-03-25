@@ -70,7 +70,7 @@ namespace Rudine.Util
             return !s.Equals(SlaveAppDomainFriendlyName());
         }
 
-        private string SlaveAppDomainFriendlyName() { return string.Format("{0}_Slave", typeof(T).Name); }
+        private string SlaveAppDomainFriendlyName() { return string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}_Slave", typeof(T).Name); }
 
         public void Dispose()
         {

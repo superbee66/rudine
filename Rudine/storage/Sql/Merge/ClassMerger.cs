@@ -146,7 +146,7 @@ namespace Rudine.Storage.Sql.Merge
 
             if (!classes.ContainsKey(signature))
             {
-                string typeFullName = string.Format("{0}.{1}", nameSpace, typeName);
+                string typeFullName = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.{1}", nameSpace, typeName);
                 TypeBuilder _TypeBuilder = parrent == null
                                                ? module.DefineType(typeFullName, TypeAttributes.Class | TypeAttributes.Public)
                                                : module.DefineType(typeFullName, TypeAttributes.Class | TypeAttributes.Public, parrent);
@@ -179,7 +179,11 @@ namespace Rudine.Storage.Sql.Merge
                 baseType = DefaultBaseType(sourceTypes);
 
             if (string.IsNullOrWhiteSpace(newClassName))
-                newClassName = DefaultClassName(sourceTypes, prettyNames);
+                newClassName = string.Join("_",
+                    sourceTypes
+                    .Select(t => prettyNames ? pretty(t.Name) : t.Name)
+                    .Distinct()
+                    .OrderBy(s => s));
 
             return Generate(nameSpace, newClassName,
                 ConsolidatePropertyNames(
@@ -269,9 +273,9 @@ namespace Rudine.Storage.Sql.Merge
                         dic[propName] = typeC;
                 }
                 else if (dic.ContainsKey(propName) && dic[propName].hasConvert() != _ClassProperty.PropertyType.hasConvert())
-                    throw new Exception(string.Format("Property {0} is defined as both a primitive value data type & complex reference type amount properties defined in parent types {1}; automatic union of these property types can't be performed.", propName, string.Join(", ", sourceTypes.Select(t => t.FullName).ToArray())));
+                    throw new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,"Property {0} is defined as both a primitive value data type & complex reference type amount properties defined in parent types {1}; automatic union of these property types can't be performed.", propName, string.Join(", ", sourceTypes.Select(t => t.FullName).ToArray())));
                 else if (dic.ContainsKey(propName) && dic[propName].isEnumeratedType() != _ClassProperty.PropertyType.isEnumeratedType())
-                    throw new Exception(string.Format("Property {0} is defined as both a Enumerable & Non-Enumerable properties defined in parent types {1}; automatic union of these property types can't be performed.", propName, string.Join(", ", sourceTypes.Select(t => t.FullName).ToArray())));
+                    throw new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,"Property {0} is defined as both a Enumerable & Non-Enumerable properties defined in parent types {1}; automatic union of these property types can't be performed.", propName, string.Join(", ", sourceTypes.Select(t => t.FullName).ToArray())));
                 else if (_ClassProperty.PropertyType == typeof(byte[]) || _ClassProperty.PropertyType == typeof(string))
                     dic[propName] = _ClassProperty.PropertyType;
                 else if (!dic.ContainsKey(propName))
@@ -351,16 +355,6 @@ namespace Rudine.Storage.Sql.Merge
                              .ToArray(),
                            targets.Union(exclusions ?? new Type[] { }).ToArray())
                              .Union(targets).Distinct().ToArray();
-        }
-
-        private string DefaultClassName(Type[] sourceTypes, bool prettyNames = true)
-        {
-            return string.Join("_",
-             sourceTypes
-             .Select(t => prettyNames ? pretty(t.Name) : t.Name)
-             .Distinct()
-             .OrderBy(s => s));
-
         }
 
         private static Type DefaultBaseType(Type[] sourceTypes)

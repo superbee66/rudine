@@ -57,7 +57,7 @@ namespace Rudine.Storage.Docdb
 
                 // searches items returned will in reverse chronological order
                 _Document.Add(new Field(Parm.LogSequenceNumber,
-                    string.Format("{0}", _LightDoc.LogSequenceNumber),
+                    string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", _LightDoc.LogSequenceNumber),
                     Field.Store.YES,
                     Field.Index.NOT_ANALYZED));
 
@@ -97,7 +97,7 @@ namespace Rudine.Storage.Docdb
                 //TODO:Find a more elegant way of making the documents DocKeys search-able. Currently they are simply concatenated to the DocData
                 _Document.Add(
                     new Field(Parm.DocData,
-                        string.Format(@"{0}\n\r{1}", _Term.Text, _Text),
+                        string.Format(System.Globalization.CultureInfo.InvariantCulture,@"{0}\n\r{1}", _Term.Text, _Text),
                         Field.Store.NO,
                         Field.Index.ANALYZED,
                         Field.TermVector.WITH_POSITIONS_OFFSETS));
@@ -118,7 +118,7 @@ namespace Rudine.Storage.Docdb
                     _Document.Add(
                         new Field(
                             p.Name,
-                            string.Format("{0}", p.GetValue(_BaseDoc, null)),
+                            string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", p.GetValue(_BaseDoc, null)),
                             p.Name == Parm.DocChecksum || p.Name == Parm.DocStatus
                                 ? Field.Store.YES
                                 : Field.Store.NO,

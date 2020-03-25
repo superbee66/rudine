@@ -56,7 +56,7 @@ namespace Rudine.Web
                 context.Response.ClearContent();
                 context.Response.Status = "405 Method Not Allowed";
                 context.Response.StatusCode = 405;
-                context.Response.StatusDescription = string.Format("A request was made of a resource using a request method not supported by that resource; {0} supports on HEAD & GET verbs.", DirectoryName);
+                context.Response.StatusDescription = string.Format(System.Globalization.CultureInfo.InvariantCulture,"A request was made of a resource using a request method not supported by that resource; {0} supports on HEAD & GET verbs.", DirectoryName);
                 context.Response.TrySkipIisCustomErrors = true;
             }
             else
@@ -66,7 +66,7 @@ namespace Rudine.Web
 
                 //EXAMPLE:http://theWebServer.progablab.com/applicationDir/SubDir
                 baseAbsoluteUri =
-                    string.Format("{0}/{1}", context.Request.Url.AbsoluteUri.Replace(
+                    string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/{1}", context.Request.Url.AbsoluteUri.Replace(
                         context.Request.Url.AbsoluteUri.Substring(
                             context.Request.Url.AbsoluteUri.IndexOf(
                                 context.Request.ApplicationPath,
@@ -82,7 +82,7 @@ namespace Rudine.Web
 
                 // the relay is not located on the a client box, the relay is hosted threw the same application as the core itself
                 if (_HttpWebRequest_Url.StartsWith("/"))
-                    _HttpWebRequest_Url = string.Format("{0}{1}", baseAbsoluteUri.Substring(0, baseAbsoluteUri.Length - DirectoryName.Length).TrimEnd('/'), _HttpWebRequest_Url);
+                    _HttpWebRequest_Url = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}{1}", baseAbsoluteUri.Substring(0, baseAbsoluteUri.Length - DirectoryName.Length).TrimEnd('/'), _HttpWebRequest_Url);
 
                 HttpWebRequest _HttpWebRequest = (HttpWebRequest)WebRequest.Create(_HttpWebRequest_Url);
                 _HttpWebRequest.Proxy = null;
@@ -116,7 +116,7 @@ namespace Rudine.Web
             if (_GetRelayUrlFound == string.Empty)
                 if (File.Exists(RequestPaths.GetPhysicalApplicationPath(DirectoryName, "web.config")))
                 {
-                    string path = string.Format("{0}/{1}", RequestPaths.ApplicationPath, DirectoryName);
+                    string path = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/{1}", RequestPaths.ApplicationPath, DirectoryName);
                     if (path.ToLower().StartsWith("http"))
                         _GetRelayUrlFound = path;
                 }
@@ -136,13 +136,13 @@ namespace Rudine.Web
             {
                 // try parse from explicit set in the MyName\web.config
                 if (string.IsNullOrWhiteSpace(FormHandlerUrl))
-                    FormHandlerUrl = string.Format("{0}", ConfigurationManager.AppSettings["ServiceUrl"]);
+                    FormHandlerUrl = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", ConfigurationManager.AppSettings["ServiceUrl"]);
 
                 // try parse from WCF service address in the App root by search for something that references IPB.svc
 
                 string webconfigXml = File.ReadAllText(RequestPaths.GetPhysicalApplicationPath("web.config"));
                 if (string.IsNullOrWhiteSpace(FormHandlerUrl))
-                    FormHandlerUrl = string.Format("{0}", FormHandlerUrlParse.Match(webconfigXml).Value);
+                    FormHandlerUrl = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", FormHandlerUrlParse.Match(webconfigXml).Value);
 
                 // make sure the URL is pretty and escaped
                 if (!string.IsNullOrWhiteSpace(FormHandlerUrl))

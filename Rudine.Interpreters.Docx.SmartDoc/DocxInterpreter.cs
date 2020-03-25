@@ -32,7 +32,7 @@ namespace Rudine.Interpreters.Docx.SmartDoc
             {
                 writer.WriteProcessingInstruction(
                     typeof(DocxInterpreter).Name.ToLower(),
-                    string.Format(
+                    string.Format(System.Globalization.CultureInfo.InvariantCulture,
                         XML_PROCESSING_INSTRUCTIONS_FORMAT,
                         pi.GetDocId(),
                         pi.DocTitle,
@@ -45,7 +45,7 @@ namespace Rudine.Interpreters.Docx.SmartDoc
             }
         };
 
-        private static readonly string parseReadDocTypeName_PATTEN = string.Format(@"(<?{0} [^>]+ DocTypeName="")(?<DocTypeName>\w+)([^>]+>)", typeof(DocxInterpreter).Name.ToLower());
+        private static readonly string parseReadDocTypeName_PATTEN = string.Format(System.Globalization.CultureInfo.InvariantCulture,@"(<?{0} [^>]+ DocTypeName="")(?<DocTypeName>\w+)([^>]+>)", typeof(DocxInterpreter).Name.ToLower());
 
         public override ContentInfo ContentInfo =>
             new ContentInfo

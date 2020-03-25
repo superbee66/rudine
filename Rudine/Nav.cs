@@ -80,12 +80,12 @@ namespace Rudine
                 RelayUrl = ReverseProxy.GetRelayUrl();
 
             return string.IsNullOrWhiteSpace(RelayUrl)
-                       ? string.Format("{0}/DocDataHandler.ashx?&DocTypeName={1}&{2}={3}&LogSequenceNumber={4}",
+                       ? string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/DocDataHandler.ashx?&DocTypeName={1}&{2}={3}&LogSequenceNumber={4}",
                            RelayUrl, DocTypeName,
                            Parm.DocId,
                            DocId,
                            LogSequenceNumber)
-                       : string.Format("{0}/DocDataHandler.ashx?{6}={4}&DocTypeName={1}&{2}={3}&LogSequenceNumber={5}",
+                       : string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/DocDataHandler.ashx?{6}={4}&DocTypeName={1}&{2}={3}&LogSequenceNumber={5}",
                            RelayUrl,
                            DocTypeName,
                            Parm.DocId,
@@ -115,12 +115,12 @@ namespace Rudine
                 string DocTypeName = BaseDoc.DocTypeName;
 
                 _Url = string.IsNullOrWhiteSpace(RelayUrl)
-                                 ? string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}",
+                                 ? string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}",
                                      RequestPaths.ApplicationPath,
                                      DocTypeName,
                                      Parm.DocBin,
                                      HttpUtility.UrlEncode(Compressor.CompressToBase64String(BaseDoc.ToBytes())))
-                                 : string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}&{4}={5}",
+                                 : string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}&{4}={5}",
                                      RelayUrl,
                                      DocTypeName,
                                      Parm.DocBin,
@@ -132,7 +132,7 @@ namespace Rudine
                 //REF:http://support.microsoft.com/kb/208427
                 if (_Url.Length > 2083)
                 {
-                    string _CacheKey = HttpUtility.UrlEncode(string.Format("{0}.{1}", DocTypeName, _Url.GetHashCode()));
+                    string _CacheKey = HttpUtility.UrlEncode(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.{1}", DocTypeName, _Url.GetHashCode()));
 
                     if (HttpRuntime.Cache[_CacheKey] == null)
                         HttpRuntime.Cache.Insert(_CacheKey,
@@ -142,12 +142,12 @@ namespace Rudine
                             TimeSpan.FromMinutes(10));
 
                     _Url = string.IsNullOrWhiteSpace(RelayUrl)
-                               ? string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}",
+                               ? string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}",
                                    RequestPaths.ApplicationPath,
                                    DocTypeName,
                                    Parm.DocCache,
                                    _CacheKey)
-                               : string.Format("{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}&{4}={5}",
+                               : string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/DocDataHandler.ashx?DocTypeName={1}&{2}={3}&{4}={5}",
                                    RelayUrl,
                                    DocTypeName,
                                    Parm.DocCache,

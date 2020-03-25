@@ -53,7 +53,7 @@ namespace Rudine.Web.Util
                 if (exceptionSuppressed)
                     return false;
 
-                string msg = string.Format("{0} not writable by {2}, verify directory attributes & permissions", directory.FullName, WindowsIdentity.GetCurrent().Name);
+                string msg = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0} not writable by {2}, verify directory attributes & permissions", directory.FullName, WindowsIdentity.GetCurrent().Name);
 
                 throw ex is UnauthorizedAccessException
                           ? new UnauthorizedAccessException(msg, ex)

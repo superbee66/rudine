@@ -34,7 +34,7 @@ namespace Rudine.Tests.help
         //public string text(object seed = null, int min = 1, int max = 50) {
         //    int minwordcount = int32(new[] { seed }, min, max);
         //    int maxwordcount = int32(new[] { seed, seed }, minwordcount, max);
-        //    return regex.matches(randomtext, string.format(@"(\w+[^\w]+){{{0},{1}}}", minwordcount, maxwordcount)).cast<match>().orderby(m => int32(new[] { seed, m })).firstordefault().tostring();
+        //    return regex.matches(randomtext, string.Format(System.Globalization.CultureInfo.InvariantCulture,@"(\w+[^\w]+){{{0},{1}}}", minwordcount, maxwordcount)).cast<match>().orderby(m => int32(new[] { seed, m })).firstordefault().tostring();
         //}
 
         public Guid guid(object seed = null)
@@ -82,7 +82,7 @@ namespace Rudine.Tests.help
                             if (!typeof(IDictionary).IsAssignableFrom(srcType))
 
                                 if (srcType == typeof(string))
-                                    src = (T)(object)string.Format("{0} string property placeholder", StringTransform.Wordify(srcType.Name));
+                                    src = (T)(object)string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0} string property placeholder", StringTransform.Wordify(srcType.Name));
                                 else if (srcType.IsEnum)
                                 {
                                     Array enums = Enum.GetValues(srcType);

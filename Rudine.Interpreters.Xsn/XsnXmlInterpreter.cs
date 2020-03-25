@@ -240,7 +240,7 @@ namespace Rudine.Interpreters.Xsn
         }
 
         private static string ParseAttributeValue(string DocData, string attributeName) =>
-            Regex.Match(DocData, string.Format("(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline)
+            Regex.Match(DocData, string.Format(System.Globalization.CultureInfo.InvariantCulture,"(?<={0}=\")(.*?)(?=\")", attributeName), RegexOptions.Singleline)
                  .Value;
 
         //BUG:<DocTypeName> may have hyphens & will not change when InfoPath designer changes the root node in the editor
@@ -365,7 +365,7 @@ namespace Rudine.Interpreters.Xsn
         public override DocProcessingInstructions ReadDocPI(string SrcDocXml)
         {
             DocProcessingInstructions _DocProcessingInstructions = new DocProcessingInstructions();
-            Regex _DocIdRegEx = new Regex(string.Format(parseRegex, "DocId"));
+            Regex _DocIdRegEx = new Regex(string.Format(System.Globalization.CultureInfo.InvariantCulture,parseRegex, "DocId"));
             XmlDocument _XmlDocument = new XmlDocument();
             _XmlDocument.LoadXml(SrcDocXml);
 
@@ -380,7 +380,7 @@ namespace Rudine.Interpreters.Xsn
                     .Select(m => new
                     {
                         property = m,
-                        matcher = new Regex(string.Format(parseRegex, m.Name))
+                        matcher = new Regex(string.Format(System.Globalization.CultureInfo.InvariantCulture,parseRegex, m.Name))
                     }))
                     if (_Kv.property.CanWrite)
                         if (_Kv.matcher.IsMatch(_XmlProcessingInstruction.InnerText))
@@ -448,7 +448,7 @@ namespace Rudine.Interpreters.Xsn
                 docXml,
                 @"(<my:)([^>]+)(>)(0|false)(</my:)(\2)(>)",
                 match => templateDocXml.IndexOf(match.Groups[0].Value) == -1 // checking the template.xml for existence of the matched element
-                             ? string.Format("{0}{1}{2}{3}{4}{5}", match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value, match.Groups[5].Value, match.Groups[6].Value, match.Groups[7].Value)
+                             ? string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}{1}{2}{3}{4}{5}", match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value, match.Groups[5].Value, match.Groups[6].Value, match.Groups[7].Value)
                              : match.Groups[0].Value,
                 RegexOptions.Singleline | RegexOptions.Multiline);
         }
@@ -467,7 +467,7 @@ namespace Rudine.Interpreters.Xsn
         private XmlWriter WriteInfoPathProcessingInstructions(DocProcessingInstructions pi, XmlWriter _XmlTextWriter)
         {
             _XmlTextWriter.WriteProcessingInstruction("mso-infoPathSolution",
-                string.Format(
+                string.Format(System.Globalization.CultureInfo.InvariantCulture,
                     mso_infoPathSolution,
                     pi.solutionVersion ?? TemplateController.Instance.TopDocRev(pi.DocTypeName),
                     pi.href,
@@ -480,7 +480,7 @@ namespace Rudine.Interpreters.Xsn
                 _XmlTextWriter.WriteProcessingInstruction("mso-infoPath-file-attachment-present", string.Empty);
 
             _XmlTextWriter.WriteProcessingInstruction("ipb-application",
-                string.Format(ipb_application,
+                string.Format(System.Globalization.CultureInfo.InvariantCulture,ipb_application,
                     pi.GetDocId(),
                     pi.DocTitle,
                     pi.DocTypeName,
@@ -491,7 +491,7 @@ namespace Rudine.Interpreters.Xsn
         }
 
         public override string WritePI(string DocData, DocProcessingInstructions _ManifestInfo) =>
-            string.Format(
+            string.Format(System.Globalization.CultureInfo.InvariantCulture,
                 "{0}{1}",
                 WriteText(_ManifestInfo),
                 Regex.Replace(DocData, XmlProcessingInstructionMatch, ""));
@@ -608,7 +608,7 @@ namespace Rudine.Interpreters.Xsn
                                                                             .Trim(':')));
                         else
                             foreach (PropertyInfo p in t.GetProperties())
-                                if (Regex.IsMatch(_T, string.Format(@"\b(?=\w){0}\b(?!\w)", p.Name)))
+                                if (Regex.IsMatch(_T, string.Format(System.Globalization.CultureInfo.InvariantCulture,@"\b(?=\w){0}\b(?!\w)", p.Name)))
                                     FieldErrors.Add(StringTransform.Wordify(p.Name)
                                                                    .Trim()
                                                                    .Trim(':'));
@@ -616,7 +616,7 @@ namespace Rudine.Interpreters.Xsn
                     if (FieldErrors.Count > 0)
                     {
                         string ValidationMessageMarkDown =
-                            string.Format(
+                            string.Format(System.Globalization.CultureInfo.InvariantCulture,
                                 "\t\t{0}",
                                 string.Join("\r\n\t\t", FieldErrors.Where(m => !string.IsNullOrWhiteSpace(m))
                                                                    .Distinct()));
@@ -625,7 +625,7 @@ namespace Rudine.Interpreters.Xsn
                         ValidationMessages.Clear();
 
                         throw new Exception(
-                            string.Format(
+                            string.Format(System.Globalization.CultureInfo.InvariantCulture,
                                 "TODO:Put back this validation message from repo as I deleted the resx on accident",
                                 ValidationMessagesCount,
                                 ValidationMessageMarkDown));

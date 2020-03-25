@@ -39,7 +39,7 @@ namespace Rudine.Tests
 
             foreach (string path in DirectoriesToDelete)
                 if (Directory.Exists(path))
-                    throw new Exception(string.Format("{0} can't be deleted, TestInitialize ResetPersistedItems method can't finished", path));
+                    throw new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0} can't be deleted, TestInitialize ResetPersistedItems method can't finished", path));
 
             //ensure everything is cleared from memory based cache
             foreach (string cacheKey in MemoryCache.Default.Select(kvp => kvp.Key)
@@ -64,7 +64,7 @@ namespace Rudine.Tests
                     {
                         Bytes = Bytes(docTypeName),
                         ModDate = DateTime.Now,
-                        Name = string.Format("{0}.{1}", docTypeName, Extension(docTypeName))
+                        Name = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}.{1}", docTypeName, Extension(docTypeName))
                     }
                 });
 

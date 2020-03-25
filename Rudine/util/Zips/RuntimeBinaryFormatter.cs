@@ -80,7 +80,7 @@ namespace Rudine.Util.Zips
                         }
                     }
                     if (t == null)
-                        throw new Exception(string.Format("{0} can't be resolved for binary serialization", typeFullname));
+                        throw new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0} can't be resolved for binary serialization", typeFullname));
 
                     BinaryDeserializationTypeDictionary[typeFullname] = t;
                 }

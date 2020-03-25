@@ -89,7 +89,7 @@ namespace Rudine.Storage.Sql
                                               checksum ^= p.ColumnAttribute.Name.ToLower().GetHashCode() ^ p.DataTypeName.GetHashCode();
                                       }
 
-                                      return string.Format(
+                                      return string.Format(System.Globalization.CultureInfo.InvariantCulture,
                                           "{0}_{1}",
                                           _BaseDoc.DocTypeName,
                                           Base36.Encode(Math.Abs(checksum)));

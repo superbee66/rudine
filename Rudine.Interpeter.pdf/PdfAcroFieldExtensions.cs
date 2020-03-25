@@ -38,7 +38,7 @@ namespace Rudine.Interpreters.Pdf
         private static CompositePropertyAndValue asCompositePropertyAndValue(PdfAcroField o)
         {
             Type _Type = GetPdfFieldType(o);
-            string _Value = string.Format("{0}", o.Value);
+            string _Value = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", o.Value);
             DateTime _DateTime;
             DateTime.TryParse(_Value, out _DateTime);
 
@@ -52,9 +52,9 @@ namespace Rudine.Interpreters.Pdf
             return new CompositePropertyAndValue(
                 _PdfCheckBoxField.NameofCSharpProperty(),
                 typeof(bool),
-                string.Format("{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.CheckedName)
+                string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.CheckedName)
                     ? true
-                    : string.Format("{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.UncheckedName)
+                    : string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", _PdfCheckBoxField.Value).Equals(_PdfCheckBoxField.UncheckedName)
                         ? (ValueType)false
                         : null);
         }
@@ -133,7 +133,7 @@ namespace Rudine.Interpreters.Pdf
         {
             List<string> _Paths = new List<string>();
             foreach (var _Element in o.Elements)
-                _Paths.AddRange(getPaths((dynamic)_Element, string.Format("{0}", parrentPath)));
+                _Paths.AddRange(getPaths((dynamic)_Element, string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", parrentPath)));
             return _Paths.Distinct().ToArray();
         }
 
@@ -141,16 +141,16 @@ namespace Rudine.Interpreters.Pdf
             getPaths((dynamic)o.Value, parrentPath);
 
         private static string[] getPaths(PdfName o, string parrentPath = null) =>
-            new[] { string.Format("{0}/{1}", parrentPath, o.Value) };
+            new[] { string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/{1}", parrentPath, o.Value) };
 
         private static string[] getPaths(PdfString o, string parrentPath = null) =>
-            new[] { string.Format("{0}/{1}", parrentPath, o.Value) };
+            new[] { string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}/{1}", parrentPath, o.Value) };
 
         private static string[] getPaths(PdfDictionary o, string parrentPath = null)
         {
             List<string> _Paths = new List<string>();
             foreach (KeyValuePair<string, PdfItem> _Element in o.Elements.Where(e => _pathsOfInterest.Any(p => p == e.Key)))
-                _Paths.AddRange(getPaths((dynamic)_Element.Value, string.Format("{0}{1}", parrentPath, _Element.Key)));
+                _Paths.AddRange(getPaths((dynamic)_Element.Value, string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}{1}", parrentPath, _Element.Key)));
             return _Paths.Distinct().ToArray();
         }
 

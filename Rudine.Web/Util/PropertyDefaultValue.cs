@@ -29,7 +29,7 @@ namespace Rudine.Web.Util
                 foreach (PropertyInfo p in t.GetProperties())
                     if (p.CanRead)
                         if (p.CanWrite)
-                            defaults[t][p.Name] = string.Format("{0}", p.PropertyType.GetDefault());
+                            defaults[t][p.Name] = string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", p.PropertyType.GetDefault());
             }
 
             // HACK: It was observed that a compare of Int32 values comparing, both set to zero where not equal for some reason. Since we know anything to compare will translate into a string easily this proves to be the bast option to compare them considering we are dealing with nulls
@@ -37,7 +37,7 @@ namespace Rudine.Web.Util
             return
                 defaults[t][PropertyName]
                     .Equals(
-                        string.Format("{0}", PropertyValue ?? t.GetProperty(PropertyName).GetValue(o, null)));
+                        string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", PropertyValue ?? t.GetProperty(PropertyName).GetValue(o, null)));
         }
 
         /// <summary>

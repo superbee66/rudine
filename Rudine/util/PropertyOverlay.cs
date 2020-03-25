@@ -66,8 +66,8 @@ namespace Rudine.Util
                             }
 
                             // old school serializable object properties such as dates always had a partner property that ended with the word Specified 
-                            if (props.Any(m => m.Name == string.Format("{0}Specified", p.Name)))
-                                props.First(m => m.Name == string.Format("{0}Specified", p.Name)).SetValue(bottom, !bottom.IsDefaultValue(p), null);
+                            if (props.Any(m => m.Name == string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}Specified", p.Name)))
+                                props.First(m => m.Name == string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}Specified", p.Name)).SetValue(bottom, !bottom.IsDefaultValue(p), null);
                         }
                     }
 

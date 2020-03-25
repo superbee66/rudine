@@ -48,7 +48,7 @@ namespace Rudine.Storage.Docdb
                                                                ? DocInterpreter.Instance.Read((byte[]) _Document.AsDocSubmissions().Last().Value)
                                                                : DocInterpreter.Instance.Read((string) _Document.AsDocSubmissions().Last().Value);
 
-                                        Debug.WriteLine(string.Format(_BaseDoc.DocTitle, "Rebuild"));
+                                        Debug.WriteLine(string.Format(System.Globalization.CultureInfo.InvariantCulture,_BaseDoc.DocTitle, "Rebuild"));
 
                                         // last step on the "Document -> AsDocSubmissions -> *****AsDocument*****" conversions is where storage efficiencies are gained with each release of this assembly
                                         _CurrentIndexWriter.UpdateDocument(_BaseDoc.docTermFromBaseDoc(), _DocSubmissions.AsDocument());

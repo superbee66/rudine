@@ -98,7 +98,7 @@ namespace Rudine.Interpreters
             {
                 new XmlSerializer(baseDoc.GetType()).Serialize(_XmlTextWriter, baseDoc);
                 return _StringWriter.ToString()
-                                    .GetHashCode() ^ string.Format("{0}", docStatus).GetHashCode();
+                                    .GetHashCode() ^ string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", docStatus).GetHashCode();
             }
         }
 
@@ -148,7 +148,7 @@ namespace Rudine.Interpreters
                     //TODO:Need a better way of discovering what IDocDataInterpreter can process the given document; it needs to consider the DocRev also
                     if (_IDocDataInterpreter.Processable(DocTypeName, DocRev))
                         return _IDocDataInterpreter;
-                throw new Exception(String.Format("{0} {1}, {2} could not locate a DocDataInterpreter to process the data passed", DocTypeName, DocRev, typeof(DocInterpreter).Name));
+                throw new Exception(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0} {1}, {2} could not locate a DocDataInterpreter to process the data passed", DocTypeName, DocRev, typeof(DocInterpreter).Name));
             }, false, "InstanceLocatorByName", DocTypeName, DocRev ?? String.Empty);
 
         private static DocTextInterpreter LocateInstance(string DocData)
@@ -275,7 +275,7 @@ namespace Rudine.Interpreters
                 context.Response.ContentType = _DocBaseInterpreter.ContentInfo.ContentType;
                 context.Response.AddHeader(
                            "content-disposition",
-                           string.Format(
+                           string.Format(System.Globalization.CultureInfo.InvariantCulture,
                                "attachment; filename=\"{0}\";",
                                DocBaseInterpreter.GetFilename(_DocProcessingInstructions, context.Request.Params["ContentFileExtension"])));
             }

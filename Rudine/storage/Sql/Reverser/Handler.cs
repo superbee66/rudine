@@ -113,8 +113,8 @@ namespace Rudine.Storage.Sql.Reverser
                 {
                     // Post VS2010 builds use a different structure for mapping
                     XmlNode setMapping = mappingDoc.ChildNodes[0].NamespaceURI == "http://schemas.microsoft.com/ado/2009/11/mapping/cs"
-                                             ? mappingDoc.SelectSingleNode(string.Format("//ef:EntitySetMapping[@Name=\"{0}\"]/ef:EntityTypeMapping/ef:MappingFragment", entitySet.Name), namespaceManager)
-                                             : mappingDoc.SelectSingleNode(string.Format("//ef:EntitySetMapping[@Name=\"{0}\"]", entitySet.Name), namespaceManager);
+                                             ? mappingDoc.SelectSingleNode(string.Format(System.Globalization.CultureInfo.InvariantCulture,"//ef:EntitySetMapping[@Name=\"{0}\"]/ef:EntityTypeMapping/ef:MappingFragment", entitySet.Name), namespaceManager)
+                                             : mappingDoc.SelectSingleNode(string.Format(System.Globalization.CultureInfo.InvariantCulture,"//ef:EntitySetMapping[@Name=\"{0}\"]", entitySet.Name), namespaceManager);
 
                     string tableName = setMapping.Attributes["StoreEntitySet"].Value;
                     EntitySet tableSet = tableSets.Single(s => s.Name == tableName);
@@ -122,7 +122,7 @@ namespace Rudine.Storage.Sql.Reverser
                     Dictionary<EdmProperty, EdmProperty> propertyMappings = new Dictionary<EdmProperty, EdmProperty>();
                     foreach (EdmProperty prop in entitySet.ElementType.Properties)
                     {
-                        XmlNode propMapping = setMapping.SelectSingleNode(string.Format("./ef:ScalarProperty[@Name=\"{0}\"]", prop.Name), namespaceManager);
+                        XmlNode propMapping = setMapping.SelectSingleNode(string.Format(System.Globalization.CultureInfo.InvariantCulture,"./ef:ScalarProperty[@Name=\"{0}\"]", prop.Name), namespaceManager);
                         string columnName = propMapping.Attributes["ColumnName"].Value;
                         EdmProperty columnProp = tableSet.ElementType.Properties[columnName];
 
@@ -143,7 +143,7 @@ namespace Rudine.Storage.Sql.Reverser
                 namespaceManager.AddNamespace("ef", mappingDoc.ChildNodes[0].NamespaceURI);
                 foreach (AssociationSet associationSet in associationSets.Where(a => !a.ElementType.AssociationEndMembers.Where(e => e.RelationshipMultiplicity != RelationshipMultiplicity.Many).Any()))
                 {
-                    XmlNode setMapping = mappingDoc.SelectSingleNode(string.Format("//ef:AssociationSetMapping[@Name=\"{0}\"]", associationSet.Name), namespaceManager);
+                    XmlNode setMapping = mappingDoc.SelectSingleNode(string.Format(System.Globalization.CultureInfo.InvariantCulture,"//ef:AssociationSetMapping[@Name=\"{0}\"]", associationSet.Name), namespaceManager);
                     string tableName = setMapping.Attributes["StoreEntitySet"].Value;
                     EntitySet tableSet = tableSets.Single(s => s.Name == tableName);
 
@@ -151,7 +151,7 @@ namespace Rudine.Storage.Sql.Reverser
                     foreach (AssociationSetEnd end in associationSet.AssociationSetEnds)
                     {
                         Dictionary<EdmMember, string> propertyToColumnMappings = new Dictionary<EdmMember, string>();
-                        XmlNode endMapping = setMapping.SelectSingleNode(string.Format("./ef:EndProperty[@Name=\"{0}\"]", end.Name), namespaceManager);
+                        XmlNode endMapping = setMapping.SelectSingleNode(string.Format(System.Globalization.CultureInfo.InvariantCulture,"./ef:EndProperty[@Name=\"{0}\"]", end.Name), namespaceManager);
                         foreach (XmlNode fk in endMapping.ChildNodes)
                         {
                             string propertyName = fk.Attributes["Name"].Value;

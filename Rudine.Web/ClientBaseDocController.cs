@@ -125,7 +125,7 @@ namespace Rudine.Web
         /// <param name="DocTypeName"></param>
         /// <returns></returns>
         private MethodInfo GetMethodInfo(DocCmd MethodPrefix) =>
-            _UnderlyingControllerType.GetMethod(string.Format("{0}", MethodPrefix));
+            _UnderlyingControllerType.GetMethod(string.Format(System.Globalization.CultureInfo.InvariantCulture,"{0}", MethodPrefix));
 
         public override DocTypeInfo Info(string DocTypeName) =>
             CacheMan.Cache(() =>
